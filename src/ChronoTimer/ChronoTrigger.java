@@ -12,6 +12,8 @@ package ChronoTimer;
 	  \/_____/   \/_/ /_/   \/_____/   \/_/ \/_/   \/_____/        \/_/   \/_/ /_/   \/_/   \/_____/   \/_____/   \/_____/   \/_/ /_/ 
 	*/
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ChronoTrigger 
 {
@@ -82,4 +84,23 @@ public class ChronoTrigger
 		
 	}
 	
+	private class Channel{
+		private boolean on = false;
+		private Set<String> validTypes;
+		private String sensorType;
+		
+		private Channel(){
+			validTypes.add("EYE");
+			validTypes.add("GATE");
+			validTypes.add("PAD");}
+		
+		private void toggle(){on = !on;}
+		
+		private void connect(String t) throws IllegalArgumentException{
+			if (!validTypes.contains(t)) throw new IllegalArgumentException("Cannot connect sensor with type '"+t+"'");
+			sensorType=t;}
+		
+		private boolean trigger(){
+			return on && sensorType != null;}
+	}
 }
