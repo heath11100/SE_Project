@@ -1,6 +1,10 @@
 package ChronoTimer;
+
+import java.time.ZonedDateTime;
+
 /**
  * The Class ChronoTime.
+ * @author - Casey Van Groll
  */
 public class ChronoTime {
 	
@@ -8,13 +12,6 @@ public class ChronoTime {
 		Range: [0, MAX_TIME]. */
 	private int _currentTime;
 	private static final int MAX_TIME = 8639999; // [0:0:0.0, 23:59:59.99]
-	
-	/** The tick amount in hundredths of seconds.
-	 * 	Defaults to 1. */
-	private int _tickAmount = 1;
-	
-	/** Toggle to enable tick. */
-	private boolean _running;
 	
 	/**
 	 * Instantiates a new time.
@@ -56,8 +53,6 @@ public class ChronoTime {
 		}
 		catch(Exception e){throw new InvalidTimeException("Malformed String passed to ChronoTime constructor: "+e.getMessage());}
 	}
-	
-	
 
 	/**
 	 * Instantiates a new time.
@@ -71,27 +66,6 @@ public class ChronoTime {
 	public ChronoTime(int hours, int minutes, int seconds, int hundredths) throws InvalidTimeException {
 		this((minutes+hours*60)+":"+seconds+"."+hundredths);
 	}
-
-	/**
-	 * Sets the tick amount.
-	 * @param hundredths the new tick amount
-	 * @throws InvalidTimeException if parameter is outside of range [1-MAX_TIME]
-	 */
-	public void setTickAmount(int hundredths) throws InvalidTimeException {
-		if (hundredths < 1 || hundredths > MAX_TIME) throw new InvalidTimeException("Invalid tick amount.");
-		_tickAmount = hundredths;}
-
-	/** Starts clock. */
-	public void start() {_running=true;}
-
-	/** Increased _currentTime by _tickAmount. */
-	public void tick() {
-		if (_running) _currentTime += _tickAmount;
-		// wrap
-		if (_currentTime > MAX_TIME) _currentTime %= (MAX_TIME + 1);}
-
-	/** Stops clock. */
-	public void stop() {_running=false;}
 
 	/**
 	 * Calculates how much time has elapsed since the parameter time.
@@ -143,6 +117,10 @@ public class ChronoTime {
 		return hours+":"+minutes+":"+seconds+"."+remaining;
 	}
 
+	public static ChronoTime now() throws InvalidTimeException{
+		ZonedDateTime t = ZonedDateTime.now();
+		return new ChronoTime(t.getHour(), t.getMinute(), t.getSecond(), t.getNano()/10000000);}
+	
 	
 	/**
 	 * We will consider two ChronoTimes as equal if their times are equal.

@@ -1,6 +1,4 @@
 package ChronoTimer;
-
-import ChronoTimer.*;
 import junit.framework.TestCase;
 
 public class TestChronoTime extends TestCase{
@@ -80,42 +78,6 @@ public class TestChronoTime extends TestCase{
 		catch (Exception e){assertTrue(e instanceof InvalidTimeException);}
 		try {t1 = new ChronoTime("matt damon rulez");}
 		catch (Exception e){assertTrue(e instanceof InvalidTimeException);}
-	}
-	
-	public void testTick() throws InvalidTimeException{
-		
-		t1 = new ChronoTime("00:00:00");
-		t1.start();
-		t1.tick();
-		assertEquals("tick is wrong",t1, new ChronoTime(0,0,0,1));
-		t1.setTickAmount(100);
-		t1.tick();
-		assertEquals("tick is wrong",t1, new ChronoTime(0,0,1,1));
-		t1.setTickAmount(6000);
-		t1.tick();
-		assertEquals("tick is wrong",t1, new ChronoTime(0,1,1,1));
-		t1.setTickAmount(360000);
-		t1.tick();
-		assertEquals("tick is wrong",t1, new ChronoTime(1,1,1,1));
-		
-		try {t1.setTickAmount(360000000);}
-		catch (Exception e){assertTrue(e instanceof InvalidTimeException);}
-		try {t1.setTickAmount(-125);}
-		catch (Exception e){assertTrue(e instanceof InvalidTimeException);}
-		
-		t1 = new ChronoTime(23,59,59,99);
-		t1.start();
-		t1.tick();
-		assertEquals("tick is wrong", t1, new ChronoTime(0,0,0,0));
-		t1.setTickAmount(8639999);
-		t1.tick();
-		assertEquals("tick is wrong", t1, new ChronoTime(23,59,59,99));
-		t1.setTickAmount(5000);
-		t1.tick();
-		assertEquals("tick is wrong", t1, new ChronoTime(0,0,49,99));
-		t1.stop();
-		t1.tick();
-		assertEquals("stop is wrong", t1, new ChronoTime(0,0,49,99));
 	}
 	
 	//Helpers
