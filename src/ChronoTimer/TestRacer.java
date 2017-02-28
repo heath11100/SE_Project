@@ -1,10 +1,11 @@
 package ChronoTimer;
 
 import junit.framework.TestCase;
+import org.junit.Test;
 
 //NB: I am assuming we have a constructor that takes a bib number
 
-public class TestRacer extends TestCase{
+public class TestRacer extends TestCase {
 
 	Racer r1,r2,r3,r4,r5;
 	ChronoTime t1,t2,t3;
@@ -15,12 +16,17 @@ public class TestRacer extends TestCase{
 		r2 = new Racer(2);
 	}
 	
+	@Test
 	public void testConstructorInvalidArgs(){
 		//handle invalid bib numbers? (negative, maximum)?
 		try	{r3 = new Racer(-1);}
 		catch(Exception e){assertTrue(e instanceof IllegalArgumentException);}
-		try	{r4 = new Racer(83291294);}
-		catch(Exception e){assertTrue(e instanceof IllegalArgumentException);}
+		/*
+		 * TODO:
+		 * I don't see a reason to restrict a racer to a maximum number
+		 */
+//		try	{r4 = new Racer(83291294);}
+//		catch(Exception e){assertTrue(e instanceof IllegalArgumentException);}
 		
 		assertEquals(r1.getNumber(), 1);
 		assertEquals(r1.getStatus(), Racer.Status.QUEUED);
@@ -28,6 +34,7 @@ public class TestRacer extends TestCase{
 		assertEquals(r2.getStatus(), Racer.Status.QUEUED);
 	}
 	
+	@Test
 	public void testStartAndFinish() throws InvalidTimeException{
 		t1 = new ChronoTime(0,0,0,0);
 		t2 = new ChronoTime(1,0,0,0);
@@ -39,6 +46,7 @@ public class TestRacer extends TestCase{
 		assertEquals(r1.getStatus(), Racer.Status.FINISHED);
 	}
 	
+	@Test
 	public void testIStartAndFinishInvalidArgs() throws InvalidTimeException{
 		//allow equal start and stop times?
 		t1 = new ChronoTime(0,0,0,0);
@@ -55,6 +63,7 @@ public class TestRacer extends TestCase{
 		// r2.finish(t1);  is this allowed???
 	}
 	
+	@Test
 	public void testDNF() throws InvalidTimeException{
 		t1 = new ChronoTime(0,0,0,0);
 		r1.start(t1);
@@ -63,6 +72,7 @@ public class TestRacer extends TestCase{
 		assertEquals(r1.getStatus(), Racer.Status.DNF);
 	}
 	
+	@Test
 	public void testCancel() throws InvalidTimeException{
 		t1 = new ChronoTime(0,0,0,0);
 		r1.start(t1);
@@ -71,7 +81,7 @@ public class TestRacer extends TestCase{
 		assertEquals(r1.getStatus(), Racer.Status.QUEUED);
 	}
 	
-	
+	@Test
 	public void testInvalidOrder() throws InvalidTimeException{
 		t1 = new ChronoTime(0,0,0,0);
 		t2 = new ChronoTime(1,0,0,0);
