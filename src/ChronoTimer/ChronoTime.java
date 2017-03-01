@@ -29,12 +29,14 @@ public class ChronoTime {
 		if (tokens.length == 3){
 			hours = Integer.parseInt(tokens[0]);
 			minutes = Integer.parseInt(tokens[1]);
-			seconds = Integer.parseInt(tokens[2]);}
-		else if (tokens.length == 4){
-			hours = Integer.parseInt(tokens[0]);
-			minutes = Integer.parseInt(tokens[1]);
-			seconds = Integer.parseInt(tokens[2]);
-			hundredths = Integer.parseInt(tokens[3]);}
+			String[] t2 = tokens[2].split("\\.");
+			if (t2.length == 1)
+				seconds = Integer.parseInt(tokens[2]);
+			else{
+				seconds = Integer.parseInt(t2[0]);
+				hundredths = Integer.parseInt(t2[1]);
+			}
+		}
 		//format 2
 		else if (tokens.length == 2){
 			String[] t2 = tokens[1].split("\\.");
@@ -87,6 +89,16 @@ public class ChronoTime {
 		end += MAX_TIME + 1;
 		return new ChronoTime(0,0,0,end-start);
 	}
+	
+	/**
+	 * Calculates if one time is before another.
+	 * 
+	 * @param other the time to compare against
+	 * @return true if this time is before other time
+	 */
+	public boolean isBefore(ChronoTime other){
+		return _currentTime < other._currentTime;}
+	
 
 	/**
 	 * Gets this time as a timestamp.
