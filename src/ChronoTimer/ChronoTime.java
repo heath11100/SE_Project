@@ -30,6 +30,11 @@ public class ChronoTime {
 			hours = Integer.parseInt(tokens[0]);
 			minutes = Integer.parseInt(tokens[1]);
 			seconds = Integer.parseInt(tokens[2]);}
+		else if (tokens.length == 4){
+			hours = Integer.parseInt(tokens[0]);
+			minutes = Integer.parseInt(tokens[1]);
+			seconds = Integer.parseInt(tokens[2]);
+			hundredths = Integer.parseInt(tokens[3]);}
 		//format 2
 		else if (tokens.length == 2){
 			String[] t2 = tokens[1].split("\\.");
