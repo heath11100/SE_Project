@@ -125,6 +125,7 @@ public class ChronoTrigger
 	{
 		System.exit(0);
 	}
+	//hello
 	
 	private class Channel{
 		private boolean on = false;
