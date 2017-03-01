@@ -30,12 +30,12 @@ public class ChronoTrigger
 		try {
 			officialTime = new ChronoTime(in);
 		} catch (InvalidTimeException e) {
-			System.out.println("invalid Start time");
+			System.out.println(e);
 		}
 		try {
 			startTime = new ChronoTime(in);
-		} catch (InvalidTimeException e) {
-			System.out.println("invalid Start time");
+		} catch (InvalidTimeException b) {
+			System.out.println(b);
 		}
 	}
 	//sets time
@@ -44,7 +44,7 @@ public class ChronoTrigger
 		try {
 			officialTime = new ChronoTime(hor,min,sec,hun);
 		} catch (InvalidTimeException e) {
-			System.out.println("not valid time");
+			System.out.println(e);
 		}
 	}
 	//toggles channel
@@ -79,9 +79,9 @@ public class ChronoTrigger
 			try {
 				races[curRace].finishNextRacer(officialTime);
 			} catch (InvalidRaceStateException e) {
-				System.out.println("This race doesn't exist");
+				System.out.println(e);
 			} catch (InvalidTimeException e) {
-				System.out.println("This time is not valid");
+				System.out.println(e);
 			}
 		}
 	}
@@ -99,7 +99,7 @@ public class ChronoTrigger
 		try {
 			races[curRace].add(num);
 		} catch (DuplicateRacerException e) {
-			System.out.println("Duplicate Racer");
+			System.out.println(e);
 		}
 	}
 	public void finRace()
@@ -107,7 +107,7 @@ public class ChronoTrigger
 		try {
 			races[curRace].endRace(this.officialTime);
 		} catch (InvalidTimeException e) {
-			System.out.println("the officialTime isnt working");
+			System.out.println(e);
 		}
 	}
 	public void printCurRace()
