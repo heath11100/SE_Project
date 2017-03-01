@@ -139,6 +139,7 @@ public class Simulator {
 		}
 		else
 		{
+			report("using console commands");
 			input = new Scanner(System.in);
 		}
 		
@@ -237,7 +238,7 @@ public class Simulator {
 						break;
 					case "NUM":
 						report(COMMAND.NUM.word);
-						if(tokens[cToken].matches(RUNNERFORMAT))
+						if(tokens[cToken++].matches(RUNNERFORMAT))
 						{
 							
 						}
@@ -246,7 +247,7 @@ public class Simulator {
 						break;
 					case "CLR":
 						report(COMMAND.CLR.word);	//not a cancel command
-						if(tokens[cToken].matches(RUNNERFORMAT))
+						if(tokens[cToken++].matches(RUNNERFORMAT))
 						{
 							
 						}
@@ -267,7 +268,7 @@ public class Simulator {
 					case "TRIG":
 						report(COMMAND.TRIG.word);
 						//I think toggle is the command used here?
-						if(tokens[cToken].matches(CHANNELFORMAT))
+						if(tokens[cToken++].matches(CHANNELFORMAT))
 							;//sim.toggle(Integer.parseInt(tokens[cToken++]));
 						else
 							throw new InvalidCommandException("channel format, trig");
