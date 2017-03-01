@@ -23,11 +23,7 @@ public class ChronoTrigger
 	private ChronoTime officialTime, startTime;
 	private Race[] races = new Race[8];
 	private int curRace = 0;
-	
-	public ChronoTrigger()
-	{
-		
-	}
+
 	//setup that allows you to set the Official Time
 	public ChronoTrigger(String in)
 	{
