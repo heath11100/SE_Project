@@ -120,7 +120,10 @@ public class Simulator {
 		String cCmd = ""; //current command, more like the current parsing token, but i like ccmd so sue me
 		String tokens[] = {""};
 		int cToken = 0;
+		
 		ChronoTime cTime;
+		cTime = null;
+		
 		ChronoTrigger sim = null;
 		if(args.length != 1 && args.length != 0)
 		{
@@ -181,6 +184,7 @@ public class Simulator {
 					}
 					else
 					{
+						//cTime = ;;
 						//WARNING this needs to be implemented in CronoTime b4 this will compile
 						//cTime = new ChronoTime(new Time())//will redefine this
 					}
@@ -191,7 +195,7 @@ public class Simulator {
 						report(COMMAND.POWER.word);
 						//I think this is what we want
 						if(sim == null)
-							;//sim = new CronoTrigger(cTime);
+							sim = new ChronoTrigger(cTime);
 						else
 							sim = null;
 						break;
@@ -202,12 +206,12 @@ public class Simulator {
 						break;
 					case "RESET":
 						report(COMMAND.RESET.word);
-						//sim.reset();
+						;//sim = new ChronoTrigger(cTime);
 						break;
 					case "TIME":
 						report(COMMAND.TIME.word);
 						if(tokens[cToken].matches(TIMEFORMAT))
-							;//sim.setTime(new CronoTime(tokens[cToken++]);
+							;//sim.setTime(cTime, new ChronoTime(tokens[cToken++]);
 						else
 							throw new InvalidCommandException("TimeFormat, time");
 						break;
@@ -241,7 +245,7 @@ public class Simulator {
 						break;
 					case "NUM":
 						report(COMMAND.NUM.word);
-						if(tokens[cToken++].matches(RUNNERFORMAT))
+						if(tokens[cToken].matches(RUNNERFORMAT))
 						{
 							
 						}
@@ -250,7 +254,7 @@ public class Simulator {
 						break;
 					case "CLR":
 						report(COMMAND.CLR.word);	//not a cancel command
-						if(tokens[cToken++].matches(RUNNERFORMAT))
+						if(tokens[cToken].matches(RUNNERFORMAT))
 						{
 							
 						}
@@ -271,7 +275,7 @@ public class Simulator {
 					case "TRIG":
 						report(COMMAND.TRIG.word);
 						//I think toggle is the command used here?
-						if(tokens[cToken++].matches(CHANNELFORMAT))
+						if(tokens[cToken].matches(CHANNELFORMAT))
 							;//sim.toggle(Integer.parseInt(tokens[cToken++]));
 						else
 							throw new InvalidCommandException("channel format, trig");
@@ -301,7 +305,7 @@ public class Simulator {
 				} 
 				catch (InvalidTimeException ex) {
 					// TODO Auto-generated catch block
-					report("incorrect time format");
+					report("error: incorrect time format");
 				} 
 				catch (InvalidCommandException ex) {
 					// TODO Auto-generated catch block
@@ -309,7 +313,7 @@ public class Simulator {
 					fparse = true;
 				}
 				if(cToken != tokens.length)
-					report("too many characters");
+					report("error: too many characters");
 			}
 			
 		}
