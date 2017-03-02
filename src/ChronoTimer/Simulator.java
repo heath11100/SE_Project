@@ -203,14 +203,14 @@ public class Simulator {
 						break;
 					case "TIME":
 						report(COMMAND.TIME.word);
-						if(tokens[cToken].matches(TIMEFORMAT))
+						if(tokens[cToken++].matches(TIMEFORMAT))
 							;//sim.setTime(new CronoTime(tokens[cToken++]);
 						else
 							throw new InvalidCommandException("TimeFormat, time");
 						break;
 					case "TOG":
 						report(COMMAND.TOG.word);
-						if(tokens[cToken].matches(CHANNELFORMAT))
+						if(tokens[cToken++].matches(CHANNELFORMAT))
 							;//sim.setTime(new CronoTime(tokens[cToken++]);
 						else
 							throw new InvalidCommandException("channel format, tog");
@@ -223,6 +223,12 @@ public class Simulator {
 						break;
 					case "EVENT": 
 						report(COMMAND.EVENT.word);
+						if(tokens[cToken++].matches(EVENTFORMAT))
+						{
+							
+						}
+						else
+							throw new InvalidCommandException("event format, event");
 						break;
 					case "NEWRUN": 
 						report(COMMAND.NEWRUN.word);
@@ -302,7 +308,7 @@ public class Simulator {
 				} 
 				catch (InvalidCommandException ex) {
 					// TODO Auto-generated catch block
-					report(ex.getMessage());
+					report("error: " + ex.getMessage());
 					fparse = true;
 				}
 				if(cToken != tokens.length)
