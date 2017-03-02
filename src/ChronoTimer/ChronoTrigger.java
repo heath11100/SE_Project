@@ -59,15 +59,16 @@ public class ChronoTrigger
 		officialTime = t;
 	}
 	//disconnects sensor
-	public void disSensor(int channel)
+	public void disSensor(ChronoTime t, int channel)
 	{
+		officialTime = t;
 		//for future
 	}
 	//triggers sensor
-	public void triggerSensor(int c)
+	public void triggerSensor(ChronoTime t, int c)
 	{
-		
-		if(c == 1 &&channels[c].trigger())
+		officialTime = t;
+		if(c == 1 && channels[c].trigger())
 		{
 			try {
 				races[curRace].startNextRacer(officialTime);
@@ -86,33 +87,38 @@ public class ChronoTrigger
 			}
 		}
 	}
-	public void newRace(EventType event)
+	public void newRace(ChronoTime t, EventType event)
 	{
+		officialTime = t;
 		races[curRace] = new Race(event);
 	}
-	public void changeRace(int i)
+	public void changeRace(ChronoTime t, int i)
 	{
+		officialTime = t;
 		if(i < 9 && i > 0)
 			curRace=i;
 	}
-	public void addRacer(int num)
+	public void addRacer(ChronoTime t, int num)
 	{
+		officialTime = t;
 		try {
 			races[curRace].add(num);
 		} catch (DuplicateRacerException e) {
 			System.out.println(e);
 		}
 	}
-	public void finRace()
+	public void finRace(ChronoTime t)
 	{
+		officialTime = t;
 		try {
 			races[curRace].endRace(this.officialTime);
 		} catch (InvalidTimeException e) {
 			System.out.println(e);
 		}
 	}
-	public void printCurRace()
+	public void printCurRace(ChronoTime t)
 	{
+		officialTime = t;
 		races[curRace].printRace();
 	}
 	//returns officialTime
