@@ -27,7 +27,7 @@ public class Simulator {
 	//Ryan Thorne
 	//2/23/2017
 	//ver 0.2
-	//commit comment
+	//commit 
 	static final String COMMANDFORMAT = "((POWER)|(EXIT)|(RESET)|(TIME)|(TOG)|(CONN)|(DISC)|(EVENT)|(NEWRUN)|(ENDRUN)|(PRINT)|(EXPORT)|(NUM)|(CLR)|(SWAP)|(DNF)|(CANCEL)|(TRIG)|(START)|(FINISH))";
 	
 	/**
