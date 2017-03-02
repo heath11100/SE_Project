@@ -11,11 +11,10 @@ package ChronoTimer;
 	 \ \_____\  \ \_\ \_\  \ \_____\  \ \_\\"\_\  \ \_____\       \ \_\  \ \_\ \_\  \ \_\  \ \_____\  \ \_____\  \ \_____\  \ \_\ \_\ 
 	  \/_____/   \/_/ /_/   \/_____/   \/_/ \/_/   \/_____/        \/_/   \/_/ /_/   \/_/   \/_____/   \/_____/   \/_____/   \/_/ /_/ 
 	*/
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 
 import ChronoTimer.Race.EventType;
+import Exceptions.InvalidTimeException;
 
 public class ChronoTrigger 
 {
