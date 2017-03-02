@@ -24,18 +24,10 @@ public class ChronoTrigger
 	private int curRace = 0;
 
 	//setup that allows you to set the Official Time
-	public ChronoTrigger(ChronoTime t, String in)
+	public ChronoTrigger(ChronoTime t)
 	{
-		try {
-			officialTime = new ChronoTime(in);
-		} catch (InvalidTimeException e) {
-			System.out.println(e);
-		}
-		try {
-			startTime = new ChronoTime(in);
-		} catch (InvalidTimeException b) {
-			System.out.println(b);
-		}
+			officialTime = t;
+			startTime = t;
 	}
 	//sets time
 	public void setTime(ChronoTime t, int hor, int min, int sec, int hun)
@@ -49,8 +41,9 @@ public class ChronoTrigger
 	//toggles channel
 	public void toggle(ChronoTime t, int c)
 	{
-		channels[c].toggle();
 		officialTime = t;
+		channels[c].toggle();
+		
 	}
 	//connects sensor to channel
 	public void connectSensor(ChronoTime t, int c, String s)
