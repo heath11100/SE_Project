@@ -1,5 +1,7 @@
 package ChronoTimer;
 
+import Exceptions.InvalidTimeException;
+
 public class Racer {
 	/**
 	 * The time the Racer starts. 

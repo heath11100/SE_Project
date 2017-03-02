@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import Exceptions.InvalidCommandException;
+import Exceptions.InvalidTimeException;
+
 /*
 	 __    __     ______     ______   ______      _____     ______     __    __     ______     __   __     ______                     
 	/\ "-./  \   /\  __ \   /\__  _\ /\__  _\    /\  __-.  /\  __ \   /\ "-./  \   /\  __ \   /\ "-.\ \   /\  ___\                    

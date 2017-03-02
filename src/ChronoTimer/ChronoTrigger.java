@@ -14,6 +14,7 @@ package ChronoTimer;
 import java.util.Set;
 
 import ChronoTimer.Race.EventType;
+import Exceptions.InvalidTimeException;
 
 public class ChronoTrigger 
 {

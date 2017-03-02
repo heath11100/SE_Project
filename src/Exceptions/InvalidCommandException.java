@@ -1,6 +1,6 @@
-package ChronoTimer;
+package Exceptions;
 @SuppressWarnings("serial")
-class InvalidCommandException extends Exception
+public class InvalidCommandException extends Exception
 {
 	// setting a default constructor will take a message when it reports to the console
 	public InvalidCommandException(String message){ super(message);}

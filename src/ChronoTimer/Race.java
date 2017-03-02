@@ -1,6 +1,8 @@
 package ChronoTimer;
 import java.util.Queue;
 
+import Exceptions.InvalidTimeException;
+
 public class Race {
 	private Queue<Racer> queuedRacers;
 	private Queue<Racer> racingRacers;

@@ -1,4 +1,6 @@
-package ChronoTimer;
+package Tests;
+import ChronoTimer.ChronoTime;
+import Exceptions.InvalidTimeException;
 import junit.framework.TestCase;
 
 public class TestChronoTime extends TestCase{
