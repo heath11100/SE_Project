@@ -30,13 +30,11 @@ public class ChronoTrigger
 			startTime = t;
 	}
 	//sets time
-	public void setTime(ChronoTime t, int hor, int min, int sec, int hun)
+	public void setTime(ChronoTime t, ChronoTime s)
 	{
-		try {
-			officialTime = new ChronoTime(hor,min,sec,hun);
-		} catch (InvalidTimeException e) {
-			System.out.println(e);
-		}
+
+			officialTime = s;
+		
 	}
 	//toggles channel
 	public void toggle(ChronoTime t, int c)
