@@ -92,7 +92,7 @@ public class TestRace extends TestCase {
 	}
 	
 public void testRacerBeginAndFinish(){
-		
+
 		//what happens if racer begins/finishes before race begins?
 		//ra.nextRacerBegan(t1);
 		//ra.nextRacerFinished(t1);

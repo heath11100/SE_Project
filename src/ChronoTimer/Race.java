@@ -33,6 +33,11 @@ public class Race {
 		this(EventType.IND);
 	}
 	
+	
+	public void setEventType(EventType eType) {
+		this.eventType = eType;
+	}
+	
 	/**
 	 * Adds a racer to the queue of racers yet to start. 
 	 * This ensures that the racer is not a duplicate, if a duplicate racer is added an exception is thrown.
