@@ -213,6 +213,14 @@ public class Race {
 		}
 	}
 	
+	public void cancel(int racerNumber) {
+		
+	}
+	
+	public void didNotFinish(int racerNumber) {
+		
+	}
+	
 	enum EventType {
 		IND;
 	}
