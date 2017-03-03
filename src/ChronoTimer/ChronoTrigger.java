@@ -13,8 +13,11 @@ package ChronoTimer;
 	*/
 import java.util.Set;
 
+
+
 import ChronoTimer.Race.EventType;
 import Exceptions.InvalidTimeException;
+import Exceptions.RaceException;
 
 public class ChronoTrigger 
 {
@@ -22,6 +25,7 @@ public class ChronoTrigger
 	private ChronoTime officialTime, startTime;
 	private Race[] races = new Race[8];
 	private int curRace = 0;
+	private Printer log;
 	public ChronoTrigger()
 	{
 			try {
@@ -77,15 +81,19 @@ public class ChronoTrigger
 		{
 			try {
 				races[curRace].startNextRacer(officialTime);
-			} catch (InvalidRaceStateException e) {
-				System.out.println("This race doesn't exist");
+			} catch (RaceException e) {
+				System.out.println(e);
+			}
+			catch(InvalidTimeException e)
+			{
+				System.out.println(e);
 			}
 		}
 		if(c == 2 && channels[c].trigger())
 		{
 			try {
 				races[curRace].finishNextRacer(officialTime);
-			} catch (InvalidRaceStateException e) {
+			} catch (RaceException e) {
 				System.out.println(e);
 			} catch (InvalidTimeException e) {
 				System.out.println(e);
@@ -112,7 +120,7 @@ public class ChronoTrigger
 		officialTime = t;
 		try {
 			races[curRace].add(num);
-		} catch (DuplicateRacerException e) {
+		} catch (RaceException e) {
 			System.out.println(e);
 		}
 	}
