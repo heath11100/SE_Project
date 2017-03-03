@@ -213,6 +213,10 @@ public class Race {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param racerNumber
+	 */
 	public void cancel(int racerNumber) {
 		
 	}
