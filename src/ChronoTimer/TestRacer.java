@@ -24,6 +24,7 @@ public class TestRacer extends TestCase {
 		/*
 		 * TODO:
 		 * I don't see a reason to restrict a racer to a maximum number
+		 * Do 
 		 */
 //		try	{r4 = new Racer(83291294);}
 //		catch(Exception e){assertTrue(e instanceof IllegalArgumentException);}
