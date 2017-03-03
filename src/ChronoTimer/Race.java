@@ -1,7 +1,8 @@
 package ChronoTimer;
+import java.util.LinkedList;
 import java.util.Queue;
 
-import Exceptions.InvalidTimeException;
+import Exceptions.*;
 
 public class Race {
 	private Queue<Racer> queuedRacers;
@@ -18,6 +19,10 @@ public class Race {
 	 * @param eventType the type of event this race will be.
 	 */
 	public Race(EventType eventType) {
+		this.queuedRacers = new LinkedList<Racer>();
+		this.racingRacers = new LinkedList<Racer>();
+		this.finishedRacers = new LinkedList<Racer>();
+		
 		this.eventType = eventType;
 	}
 	
@@ -25,7 +30,7 @@ public class Race {
 	 * Initializes a race with no racers and event type IND.
 	 */
 	public Race() {
-		this.eventType = EventType.IND;
+		this(EventType.IND);
 	}
 	
 	/**
@@ -35,12 +40,12 @@ public class Race {
 	 * @param racer to be added to the list
 	 * @precondition the race has NOT began and racer does not already exist.
 	 */
-	void add(int racerNumber) throws DuplicateRacerException {
+	public void add(int racerNumber) throws RaceException {
 		Racer racer = new Racer(racerNumber);
 		if (this.finishedRacers.contains(racer) || 
 				this.racingRacers.contains(racer) || 
 				this.queuedRacers.contains(racer)) {
-			throw new DuplicateRacerException("Racer with that number already exists!");
+			throw new RaceException("Racer with that number already exists!");
 			
 		} else {
 			this.queuedRacers.add(racer);
@@ -54,13 +59,13 @@ public class Race {
 	 * @return the Racer that was removed, or null if no racer was found
 	 * @throws InvalidRacerException when a racer cannot be found with the given racerNumber.
 	 */
-	Racer remove(int racerNumber) throws InvalidRacerException {
+	public Racer remove(int racerNumber) throws RaceException {
 		Racer removedRacer = getRacer(racerNumber);
 		if (removedRacer != null) {
 			queuedRacers.remove(removedRacer);
 		}
 		else {
-			throw new InvalidRacerException("Racer does not exist with that number.");
+			throw new RaceException("Racer does not exist with that number.");
 		}
 		return removedRacer;
 	}
@@ -70,12 +75,30 @@ public class Race {
 	 * @param racerNumber corresponding to the racer to be deleted.
 	 * @return the Racer corresponding to racerNumber, or null if no racer was found
 	 */
-	private Racer getRacer(int racerNumber) {
+	public Racer getRacer(int racerNumber) {
 		Racer returnRacer = null;
 		for (Racer racer : queuedRacers) {
 			if (racer.getNumber() == racerNumber) {
 				returnRacer = racer;
 				break;
+			}
+		}
+		
+		if (returnRacer == null) {
+			for (Racer racer : racingRacers) {
+				if (racer.getNumber() == racerNumber) {
+					returnRacer = racer;
+					break;
+				}
+			}
+		}
+		
+		if (returnRacer == null) {
+			for (Racer racer : finishedRacers) {
+				if (racer.getNumber() == racerNumber) {
+					returnRacer = racer;
+					break;
+				}
 			}
 		}
 		return returnRacer;
@@ -87,11 +110,11 @@ public class Race {
 	 * @throws InvalidRaceStartException
 	 * @param withTime corresponds to the time of the race starting.
 	 */
-	void beginRace(ChronoTime startTime) throws InvalidTimeException {
+	public void beginRace(ChronoTime startTime) throws InvalidTimeException {
 		if (this.startTime == null) {
 			this.startTime = startTime;
 		} else {
-			throw new InvalidTimeException("Attempting to begin a race that already started.");
+			throw new InvalidTimeException("Race that already began - command canceled");
 		}
 	}
 	
@@ -100,7 +123,7 @@ public class Race {
 	 * @throws InvalidRaceEndException
 	 * @param withTime corresponding to the time the race ends.
 	 */
-	void endRace(ChronoTime endTime) throws InvalidTimeException{
+	public void endRace(ChronoTime endTime) throws InvalidTimeException{
 		if (this.startTime == null) {
 			throw new InvalidTimeException("Attempting to end a race that has not started.");
 		} else if (this.endTime != null) {
@@ -113,7 +136,7 @@ public class Race {
 	/**
 	 * Prints a list of all racers and their respective data to the console.
 	 */
-	void printRace() {
+	public void printRace() {
 		//Queued Racers
 		for (Racer racer : queuedRacers) {
 			String racerOutput = "Racer[" + racer.getNumber() + "] - Queued";
@@ -142,19 +165,28 @@ public class Race {
 	
 	/**
 	 * Adds the next queued racer to the race with start time atTime.
-	 * @precondition the race has already began
+	 * @precondition the race has already began, there is a racer to start
 	 * @param atTime the absolute time the next racer started
-	 * @throws InvalidRaceException when there is not another racer to start
+	 * @throws InvalidTimeException when the time the racer starts is before the race start time.
+	 * @throws InvalidRaceException when there is not another racer to start OR the race has not started
 	 */
-	void startNextRacer(ChronoTime atTime) throws InvalidRaceStateException {
+	public void startNextRacer(ChronoTime atTime) throws RaceException, InvalidTimeException {
 		Racer nextRacer = this.queuedRacers.remove();
-		if (nextRacer != null) {
-			//Then there is a racer to start.
+		
+		if (this.startTime == null) {
+			throw new RaceException("Attempting to start a racer when the race has not started!");
+		} else if (atTime.isBefore(this.startTime)) {
+			//Illegal time because the time the racer is starting is before the race start time
+			throw new InvalidTimeException("The Racer start time cannot be before the racer start time!");
+		} else if (nextRacer == null) {
+			throw new RaceException("Attempting to start next racer when there is no racer to start.");
+		} else {
+			/* Then: race has started
+			 * Racer is starting at or after the time the race started
+			 * There is another racer waiting in the queue.
+			 */
 			nextRacer.start(atTime);
 			this.racingRacers.add(nextRacer);
-			
-		} else {
-			throw new InvalidRaceStateException("Attempting to start next racer when there is no racer to start.");
 		}
 	}
 	
@@ -165,14 +197,14 @@ public class Race {
 	 * @throws InvalidRaceException when attempting to finish the next racer when there is not a racer in the race.
 	 * @throws InvalidTimeException when the racer's status is not RACING
 	 */
-	void finishNextRacer(ChronoTime atTime) throws InvalidRaceStateException, InvalidTimeException {
+	public void finishNextRacer(ChronoTime atTime) throws RaceException, InvalidTimeException {
 		Racer nextRacer = this.racingRacers.remove();
 		if (nextRacer != null) {
 			//Then there is a racer to finish.
 			nextRacer.finish(atTime);
 			this.finishedRacers.add(nextRacer);
 		} else {
-			throw new InvalidRaceStateException("Attempting to finish next racer when there is not a racer in the race.");
+			throw new RaceException("Attempting to finish next racer when there is not a racer in the race.");
 		}
 	}
 	
@@ -180,60 +212,3 @@ public class Race {
 		IND;
 	}
 }
-
-//MARK: Race Exceptions
-
-class RaceException extends Exception {
-	private static final long serialVersionUID = 1L;
-
-	//Parameterless Constructor
-      public RaceException() {}
-
-      //Constructor that accepts a message
-      public RaceException(String message)
-      {
-         super(message);
-      }
-}
-
-class DuplicateRacerException extends RaceException
-{
-	private static final long serialVersionUID = 1L;
-
-	//Parameterless Constructor
-      public DuplicateRacerException() {}
-
-      //Constructor that accepts a message
-      public DuplicateRacerException(String message)
-      {
-         super(message);
-      }
- }
-
-class InvalidRacerException extends RaceException
-{
-	private static final long serialVersionUID = 1L;
-
-	//Parameterless Constructor
-      public InvalidRacerException() {}
-
-      //Constructor that accepts a message
-      public InvalidRacerException(String message)
-      {
-         super(message);
-      }
- }
-
-class InvalidRaceStateException extends RaceException
-{
-	private static final long serialVersionUID = 1L;
-
-	//Parameterless Constructor
-      public InvalidRaceStateException() {}
-
-      //Constructor that accepts a message
-      public InvalidRaceStateException(String message)
-      {
-         super(message);
-      }
- }
