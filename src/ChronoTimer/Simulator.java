@@ -246,7 +246,7 @@ public class Simulator {
 						break;
 					case "ENDRUN": 
 						report(COMMAND.ENDRUN.word);
-						sim.newRace(cTime);
+						sim.finRace(cTime);
 						break;
 					case "PRINT": //not used in sprint 1
 						report(COMMAND.PRINT.word);

@@ -143,11 +143,15 @@ public class ChronoTrigger
 	{
 		return this.officialTime;
 	}
-
-	//ends chronotrigger
-	public void exit()
+	
+	public void dnf(ChronoTime t, int r)
 	{
-		System.exit(0);
+		races[curRace].getClass().didNotFinish(r);
+	}
+	
+	public void cancel(ChronoTime t, int r)
+	{
+		races[curRace].cancel(r);
 	}
 	
 	private class Channel{
