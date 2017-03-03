@@ -213,6 +213,18 @@ public class Race {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param racerNumber
+	 */
+	public void cancel(int racerNumber) {
+		
+	}
+	
+	public void didNotFinish(int racerNumber) {
+		
+	}
+	
 	enum EventType {
 		IND;
 	}
