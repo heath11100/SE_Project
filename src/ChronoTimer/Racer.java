@@ -40,6 +40,8 @@ public class Racer {
 	public Racer(int number) throws IllegalArgumentException {
 		if (number < 1) {
 			throw new IllegalArgumentException("Racer cannot have a number less than 1");
+		} else if (number > 9999) {
+			throw new IllegalArgumentException("Racer cannot have a number greater than 4 digits");
 		} else {
 			this.number = number;
 			this.status = Status.QUEUED;
@@ -53,7 +55,7 @@ public class Racer {
 	 * @postcondition The Racer has status RACING
 	 * @throws IllegalStateException when the status is not QUEUED. This can occur if you attempt to start a racer that already began. 
 	 */
-	void start(ChronoTime startTime) throws IllegalStateException {
+	public void start(ChronoTime startTime) throws IllegalStateException {
 		if (this.status == Status.QUEUED) {
 			this.status = Status.RACING;
 			this.startTime = startTime;
@@ -67,18 +69,16 @@ public class Racer {
 	 * @param finishTime the time corresponding to when the Racer finished a Race
 	 * @precondition The Racer has status RACING
 	 * @postcondition The Racer has status FINISHED
-	 * @throws InvalidTimeException when the racer's status is not RACING
+	 * @throws InvalidTimeException when endTime is before startTime
 	 */
-	void finish(ChronoTime endTime) throws InvalidTimeException {
-		/*
-		 *TODO: test for invalid endTime:
-		 * - endTime <= startTime
-		 */
-		if (this.status == Status.RACING) {
+	public void finish(ChronoTime endTime) throws InvalidTimeException, IllegalStateException {
+		if (this.status != Status.RACING) {
+			throw new InvalidTimeException("Cannot finish because the racer is not racing! Current status is " + this.status);
+		} else if (endTime.isBefore(this.startTime) || endTime.equals(this.startTime)) {
+			throw new InvalidTimeException("Start time is before end time which is an invalid state.");
+		} else {
 			this.status = Status.FINISHED;
 			this.endTime = endTime;
-		} else {
-			throw new InvalidTimeException("Cannot finish because the racer is not racing! Current status is " + this.status);
 		}
 	}
 	
@@ -89,7 +89,7 @@ public class Racer {
 	 * @postcondition The Racer has status DNF
 	 * @throws IllegalStateException when the status of the racer is not RACING.
 	 */
-	void didNotFinish() throws IllegalStateException {
+	public void didNotFinish() throws IllegalStateException {
 		if (this.status == Status.RACING) {
 			this.status = Status.DNF;
 			this.endTime = null;
@@ -105,7 +105,7 @@ public class Racer {
 	 * @postcondition The Racer has status QUEUED
 	 * @throws IllegalStateException when attempting to cancel a racer without status RACING
 	 */
-	void cancel() throws IllegalStateException {
+	public void cancel() throws IllegalStateException {
 		if (this.status == Status.RACING) {
 			this.status = Status.QUEUED;
 			this.startTime = null;
@@ -119,7 +119,7 @@ public class Racer {
 	 * Returns the Racer's start time.
 	 * @return the startTime of the Racer, null if there is not a start time (racer has not started)
 	 */
-	ChronoTime getStartTime() {
+	public ChronoTime getStartTime() {
 		return this.startTime;
 	}
 	
@@ -127,7 +127,7 @@ public class Racer {
 	 * Returns the Racer's end time.
 	 * @return the endTime of the Racer, null if there is not an end time (i.e., racer still racing or racer DNF, etc.)
 	 */
-	ChronoTime getEndTime() {
+	public ChronoTime getEndTime() {
 		return this.endTime;
 	}
 	
@@ -135,7 +135,7 @@ public class Racer {
 	 * Returns the Racer's number.
 	 * @return the number of the Racer.
 	 */
-	int getNumber() {
+	public int getNumber() {
 		return this.number;
 	}
 	
@@ -143,11 +143,11 @@ public class Racer {
 	 * Returns the Racer's status
 	 * @return the current status of the Racer
 	 */
-	Racer.Status getStatus() {
+	public Racer.Status getStatus() {
 		return this.status;
 	}
 	
-	enum Status {
+	public enum Status {
 		//When the Racer is created, but has not yet started
 		QUEUED,
 		//When the Racer has started, but has not yet finished.

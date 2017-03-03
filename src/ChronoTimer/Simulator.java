@@ -3,8 +3,12 @@ package ChronoTimer;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Time;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import ChronoTimer.Race.EventType;
 
 import Exceptions.InvalidCommandException;
 import Exceptions.InvalidTimeException;
@@ -27,7 +31,7 @@ public class Simulator {
 	//Ryan Thorne
 	//2/23/2017
 	//ver 0.2
-
+	//commit 
 	static final String COMMANDFORMAT = "((POWER)|(EXIT)|(RESET)|(TIME)|(TOG)|(CONN)|(DISC)|(EVENT)|(NEWRUN)|(ENDRUN)|(PRINT)|(EXPORT)|(NUM)|(CLR)|(SWAP)|(DNF)|(CANCEL)|(TRIG)|(START)|(FINISH))";
 	
 	/**
@@ -120,7 +124,11 @@ public class Simulator {
 		String cCmd = ""; //current command, more like the current parsing token, but i like ccmd so sue me
 		String tokens[] = {""};
 		int cToken = 0;
+		Date t = new Date();
+		
 		ChronoTime cTime;
+		cTime = null;
+		
 		ChronoTrigger sim = null;
 		if(args.length != 1 && args.length != 0)
 		{
@@ -181,8 +189,7 @@ public class Simulator {
 					}
 					else
 					{
-						//WARNING this needs to be implemented in CronoTime b4 this will compile
-						//cTime = new ChronoTime(new Time())//will redefine this
+						cTime = ChronoTime.now();
 					}
 					switch(tokens[cToken++])
 					{
@@ -191,7 +198,7 @@ public class Simulator {
 						report(COMMAND.POWER.word);
 						//I think this is what we want
 						if(sim == null)
-							;//sim = new CronoTrigger(cTime);
+							sim = new ChronoTrigger(cTime);
 						else
 							sim = null;
 						break;
@@ -202,19 +209,19 @@ public class Simulator {
 						break;
 					case "RESET":
 						report(COMMAND.RESET.word);
-						//sim.reset();
+						sim = new ChronoTrigger(cTime);
 						break;
 					case "TIME":
 						report(COMMAND.TIME.word);
 						if(tokens[cToken].matches(TIMEFORMAT))
-							;//sim.setTime(new CronoTime(tokens[cToken++]);
+							sim.setTime(cTime, new ChronoTime(tokens[cToken++]));
 						else
 							throw new InvalidCommandException("TimeFormat, time");
 						break;
 					case "TOG":
 						report(COMMAND.TOG.word);
 						if(tokens[cToken].matches(CHANNELFORMAT))
-							;//sim.setTime(new CronoTime(tokens[cToken++]);
+							sim.toggle(cTime, Integer.parseInt(tokens[cToken++]));
 						else
 							throw new InvalidCommandException("channel format, tog");
 						break;
@@ -226,64 +233,73 @@ public class Simulator {
 						break;
 					case "EVENT": 
 						report(COMMAND.EVENT.word);
+						if(tokens[cToken++].matches(EVENTFORMAT))
+						{
+							sim.event(cTime, );//fix this
+						}
+						else
+							throw new InvalidCommandException("event format, event");
 						break;
 					case "NEWRUN": 
 						report(COMMAND.NEWRUN.word);
+						sim.newRace(cTime);
 						break;
 					case "ENDRUN": 
 						report(COMMAND.ENDRUN.word);
+						sim.newRace(cTime);
 						break;
 					case "PRINT": //not used in sprint 1
 						report(COMMAND.PRINT.word);
+						//test data conflicts with sprint 0 details again, discuss with group add race param or no? 
 						break;
 					case "EXPORT": //not used in sprint 1
 						report(COMMAND.EXPORT.word);
 						break;
 					case "NUM":
 						report(COMMAND.NUM.word);
-						if(tokens[cToken++].matches(RUNNERFORMAT))
+						if(tokens[cToken].matches(RUNNERFORMAT))
 						{
-							
+							sim.addRacer(cTime, Integer.parseInt(tokens[cToken++]));
 						}
 						else
 							throw new InvalidCommandException("runner format, num");
 						break;
 					case "CLR":
 						report(COMMAND.CLR.word);	//not a cancel command
-						if(tokens[cToken++].matches(RUNNERFORMAT))
-						{
-							
-						}
-						else
-							throw new InvalidCommandException("runner format, clr");
+//						if(tokens[cToken].matches(RUNNERFORMAT))
+//						{
+//							//idk what this command should do
+//						}
+//						else
+//							throw new InvalidCommandException("runner format, clr");
 						break;
 					case "SWAP": //not used in sprint 1
 						report(COMMAND.SWAP.word);
 						break;
 					case "CANCEL":
 						report(COMMAND.CANCEL.word);
-						//sim.cancel();// no information to give here I think?
+						sim.cancel(cTime);// no information to give here I think?
 						break;
 					case "DNF": 
 						report(COMMAND.DNF.word);
-						//sim.didNotFinish();
+						sim.didNotFinish();
 						break;
 					case "TRIG":
 						report(COMMAND.TRIG.word);
 						//I think toggle is the command used here?
-						if(tokens[cToken++].matches(CHANNELFORMAT))
-							;//sim.toggle(Integer.parseInt(tokens[cToken++]));
+						if(tokens[cToken].matches(CHANNELFORMAT))
+							sim.triggerSensor(cTime, Integer.parseInt(tokens[cToken++]));
 						else
 							throw new InvalidCommandException("channel format, trig");
 						break;
 					case "START":
 						report(COMMAND.START.word);
 							//per instructions we will toggle 1 here we can change this to be using sim.start()
-							//sim.toggle(1);
+						sim.triggerSensor(cTime, 1);
 						break;
 					case "FINISH":
 						report(COMMAND.FINISH.word);
-							//sim.toggle(2);
+						sim.triggerSensor(cTime, 2);
 						break;
 					default:
 						report("Could not parse command");
@@ -301,15 +317,15 @@ public class Simulator {
 				} 
 				catch (InvalidTimeException ex) {
 					// TODO Auto-generated catch block
-					report("incorrect time format");
+					report("error: incorrect time format");
 				} 
 				catch (InvalidCommandException ex) {
 					// TODO Auto-generated catch block
-					report(ex.getMessage());
+					report("error: " + ex.getMessage());
 					fparse = true;
 				}
 				if(cToken != tokens.length)
-					report("too many characters");
+					report("error: too many characters");
 			}
 			
 		}
