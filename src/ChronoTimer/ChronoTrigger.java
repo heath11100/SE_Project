@@ -22,7 +22,21 @@ public class ChronoTrigger
 	private ChronoTime officialTime, startTime;
 	private Race[] races = new Race[8];
 	private int curRace = 0;
-
+	public ChronoTrigger()
+	{
+			try {
+				officialTime = new ChronoTime(1,1,1,1);
+			} catch (InvalidTimeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				startTime = new ChronoTime(1,1,1,1);
+			} catch (InvalidTimeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
 	//setup that allows you to set the Official Time
 	public ChronoTrigger(ChronoTime t)
 	{
@@ -78,10 +92,14 @@ public class ChronoTrigger
 			}
 		}
 	}
-	public void newRace(ChronoTime t, EventType event)
+	public void newRace(ChronoTime t)
 	{
 		officialTime = t;
-		races[curRace] = new Race(event);
+		races[curRace] = new Race();
+	}
+	public void setType(ChronoTime t, EventType e)
+	{
+		races[curRace].setEventType(e);
 	}
 	public void changeRace(ChronoTime t, int i)
 	{
@@ -123,7 +141,6 @@ public class ChronoTrigger
 	{
 		System.exit(0);
 	}
-	//hello
 	
 	private class Channel{
 		private boolean on = false;
