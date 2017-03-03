@@ -1,6 +1,5 @@
 package ChronoTimer;
 import java.io.PrintStream;
-import java.util.PriorityQueue;
 
 /**
  * The Printer class.
@@ -21,9 +20,7 @@ public class Printer
 	 * @param stream the new PrintStream */
 	public void changeStream(PrintStream stream){output = stream;}
 	
-	/** Writes the parameter queue to the output.
+	/** Prints the parameter queue to the output.
 	 *  NB: doesn't empty the queue, so Log.readAll() can return actual copy of master queue. */
-	public void write(PriorityQueue<String> pq){
-		for (String s: pq)
-			output.print(s);}
+	public void print(String str){output.print(str);}
 }

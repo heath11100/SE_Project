@@ -1,5 +1,4 @@
 package ChronoTimer;
-import java.util.PriorityQueue;
 
 /**
  * The Log class.
@@ -7,26 +6,23 @@ import java.util.PriorityQueue;
  */
 public class Log 
 {
-	private PriorityQueue<String> master, buffer;
+	private String master, buffer;
 	
 	/** Constructor */
-	public Log(){
-		master = new PriorityQueue<>();
-		buffer = new PriorityQueue<>();}
+	public Log(){master = buffer = "";}
 	
 	/** Add a string to the log
 	 * @param str the string to be added */
 	public void add(String str){
-		master.add(str);
-		buffer.add(str);}
+		master += str+"\n";
+		buffer += str+"\n";}
 	
 	/** Returns the buffer, then empties it. */
-	public PriorityQueue<String> flush(){
-		PriorityQueue<String> result = buffer;
-		buffer.clear();
+	public String flush(){
+		String result = new String(buffer);
+		buffer = "";
 		return result;}
 	
 	/** Returns the entire log. */
-	public PriorityQueue<String> readAll(){
-		return master;}
+	public String readAll(){return master;}
 }
