@@ -1,4 +1,4 @@
-package ChronoTimer;
+package Tests;
 
 import junit.framework.TestCase;
 import org.junit.Test;
@@ -7,6 +7,7 @@ import org.junit.Test;
 
 public class TestRacer extends TestCase {
 
+	/*	TODO: finish these tests
 	Racer r1,r2,r3,r4,r5;
 	ChronoTime t1,t2,t3;
 
@@ -21,11 +22,14 @@ public class TestRacer extends TestCase {
 		//handle invalid bib numbers? (negative, maximum)?
 		try	{r3 = new Racer(-1);}
 		catch(Exception e){assertTrue(e instanceof IllegalArgumentException);}
+<<<<<<< HEAD:src/ChronoTimer/TestRacer.java
 		/*
 		 * TODO:
 		 * I don't see a reason to restrict a racer to a maximum number
 		 * Do 
 		 */
+=======
+>>>>>>> origin/master:src/Tests/TestRacer.java
 //		try	{r4 = new Racer(83291294);}
 //		catch(Exception e){assertTrue(e instanceof IllegalArgumentException);}
 		
@@ -117,5 +121,5 @@ public class TestRacer extends TestCase {
 		//try{r1.didNotFinish();}
 		//catch(Exception e){assertTrue(e instanceof ???);}
 	}
-	
+	*/
 }

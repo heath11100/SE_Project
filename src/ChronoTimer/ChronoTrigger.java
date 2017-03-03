@@ -11,75 +11,137 @@ package ChronoTimer;
 	 \ \_____\  \ \_\ \_\  \ \_____\  \ \_\\"\_\  \ \_____\       \ \_\  \ \_\ \_\  \ \_\  \ \_____\  \ \_____\  \ \_____\  \ \_\ \_\ 
 	  \/_____/   \/_/ /_/   \/_____/   \/_/ \/_/   \/_____/        \/_/   \/_/ /_/   \/_/   \/_____/   \/_____/   \/_____/   \/_/ /_/ 
 	*/
-import java.util.ArrayList;
+import java.util.Set;
+
+import ChronoTimer.Race.EventType;
+import Exceptions.InvalidTimeException;
 
 public class ChronoTrigger 
 {
-	private ArrayList raceList;
-	private Time officialTime;
-	private ArrayList channelList;
-	
-	public ChronoTrigger()
-	{
-		
-	}
+	private Channel[] channels = new Channel[8];
+	private ChronoTime officialTime, startTime;
+	private Race[] races = new Race[8];
+	private int curRace = 0;
+
 	//setup that allows you to set the Official Time
-	public ChronoTrigger(Time officialTime)
+	public ChronoTrigger(ChronoTime t)
 	{
-		
+			officialTime = t;
+			startTime = t;
 	}
 	//sets time
-	public void setTime(Time newTime)
+	public void setTime(ChronoTime t, ChronoTime s)
 	{
+
+			officialTime = s;
 		
 	}
 	//toggles channel
-	public void toggle(int channel)
+	public void toggle(ChronoTime t, int c)
 	{
+		officialTime = t;
+		channels[c].toggle();
 		
 	}
 	//connects sensor to channel
-	public void connectSensor(int eye, int gate, int pad, int channel)
+	public void connectSensor(ChronoTime t, int c, String s)
 	{
-		
+		channels[c].connect(s);
+		officialTime = t;
 	}
 	//disconnects sensor
-	public void disSensor(int channel)
+	public void disSensor(ChronoTime t, int channel)
 	{
-		
+		officialTime = t;
+		//for future
 	}
-	public void start(int channel)
+	//triggers sensor
+	public void triggerSensor(ChronoTime t, int c)
 	{
-		
+		officialTime = t;
+		if(c == 1 && channels[c].trigger())
+		{
+			try {
+				races[curRace].startNextRacer(officialTime);
+			} catch (InvalidRaceStateException e) {
+				System.out.println("This race doesn't exist");
+			}
+		}
+		if(c == 2 && channels[c].trigger())
+		{
+			try {
+				races[curRace].finishNextRacer(officialTime);
+			} catch (InvalidRaceStateException e) {
+				System.out.println(e);
+			} catch (InvalidTimeException e) {
+				System.out.println(e);
+			}
+		}
 	}
-	public void finish(int channel)
+	public void newRace(ChronoTime t, EventType event)
 	{
-		
+		officialTime = t;
+		races[curRace] = new Race(event);
 	}
-	//competitor did not finish
-	public void didNotFinish(int competitor)
+	public void changeRace(ChronoTime t, int i)
 	{
-		
+		officialTime = t;
+		if(i < 9 && i > 0)
+			curRace=i;
 	}
-	//cancels run
-	public void cancelRun(int channel, int runner)
+	public void addRacer(ChronoTime t, int num)
 	{
-		
+		officialTime = t;
+		try {
+			races[curRace].add(num);
+		} catch (DuplicateRacerException e) {
+			System.out.println(e);
+		}
+	}
+	public void finRace(ChronoTime t)
+	{
+		officialTime = t;
+		try {
+			races[curRace].endRace(this.officialTime);
+		} catch (InvalidTimeException e) {
+			System.out.println(e);
+		}
+	}
+	public void printCurRace(ChronoTime t)
+	{
+		officialTime = t;
+		races[curRace].printRace();
 	}
 	//returns officialTime
-	public Time getTime()
+	public ChronoTime getTime()
 	{
 		return this.officialTime;
 	}
-	//resets the time, racelist, and channel list
-	public void reset()
-	{
-		
-	}
+
 	//ends chronotrigger
 	public void exit()
 	{
-		
+		System.exit(0);
 	}
+	//hello
 	
+	private class Channel{
+		private boolean on = false;
+		private Set<String> validTypes;
+		private String sensorType;
+		
+		private Channel(){
+			validTypes.add("EYE");
+			validTypes.add("GATE");
+			validTypes.add("PAD");}
+		
+		private void toggle(){on = !on;}
+		
+		private void connect(String t) throws IllegalArgumentException{
+			if (!validTypes.contains(t)) throw new IllegalArgumentException("Cannot connect sensor with type '"+t+"'");
+			sensorType=t;}
+		
+		private boolean trigger(){
+			return on && sensorType != null;}
+	}
 }
