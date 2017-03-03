@@ -2,6 +2,8 @@ package ChronoTimer;
 
 import java.time.ZonedDateTime;
 
+import Exceptions.InvalidTimeException;
+
 /**
  * The Class ChronoTime.
  * @author - Casey Van Groll
