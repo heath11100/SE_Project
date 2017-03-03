@@ -224,6 +224,7 @@ public class Race {
 	public void didNotFinish(int racerNumber) {
 		
 	}
+
 	
 	enum EventType {
 		IND;
