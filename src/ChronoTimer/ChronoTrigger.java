@@ -50,9 +50,7 @@ public class ChronoTrigger
 	//sets time
 	public void setTime(ChronoTime t, ChronoTime s)
 	{
-
 			officialTime = s;
-		
 	}
 	//toggles channel
 	public void toggle(ChronoTime t, int c)
@@ -146,7 +144,7 @@ public class ChronoTrigger
 	
 	public void dnf(ChronoTime t, int r)
 	{
-		races[curRace].getClass().didNotFinish(r);
+		races[curRace].didNotFinish(r);
 	}
 	
 	public void cancel(ChronoTime t, int r)
