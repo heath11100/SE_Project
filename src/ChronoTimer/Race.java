@@ -84,6 +84,8 @@ public class Race {
 	 */
 	public void add(int racerNumber) throws RaceException {
 		Racer racer = new Racer(racerNumber);
+		if (this.isEnded())
+			throw new RaceException("Race has already ended");
 		if (this.finishedRacers.contains(racer) || 
 				this.racingRacers.contains(racer) || 
 				this.queuedRacers.contains(racer)) {
