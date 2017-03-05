@@ -244,7 +244,7 @@ public class ChronoTrigger
 			
 		}
 		catch(ArrayIndexOutOfBoundsException e){history.add("Cannot DNF before race is created.");}
-		
+		flush();
 	}
 	
 	public void cancel(ChronoTime t)
@@ -259,7 +259,7 @@ public class ChronoTrigger
 			
 		}
 		catch(ArrayIndexOutOfBoundsException e){history.add("Cannot cancel racer before race is created.");}
-		
+		flush();
 	}
 	
 	private class Channel{

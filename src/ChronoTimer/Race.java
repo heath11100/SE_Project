@@ -282,7 +282,7 @@ public class Race {
 	 * @param racerNumber corresponding to the racer
 	 */
 	public void cancel() throws RaceException {
-		Racer racer = this.queuedRacers.poll();
+		Racer racer = this.racingRacers.poll();
 		if (racer == null) {
 			throw new RaceException("No Racer to cancel");
 		} else {
