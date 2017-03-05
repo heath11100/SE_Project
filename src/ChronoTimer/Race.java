@@ -259,7 +259,7 @@ public class Race {
 	 * @throws InvalidTimeException when the racer's status is not RACING
 	 */
 	public void finishNextRacer(ChronoTime atTime) throws RaceException, InvalidTimeException {
-		Racer nextRacer = this.racingRacers.remove();
+		Racer nextRacer = this.racingRacers.poll();
 		if (this.endTime != null) {
 			//Then the race has already ended
 			throw new RaceException("Cannot finish racer after race ended");
@@ -282,7 +282,7 @@ public class Race {
 	 * @param racerNumber corresponding to the racer
 	 */
 	public void cancel() throws RaceException {
-		Racer racer = this.racingRacers.remove();
+		Racer racer = this.queuedRacers.poll();
 		if (racer == null) {
 			throw new RaceException("No Racer to cancel");
 		} else {
@@ -302,7 +302,7 @@ public class Race {
 	 * @throws RaceException thrown if a racer cannot be found or if the racer is not DNF
 	 */
 	public void didNotFinish() throws RaceException {
-		Racer racer = this.racingRacers.remove();
+		Racer racer = this.racingRacers.poll();
 		
 		if (racer == null) {
 			throw new RaceException("No Racer available");
