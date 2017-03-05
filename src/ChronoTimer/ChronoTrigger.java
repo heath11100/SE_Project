@@ -112,9 +112,7 @@ public class ChronoTrigger
 		} catch (RaceException e1) {
 			history.add(e1.toString());
 		}
-		catch(NullPointerException e){
-			history.add("Cannot set type before race is created.");
-		}
+		catch(ArrayIndexOutOfBoundsException e){history.add("Cannot set type before race is created.");}
 		flush();
 	}
 	public void newRace(ChronoTime t)
@@ -132,9 +130,7 @@ public class ChronoTrigger
 		} catch (RaceException e) {
 			history.add(e.toString());
 		}
-		catch(NullPointerException e){
-			history.add("Cannot add racer before race is created.");
-		}
+		catch(ArrayIndexOutOfBoundsException e){history.add("Cannot add racer before race is created.");}
 		flush();
 	}
 	public void finRace(ChronoTime t)
@@ -157,9 +153,7 @@ public class ChronoTrigger
 		history.add(races[curRace].getLog().readAll());
 		printIt.print(races[curRace].getLog().readAll());
 		}
-		catch(NullPointerException e){
-			history.add("Cannot print race before race is created.");
-		}
+		catch(ArrayIndexOutOfBoundsException e){history.add("Cannot print race before race is created.");}
 		flush();
 	}
 	public void flush()
@@ -182,9 +176,7 @@ public class ChronoTrigger
 		} catch (RaceException e) {
 			history.add(e.toString());
 		}
-		catch(NullPointerException e){
-			history.add("Cannot DNF before race is created.");
-		}
+		catch(ArrayIndexOutOfBoundsException e){history.add("Cannot DNF before race is created.");}
 		
 	}
 	
@@ -195,9 +187,7 @@ public class ChronoTrigger
 		} catch (RaceException e) {
 			history.add(e.toString());
 		}
-		catch(NullPointerException e){
-			history.add("Cannot cancel before race is created.");
-		}
+		catch(ArrayIndexOutOfBoundsException e){history.add("Cannot cancel racer before race is created.");}
 		
 	}
 	
