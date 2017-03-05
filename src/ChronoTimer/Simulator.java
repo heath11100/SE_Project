@@ -233,9 +233,9 @@ public class Simulator {
 						break;
 					case "EVENT": 
 						report(COMMAND.EVENT.word);
-						if(tokens[cToken++].matches(EVENTFORMAT))
+						if(tokens[cToken].matches(EVENTFORMAT))
 						{
-							sim.event(cTime, );//fix this
+							sim.changeRace(cTime, tokens[cToken]);//fix this
 						}
 						else
 							throw new InvalidCommandException("event format, event");
@@ -265,7 +265,7 @@ public class Simulator {
 							throw new InvalidCommandException("runner format, num");
 						break;
 					case "CLR":
-						report(COMMAND.CLR.word);	//not a cancel command
+						report(COMMAND.CLR.word);	//not a cancel command, not used ion sprint 1?
 //						if(tokens[cToken].matches(RUNNERFORMAT))
 //						{
 //							//idk what this command should do
@@ -282,7 +282,7 @@ public class Simulator {
 						break;
 					case "DNF": 
 						report(COMMAND.DNF.word);
-						sim.didNotFinish();
+						sim.didNotFinish(cTime);
 						break;
 					case "TRIG":
 						report(COMMAND.TRIG.word);

@@ -1,5 +1,6 @@
 package ChronoTimer;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 
 import Exceptions.*;
@@ -14,28 +15,55 @@ public class Race {
 	private ChronoTime startTime;
 	private ChronoTime endTime;
 	
+	private Log log;
+	
 	/**
 	 * Initializes a race with no racers.
 	 * @param eventType the type of event this race will be.
+	 * @throws InvalidTimeException 
 	 */
-	public Race(EventType eventType) {
+	@Deprecated
+	public Race(EventType eventType) throws InvalidTimeException {
 		this.queuedRacers = new LinkedList<Racer>();
 		this.racingRacers = new LinkedList<Racer>();
 		this.finishedRacers = new LinkedList<Racer>();
 		
 		this.eventType = eventType;
+		this.startTime = new ChronoTime(0, 0, 0, 0);
+		
+		this.log = new Log();
+	}
+	
+	public Race(EventType eventType, ChronoTime startTime) {
+		this.queuedRacers = new LinkedList<Racer>();
+		this.racingRacers = new LinkedList<Racer>();
+		this.finishedRacers = new LinkedList<Racer>();
+		
+		this.eventType = eventType;
+		
+		this.startTime = startTime;
+		this.log = new Log();
 	}
 	
 	/**
 	 * Initializes a race with no racers and event type IND.
+	 * @param startTime the time the race began
 	 */
-	public Race() {
-		this(EventType.IND);
+	public Race(ChronoTime startTime) {
+		this(EventType.IND, startTime);		
 	}
 	
-	
-	public void setEventType(EventType eType) {
-		this.eventType = eType;
+	/**
+	 * Changes the eventType
+	 * @param eType the type of event you would like to change it to
+	 */
+	public void setEventType(EventType eType) throws RaceException {
+		if (this.racingRacers.size() > 0 || this.finishedRacers.size() > 0) {
+			throw new RaceException("Cannot set event type after a racer has started");
+		} else {
+			this.eventType = eType;
+			this.log.add("Changed event type to " + this.eventType);
+		}
 	}
 	
 	/**
@@ -50,10 +78,10 @@ public class Race {
 		if (this.finishedRacers.contains(racer) || 
 				this.racingRacers.contains(racer) || 
 				this.queuedRacers.contains(racer)) {
-			throw new RaceException("Racer with that number already exists!");
-			
+			throw new RaceException("Duplicate racer");
 		} else {
 			this.queuedRacers.add(racer);
+			this.log.add("Added Racer: " + racer);
 		}
 	}
 	
@@ -68,9 +96,10 @@ public class Race {
 		Racer removedRacer = getRacer(racerNumber);
 		if (removedRacer != null) {
 			queuedRacers.remove(removedRacer);
+			this.log.add("Removed Racer: " + removedRacer);
 		}
 		else {
-			throw new RaceException("Racer does not exist with that number.");
+			throw new RaceException("Invalid racer number");
 		}
 		return removedRacer;
 	}
@@ -115,6 +144,7 @@ public class Race {
 	 * @throws InvalidRaceStartException
 	 * @param withTime corresponds to the time of the race starting.
 	 */
+	@Deprecated
 	public void beginRace(ChronoTime startTime) throws InvalidTimeException {
 		if (this.startTime == null) {
 			this.startTime = startTime;
@@ -128,19 +158,20 @@ public class Race {
 	 * @throws InvalidRaceEndException
 	 * @param withTime corresponding to the time the race ends.
 	 */
-	public void endRace(ChronoTime endTime) throws InvalidTimeException{
-		if (this.startTime == null) {
-			throw new InvalidTimeException("Attempting to end a race that has not started.");
-		} else if (this.endTime != null) {
-			throw new InvalidTimeException("Attempting to end a race that has already ended.");
+	public void endRace(ChronoTime endTime) throws InvalidTimeException {
+		//TODO: What happens to any unfinished racers when the race finishes?
+		if (this.endTime != null) {
+			throw new InvalidTimeException("Race already ended");
 		} else {
 			this.endTime = endTime;
+			this.log.add(endTime.getTimeStamp() + " Ended Race");
 		}
 	}
 	
 	/**
 	 * Prints a list of all racers and their respective data to the console.
 	 */
+	@Deprecated
 	public void printRace() {
 		//Queued Racers
 		for (Racer racer : queuedRacers) {
@@ -173,25 +204,32 @@ public class Race {
 	 * @precondition the race has already began, there is a racer to start
 	 * @param atTime the absolute time the next racer started
 	 * @throws InvalidTimeException when the time the racer starts is before the race start time.
-	 * @throws InvalidRaceException when there is not another racer to start OR the race has not started
+	 * @throws InvalidRaceException when there is not another racer to start
 	 */
 	public void startNextRacer(ChronoTime atTime) throws RaceException, InvalidTimeException {
-		Racer nextRacer = this.queuedRacers.remove();
+		Racer nextRacer;
+		try {
+			nextRacer = this.queuedRacers.remove();
+		} catch (NoSuchElementException e) {
+			throw new RaceException("No racer to start");
+		}
 		
-		if (this.startTime == null) {
-			throw new RaceException("Attempting to start a racer when the race has not started!");
-		} else if (atTime.isBefore(this.startTime)) {
+		if (atTime.isBefore(this.startTime)) {
 			//Illegal time because the time the racer is starting is before the race start time
-			throw new InvalidTimeException("The Racer start time cannot be before the racer start time!");
+			throw new InvalidTimeException("Invalid racer time");
 		} else if (nextRacer == null) {
-			throw new RaceException("Attempting to start next racer when there is no racer to start.");
+			throw new RaceException("No racer to start");
 		} else {
 			/* Then: race has started
 			 * Racer is starting at or after the time the race started
 			 * There is another racer waiting in the queue.
 			 */
-			nextRacer.start(atTime);
+			ChronoTime elapsed = atTime.elapsedSince(startTime);
+			nextRacer.start(elapsed);
 			this.racingRacers.add(nextRacer);
+			
+			//TODO: Should time be elapsed or absolute?
+			this.log.add(elapsed.getTimeStamp() + " | started racer: " + nextRacer);
 		}
 	}
 	
@@ -204,27 +242,85 @@ public class Race {
 	 */
 	public void finishNextRacer(ChronoTime atTime) throws RaceException, InvalidTimeException {
 		Racer nextRacer = this.racingRacers.remove();
-		if (nextRacer != null) {
+		if (this.endTime != null) {
+			//Then the race has already ended
+			throw new RaceException("Cannot finish racer after race ended");
+			
+		} else if (nextRacer != null) {
 			//Then there is a racer to finish.
-			nextRacer.finish(atTime);
+			ChronoTime elapsed = atTime.elapsedSince(startTime);
+			nextRacer.finish(elapsed);
 			this.finishedRacers.add(nextRacer);
+			//TODO: Should time be elapsed or absolute?
+			this.log.add(elapsed.getTimeStamp() + " | finished racer: " + nextRacer);
 		} else {
-			throw new RaceException("Attempting to finish next racer when there is not a racer in the race.");
+			throw new RaceException("No racer to finish");
 		}
 	}
 	
 	/**
-	 * 
-	 * @param racerNumber
+	 * Sets the racer corresponding to racer number.
+	 * @throws RaceException when racerNumber is invalid (does not correspond to racer) or if a Racer has a DNF status
+	 * @param racerNumber corresponding to the racer
 	 */
-	public void cancel(int racerNumber) {
-		
+	public void cancel(int racerNumber) throws RaceException {
+		Racer racer = getRacer(racerNumber);
+		if (racer == null) {
+			throw new RaceException("Invalid racer number");
+		} else {
+			
+			if (racer.getStatus() == Racer.Status.RACING) {
+				this.racingRacers.remove(racer);
+				this.queuedRacers.add(racer);
+				racer.cancel();
+				
+			} else if (racer.getStatus() == Racer.Status.QUEUED) {
+				racer.cancel();
+
+			} else if (racer.getStatus() == Racer.Status.FINISHED) {
+				this.racingRacers.remove(racer);
+				this.queuedRacers.add(racer);
+				racer.cancel();
+
+			} else {
+				throw new RaceException("Cannot cancel a racer that DNF");
+			}
+			
+			this.log.add("Cancelled racer: " + racer);
+		}
 	}
 	
-	public void didNotFinish(int racerNumber) {
-		
-	}
+	/**
+	 * Sets the racer corresponding to racer number to DNF.
+	 * @param racerNumber corresponding to the racer
+	 * @throws RaceException thrown if a racer cannot be found or if the racer is not DNF
+	 */
+	public void didNotFinish(int racerNumber) throws RaceException {
+		Racer racer = getRacer(racerNumber);
+		if (racer == null) {
+			throw new RaceException("Invalid racer number");
+		} else {
+			
+			try {
+				racer.didNotFinish();
+				
+				this.racingRacers.remove(racer);
+				this.finishedRacers.add(racer);
+				this.log.add("Racer: " + racer + " - did not finish");
 
+			} catch (IllegalStateException e) {
+				throw new RaceException("Cannot DNF racer that is not racing");
+			}
+		}
+	}
+	
+	/**
+	 * The log for the Race
+	 * @return the log
+	 */
+	public Log getLog() {
+		return this.log;
+	}
 	
 	enum EventType {
 		IND;

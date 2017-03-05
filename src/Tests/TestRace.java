@@ -15,12 +15,13 @@ public class TestRace extends TestCase {
 
 	@Override
 	public void setUp() throws InvalidTimeException{
-		ra = new Race();
 		rn1 = 1;
 		rn2 = 2;
 		t1 = new ChronoTime(0,0,0,0);
 		t2 = new ChronoTime(1,0,0,0);
 		t3 = new ChronoTime(2,0,0,0);
+		
+		ra = new Race(t1);
 	}
 	
 	public void testAddGetRemoveRacer() {
@@ -66,14 +67,9 @@ public class TestRace extends TestCase {
 	
 	
 	public void testBeginAndFinish() throws InvalidTimeException {
-		
-		//ok to begin and end without racers?
-		/*
-		 * TODO: Should we be able to do this?
-		 */
 		setUp();
 		try {
-			ra.beginRace(t1);
+			ra = new Race(t1);
 			
 			ra.add(rn1);
 			ra.startNextRacer(t1);
@@ -91,31 +87,23 @@ public class TestRace extends TestCase {
 		}
 	}
 	
-public void testRacerBeginAndFinish(){
-
-		//what happens if racer begins/finishes before race begins?
-		//ra.nextRacerBegan(t1);
-		//ra.nextRacerFinished(t1);
-	
+public void testRacerBeginAndFinish() {
 		//what happens if racer begins/finishes after race ends?
-		//ra.beginRace(t1);
-		//ra.endRace(t1);
-		//ra.nextRacerBegan(t1);
-		//ra.nextRacerFinished(t1);
-	
-//		try {
-//			ra.beginRace(t1);
-//			ra.endRace(t2);
-//		} catch (InvalidTimeException e) {
-//			e.printStackTrace();
-//			assertTrue(false);
-//		}
+		try {
+			ra.endRace(t2);
+			ra.startNextRacer(t3);
+			
+			assertTrue("Racer should not be able to start once race is finished", false);
+		} catch (InvalidTimeException e) {
+			assertTrue(false);
+		} catch (RaceException e) {
+			assertTrue(true);
+		}
 
 		//this is a normal scenario
-		ra = new Race();
+		ra = new Race(t1);
 		try {
 			ra.add(rn1);
-			ra.beginRace(t1);
 			ra.startNextRacer(t2);
 			ra.finishNextRacer(t3);
 			
@@ -131,8 +119,23 @@ public void testRacerBeginAndFinish(){
 		}
 		
 		//what happens if more began or finished than exist?
-		//while (true)
-		//	ra.nextRacerBegan(t1);
-		//	ra.nextRacerFinished(t1);
+		ra = new Race(t1);
+		int startCount = 0;
+		try {
+			ra.add(rn1);
+			
+			ra.startNextRacer(t2);
+			assertTrue(true);
+			startCount++;
+			
+			ra.startNextRacer(t3);
+			startCount++;
+			assertTrue(false);
+			
+		} catch (RaceException e) {
+			assertEquals(startCount, 1);
+		} catch (InvalidTimeException e) {
+			assertTrue(false);
+		}
 	}
 }
