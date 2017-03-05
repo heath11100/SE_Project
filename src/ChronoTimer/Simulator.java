@@ -2,13 +2,9 @@ package ChronoTimer;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
-import java.sql.Time;
-import java.text.DateFormat;
 import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-import ChronoTimer.Race.EventType;
 
 import Exceptions.InvalidCommandException;
 import Exceptions.InvalidTimeException;
