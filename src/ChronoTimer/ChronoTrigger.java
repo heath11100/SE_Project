@@ -104,6 +104,9 @@ public class ChronoTrigger
 			{
 				history.add(e.toString());
 			}
+			catch(NullPointerException e){
+				history.add("Cannot trigger before race is created.");
+			}
 		}
 		if(c == 2 && channels[c].trigger())
 		{
@@ -113,6 +116,9 @@ public class ChronoTrigger
 				history.add(e.toString());
 			} catch (InvalidTimeException e) {
 				history.add(e.toString());
+			}
+			catch(NullPointerException e){
+				history.add("Cannot trigger before race is created.");
 			}
 		}
 		else
