@@ -18,20 +18,38 @@ import Exceptions.RaceException;
 //eeeezs
 public class ChronoTrigger 
 {
-	private Channel[] channels = new Channel[8];
-	private ChronoTime officialTime;
+	private Channel[] channels;
+	private ChronoTime officialTime, startTime;
 	private Race[] races = new Race[8];
 	private int curRace = -1;
 	private Log history = new Log();
 	private Printer printIt = new Printer();
+	private String raceType;
 	public ChronoTrigger()
 	{
+			try {
+				officialTime = new ChronoTime(1,1,1,1);
+			} catch (InvalidTimeException e) {
+				
+				history.add(e.toString());
+			}
+			try {
+				startTime = new ChronoTime(1,1,1,1);
+			} catch (InvalidTimeException e) {
+				
+				history.add(e.toString());
+			}
+			channels = new Channel[8];
+			for(int i =0; i < 8; i++)
+			{
 			try {officialTime = new ChronoTime(0,0,0,0);}
 			catch (InvalidTimeException e) {history.add(e.toString());}
-
-			for(int i =0; i < 8; i++){
-				channels[i] = new Channel();
-				channels[i].connect("EYE");}
+			}
+			for(int j =0; j < 8; j++)
+			{
+				channels[j] = new Channel();
+				channels[j].connect("EYE");
+				}
 			
 			history.add("ChronoTrigger is on.");
 			flush();
@@ -40,6 +58,9 @@ public class ChronoTrigger
 	public ChronoTrigger(ChronoTime t)
 	{
 			officialTime = t;
+
+			startTime = t;
+			channels = new Channel[8];
 			for(int i = 0; i < 8; i++)
 			{
 				channels[i] = new Channel();
@@ -110,15 +131,28 @@ public class ChronoTrigger
 		try {
 			races[curRace].setEventType(s);
 		} catch (RaceException e1) {
+			
 			history.add(e1.toString());
+			
 		}
-		catch(ArrayIndexOutOfBoundsException e){history.add("Cannot set type before race is created.");}
+		catch(ArrayIndexOutOfBoundsException e){
+			raceType = s;
+			}
 		flush();
 	}
 	public void newRace(ChronoTime t)
 	{
 		officialTime = t;
 		races[++curRace] = new Race(t);
+		if(raceType != null)
+		{
+			try {
+				races[curRace].setEventType(raceType);
+			} catch (RaceException e) {
+				history.add(e.toString());
+			}
+			raceType = null;
+		}
 		history.add("Created race "+curRace+".");
 		flush();
 	}
