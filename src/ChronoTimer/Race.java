@@ -57,10 +57,19 @@ public class Race {
 	 * Changes the eventType
 	 * @param eType the type of event you would like to change it to
 	 */
-	public void setEventType(EventType eType) throws RaceException {
+	public void setEventType(String type) throws RaceException {
+		EventType eType = null;
+		switch(type){
+			case "IND":eType = EventType.IND;break;//all that's needed for now
+		}
+		
+		
 		if (this.racingRacers.size() > 0 || this.finishedRacers.size() > 0) {
 			throw new RaceException("Cannot set event type after a racer has started");
-		} else {
+		} else if (eType == null){
+			throw new RaceException("Illegal event type");
+		}
+		else{
 			this.eventType = eType;
 			this.log.add("Changed event type to " + this.eventType);
 		}
