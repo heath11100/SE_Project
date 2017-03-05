@@ -235,7 +235,7 @@ public class Simulator {
 						report(COMMAND.EVENT.word);
 						if(tokens[cToken].matches(EVENTFORMAT))
 						{
-							sim.changeRace(cTime, tokens[cToken]);//fix this
+							sim.changeRace(cTime, Integer.parseInt(tokens[cToken]));//fix this
 						}
 						else
 							throw new InvalidCommandException("event format, event");
@@ -282,7 +282,7 @@ public class Simulator {
 						break;
 					case "DNF": 
 						report(COMMAND.DNF.word);
-						sim.didNotFinish(cTime);
+						sim.dnf(cTime);
 						break;
 					case "TRIG":
 						report(COMMAND.TRIG.word);
