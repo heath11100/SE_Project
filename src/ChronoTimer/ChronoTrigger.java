@@ -116,6 +116,10 @@ public class ChronoTrigger
 			catch(ArrayIndexOutOfBoundsException e){history.add("Cannot trigger before race is created.");}
 			catch (RaceException e) {history.add(e.toString());}
 			catch(InvalidTimeException e){history.add(e.toString());}
+			catch(NoSuchElementException a)
+			{
+				
+			}
 		}
 		else if(c == 2)
 		{
@@ -123,6 +127,10 @@ public class ChronoTrigger
 			catch(ArrayIndexOutOfBoundsException e){history.add("Cannot trigger before race is created.");}
 			catch (RaceException e) {history.add(e.toString());}
 			catch(InvalidTimeException e){history.add(e.toString());}
+			catch(NoSuchElementException a)
+			{
+				
+			}
 		}
 		flush();
 	}
@@ -245,6 +253,10 @@ public class ChronoTrigger
 			races[curRace].cancel();
 		} catch (RaceException e) {
 			history.add(e.toString());
+		}
+		catch(NoSuchElementException a)
+		{
+			
 		}
 		catch(ArrayIndexOutOfBoundsException e){history.add("Cannot cancel racer before race is created.");}
 		
