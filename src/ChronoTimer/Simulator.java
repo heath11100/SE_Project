@@ -191,7 +191,7 @@ public class Simulator {
 						cTime = new ChronoTime(tokens[cToken++]);
 					}
 					else
-					{
+					{ 
 						cTime = ChronoTime.now();
 					}
 					switch(tokens[cToken++])
@@ -201,7 +201,10 @@ public class Simulator {
 						report(COMMAND.POWER.word);
 						//I think this is what we want
 						if(sim == null)
+						{
 							sim = new ChronoTrigger(cTime);
+							report("power on");
+						}
 						else
 							sim = null;
 						break;
