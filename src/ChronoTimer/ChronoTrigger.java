@@ -200,6 +200,8 @@ public class ChronoTrigger
 			if (!validTypes.contains(t)) throw new IllegalArgumentException("Cannot connect sensor with type '"+t+"'");
 			sensorType=t;}
 		
+		private void disconnect(){sensorType=null;}
+		
 		private boolean trigger(){
 			return on && sensorType != null;}
 	}
