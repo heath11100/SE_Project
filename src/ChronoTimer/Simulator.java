@@ -225,7 +225,7 @@ public class Simulator {
 					case "EVENT": ;
 						if(tokens[cToken].matches(EVENTFORMAT))
 						{
-							sim.setType(cTime, tokens[cToken]);//fix this
+							sim.setType(cTime, tokens[cToken++]);//fix this
 						}
 						else
 							throw new InvalidCommandException("event format, event");
