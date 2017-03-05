@@ -34,7 +34,7 @@ public class Simulator {
 	 * timeformat can only be in the format of <min>:<sec>.<hund>
 	 * also i am unsure of how to express the max in this format so i'll just assume any number of minutes is ok and catch time exceptions
 	 */
-	static final String TIMEFORMAT = "[0-9]+.[0-5][0-9].[0-9]{1,2}";
+	static final String TIMEFORMAT = "([0-9]+.[0-5][0-9].[0-9]{1,2})|([0-9]+.[0-9][0-9].[0-5][0-9].[0-9]{1,2})";
 	
 	/**
 	 * for later use
