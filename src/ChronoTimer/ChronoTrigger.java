@@ -167,7 +167,7 @@ public class ChronoTrigger
 	public void dnf(ChronoTime t, int r)
 	{
 		try {
-			races[curRace].didNotFinish(r);
+			races[curRace].didNotFinish();
 		} catch (RaceException e) {
 			System.out.println(e);
 		}

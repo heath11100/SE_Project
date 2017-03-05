@@ -159,7 +159,6 @@ public class Race {
 	 * @param withTime corresponding to the time the race ends.
 	 */
 	public void endRace(ChronoTime endTime) throws InvalidTimeException {
-		//TODO: What happens to any unfinished racers when the race finishes?
 		if (this.endTime != null) {
 			throw new InvalidTimeException("Race already ended");
 		} else {
@@ -295,10 +294,11 @@ public class Race {
 	 * @param racerNumber corresponding to the racer
 	 * @throws RaceException thrown if a racer cannot be found or if the racer is not DNF
 	 */
-	public void didNotFinish(int racerNumber) throws RaceException {
-		Racer racer = getRacer(racerNumber);
+	public void didNotFinish() throws RaceException {
+		Racer racer = this.racingRacers.remove();
+		
 		if (racer == null) {
-			throw new RaceException("Invalid racer number");
+			throw new RaceException("No Racer available");
 		} else {
 			
 			try {
