@@ -1,5 +1,6 @@
 package ChronoTimer;
-	 /**__    __     ______     ______   ______      _____     ______     __    __     ______     __   __     ______                     
+	 import java.util.HashSet;
+/**__    __     ______     ______   ______      _____     ______     __    __     ______     __   __     ______                     
 	/\ "-./  \   /\  __ \   /\__  _\ /\__  _\    /\  __-.  /\  __ \   /\ "-./  \   /\  __ \   /\ "-.\ \   /\  ___\                    
 	\ \ \-./\ \  \ \  __ \  \/_/\ \/ \/_/\ \/    \ \ \/\ \ \ \  __ \  \ \ \-./\ \  \ \ \/\ \  \ \ \-.  \  \ \___  \                   
 	 \ \_\ \ \_\  \ \_\ \_\    \ \_\    \ \_\     \ \____-  \ \_\ \_\  \ \_\ \ \_\  \ \_____\  \ \_\\"\_\  \/\_____\                  
@@ -45,7 +46,6 @@ public class ChronoTrigger
 			{
 				channels[i] = new Channel();
 				channels[i].connect("EYE");
-				System.out.println(i);
 			}
 			
 	}
@@ -57,7 +57,7 @@ public class ChronoTrigger
 			for(int i = 0; i < 8; i++)
 			{
 				channels[i] = new Channel();
-				System.out.println(i);
+				channels[i].connect("EYE");
 			}
 	}
 	//sets time
@@ -200,6 +200,7 @@ public class ChronoTrigger
 		private String sensorType;
 		
 		private Channel(){
+			validTypes = new HashSet<>();
 			validTypes.add("EYE");
 			validTypes.add("GATE");
 			validTypes.add("PAD");}
