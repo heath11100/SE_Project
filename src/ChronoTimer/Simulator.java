@@ -201,7 +201,10 @@ public class Simulator {
 						report(COMMAND.POWER.word);
 						//I think this is what we want
 						if(sim == null)
+						{
 							sim = new ChronoTrigger(cTime);
+							report("power on");
+						}
 						else
 							sim = null;
 						break;
