@@ -218,7 +218,7 @@ public class ChronoTrigger
 		catch(Exception e){}
 		printIt.print(history.flush());
 	}
-	//returns officialTime
+	//returns officialTimesas
 	public ChronoTime getTime()
 	{
 		return this.officialTime;
