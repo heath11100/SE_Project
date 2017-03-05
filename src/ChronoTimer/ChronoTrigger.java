@@ -161,7 +161,7 @@ public class ChronoTrigger
 				try {
 					races[curRace].setEventType(raceType);
 				} catch (RaceException e) {
-					history.add(e.toString());
+					history.add(e.getMessage());
 				}
 				raceType = null;
 			}
@@ -176,7 +176,7 @@ public class ChronoTrigger
 				try {
 					races[curRace].setEventType(raceType);
 				} catch (RaceException k) {
-					history.add(k.toString());
+					history.add(k.getMessage());
 				}
 				raceType = null;
 			}
@@ -191,7 +191,7 @@ public class ChronoTrigger
 		try {
 			races[curRace].add(num);
 		} catch (RaceException e) {
-			history.add(e.toString());
+			history.add(e.getMessage());
 		}
 		catch(ArrayIndexOutOfBoundsException e){history.add("Cannot add racer before race is created.");}
 		flush();
@@ -202,7 +202,7 @@ public class ChronoTrigger
 		try {
 			races[curRace].endRace(this.officialTime);
 		} catch (InvalidTimeException e) {
-			history.add(e.toString());
+			history.add(e.getMessage());
 		}
 		catch(NullPointerException e){
 			history.add("Cannot end race before race is created.");
@@ -237,7 +237,7 @@ public class ChronoTrigger
 		try {
 			races[curRace].didNotFinish();
 		} catch (RaceException e) {
-			history.add(e.toString());
+			history.add(e.getMessage());
 		}
 		catch(NoSuchElementException a)
 		{
@@ -252,7 +252,7 @@ public class ChronoTrigger
 		try {
 			races[curRace].cancel();
 		} catch (RaceException e) {
-			history.add(e.toString());
+			history.add(e.getMessage());
 		}
 		catch(NoSuchElementException a)
 		{
