@@ -272,7 +272,7 @@ public class Race {
 	 * @param racerNumber corresponding to the racer
 	 */
 	public void cancel() throws RaceException {
-		Racer racer = this.racingRacers.remove();
+		Racer racer = this.queuedRacers.poll();
 		if (racer == null) {
 			throw new RaceException("No Racer to cancel");
 		} else {
@@ -292,7 +292,7 @@ public class Race {
 	 * @throws RaceException thrown if a racer cannot be found or if the racer is not DNF
 	 */
 	public void didNotFinish() throws RaceException {
-		Racer racer = this.racingRacers.remove();
+		Racer racer = this.racingRacers.poll();
 		
 		if (racer == null) {
 			throw new RaceException("No Racer available");
