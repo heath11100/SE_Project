@@ -109,20 +109,19 @@ public class ChronoTrigger
 			history.add("This channel "+c+" couldnt be triggered");
 	}
 
-	public void setType(ChronoTime t, EventType e)
+	public void setType(ChronoTime t, String s)
 	{
 		try {
-			races[curRace].setEventType(e);
+			races[curRace].setEventType(s);
 		} catch (RaceException e1) {
-			history.add(e.toString());
+			history.add(e1.toString());
 		}
 		
 	}
-	public void changeRace(ChronoTime t, int i)
+	public void newRace(ChronoTime t)
 	{
 		officialTime = t;
-		if(i < 9 && i > 0)
-			curRace=i;
+		curRace++;
 		
 	}
 	public void addRacer(ChronoTime t, int num)
