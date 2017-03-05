@@ -88,29 +88,30 @@ public class ChronoTrigger
 		{
 			try {
 				races[curRace].startNextRacer(officialTime);
-			} catch (RaceException e) {
+			}
+			catch(NullPointerException e){
+				history.add("Cannot trigger before race is created.");
+			}catch (RaceException e) {
 				history.add(e.toString());
 			}
 			catch(InvalidTimeException e)
 			{
 				history.add(e.toString());
 			}
-			catch(NullPointerException e){
-				history.add("Cannot trigger before race is created.");
-			}
 		}
 		if(c == 2 && channels[c].trigger())
 		{
 			try {
 				races[curRace].finishNextRacer(officialTime);
-			} catch (RaceException e) {
+			}
+			catch(NullPointerException e){
+				history.add("Cannot trigger before race is created.");
+			}catch (RaceException e) {
 				history.add(e.toString());
 			} catch (InvalidTimeException e) {
 				history.add(e.toString());
 			}
-			catch(NullPointerException e){
-				history.add("Cannot trigger before race is created.");
-			}
+			
 		}
 		flush();
 	}
