@@ -213,7 +213,7 @@ public class ChronoTrigger
 	{
 		officialTime = t;
 		try{
-		history.add(races[curRace].getLog().readAll());
+		//history.add(races[curRace].getLog().readAll());
 		printIt.print(races[curRace].getLog().readAll());
 		}
 		catch(ArrayIndexOutOfBoundsException e){history.add("Cannot print race before race is created.");}
