@@ -164,13 +164,14 @@ public class ChronoTrigger
 		return this.officialTime;
 	}
 	
-	public void dnf(ChronoTime t, int r)
+	public void dnf(ChronoTime t)
 	{
 		try {
 			races[curRace].didNotFinish();
 		} catch (RaceException e) {
 			System.out.println(e);
 		}
+		history.add("dnf("+t.toString()+")");
 	}
 	
 	public void cancel(ChronoTime t, int r)
@@ -180,6 +181,7 @@ public class ChronoTrigger
 		} catch (RaceException e) {
 			System.out.println(e);
 		}
+		history.add("cancel("+t.toString()+")");
 	}
 	
 	private class Channel{
