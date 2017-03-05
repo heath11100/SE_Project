@@ -49,7 +49,7 @@ public class ChronoTrigger
 			}
 			
 	}
-	//setup that allows you to set the Official Time
+	//setup thast allows you to set the Official Time
 	public ChronoTrigger(ChronoTime t)
 	{
 			officialTime = t;
