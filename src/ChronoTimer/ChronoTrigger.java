@@ -182,13 +182,10 @@ public class ChronoTrigger
 	}
 	public void flush()
 	{
-		try{
-		history.add(races[curRace].getLog().flush());
+		//try to flush race if it exists
+		try{history.add(races[curRace].getLog().flush());}
+		catch(NullPointerException e){}
 		printIt.print(history.flush());
-		}
-		catch(NullPointerException e){
-			history.add("Cannot flush before race is created.");
-		}
 	}
 	//returns officialTime
 	public ChronoTime getTime()
