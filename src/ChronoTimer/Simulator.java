@@ -173,7 +173,7 @@ public class Simulator {
 					warning("unhandled IOException");
 			}
 			tokens = cCmd.split("\\s");
-			System.out.println(cCmd);
+			report(cCmd);
 			if (fread_m && tokens.length < 2)
 				warning("improper token matching in file read, did you forget a timestamp?");
 			else if(tokens.length < 1)
@@ -192,9 +192,7 @@ public class Simulator {
 					}
 					switch(tokens[cToken++])
 					{
-						//may need to add a ".word" to each usage of COMMANDS.W/E note this
 					case "POWER":
-						//I think this is what we want
 						if(sim == null)
 							sim = new ChronoTrigger(cTime);
 						else{
