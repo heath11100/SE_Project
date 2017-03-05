@@ -29,6 +29,7 @@ public class ChronoTrigger
 	private Printer printIt = new Printer();
 	public ChronoTrigger()
 	{
+		System.out.println("hello");
 			try {
 				officialTime = new ChronoTime(1,1,1,1);
 			} catch (InvalidTimeException e) {
@@ -44,8 +45,9 @@ public class ChronoTrigger
 			for(int i =0; i <9; i++)
 			{
 				channels[i] = new Channel();
-				channels[i].connect("sensor");
+				channels[i].connect("EYE");
 			}
+			
 	}
 	//setup that allows you to set the Official Time
 	public ChronoTrigger(ChronoTime t)
@@ -55,7 +57,7 @@ public class ChronoTrigger
 			for(int i =0; i <9; i++)
 			{
 				channels[i] = new Channel();
-				channels[i].connect("sensor");
+				channels[i].connect("EYE");
 			}
 	}
 	//sets time
