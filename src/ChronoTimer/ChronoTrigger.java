@@ -78,7 +78,7 @@ public class ChronoTrigger
 		officialTime = t;
 		history.add("Connected " +c+" at "+ t.toString());
 	}
-	//disconnects sensor
+	//dissconnects sensor
 	public void disSensor(ChronoTime t, int channel)
 	{
 		officialTime = t;
