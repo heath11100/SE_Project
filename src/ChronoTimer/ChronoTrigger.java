@@ -41,14 +41,20 @@ public class ChronoTrigger
 				
 				history.add(e.toString());
 			}
-			
+			for(int i =0; i <9; i++)
+			{
+				channels[i] = new Channel();
+			}
 	}
 	//setup that allows you to set the Official Time
 	public ChronoTrigger(ChronoTime t)
 	{
 			officialTime = t;
 			startTime = t;
-			
+			for(int i =0; i <9; i++)
+			{
+				channels[i] = new Channel();
+			}
 	}
 	//sets time
 	public void setTime(ChronoTime t, ChronoTime s)
@@ -60,14 +66,14 @@ public class ChronoTrigger
 	public void toggle(ChronoTime t, int c)
 	{
 		officialTime = t;
-		if(c>0)
+		if(c>0 && c< 9)
 			channels[c].toggle();
 		history.add("Toggled " +c+" at "+ t.toString());
 	}
 	//connects sensor to channel
 	public void connectSensor(ChronoTime t, int c, String s)
 	{	
-		if(c >0)
+		if(c >0&& c< 9)
 			channels[c].connect(s);
 		officialTime = t;
 		history.add("Connected " +c+" at "+ t.toString());
