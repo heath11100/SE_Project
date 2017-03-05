@@ -262,29 +262,17 @@ public class Race {
 	 * @throws RaceException when racerNumber is invalid (does not correspond to racer) or if a Racer has a DNF status
 	 * @param racerNumber corresponding to the racer
 	 */
-	public void cancel(int racerNumber) throws RaceException {
-		Racer racer = getRacer(racerNumber);
+	public void cancel() throws RaceException {
+		Racer racer = this.racingRacers.remove();
 		if (racer == null) {
-			throw new RaceException("Invalid racer number");
+			throw new RaceException("No Racer to cancel");
 		} else {
-			
 			if (racer.getStatus() == Racer.Status.RACING) {
-				this.racingRacers.remove(racer);
 				this.queuedRacers.add(racer);
 				racer.cancel();
-				
-			} else if (racer.getStatus() == Racer.Status.QUEUED) {
-				racer.cancel();
-
-			} else if (racer.getStatus() == Racer.Status.FINISHED) {
-				this.racingRacers.remove(racer);
-				this.queuedRacers.add(racer);
-				racer.cancel();
-
 			} else {
-				throw new RaceException("Cannot cancel a racer that DNF");
+				throw new RaceException("Cannot cancel a racer that is " + racer.getStatus());
 			}
-			
 			this.log.add("Cancelled racer: " + racer);
 		}
 	}
