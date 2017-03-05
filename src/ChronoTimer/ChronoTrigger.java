@@ -1,5 +1,6 @@
 package ChronoTimer;
 	 import java.util.HashSet;
+import java.util.NoSuchElementException;
 /**__    __     ______     ______   ______      _____     ______     __    __     ______     __   __     ______                     
 	/\ "-./  \   /\  __ \   /\__  _\ /\__  _\    /\  __-.  /\  __ \   /\ "-./  \   /\  __ \   /\ "-.\ \   /\  ___\                    
 	\ \ \-./\ \  \ \  __ \  \/_/\ \/ \/_/\ \/    \ \ \/\ \ \ \  __ \  \ \ \-./\ \  \ \ \/\ \  \ \ \-.  \  \ \___  \                   
@@ -159,9 +160,19 @@ public class ChronoTrigger
 			history.add("Created race "+curRace+".");
 		}
 		}
-		catch(arr)
+		catch(ArrayIndexOutOfBoundsException e)
 		{
-			
+			races[++curRace] = new Race(t);
+			if(raceType != null)
+			{
+				try {
+					races[curRace].setEventType(raceType);
+				} catch (RaceException k) {
+					history.add(k.toString());
+				}
+				raceType = null;
+			}
+			history.add("Created race "+curRace+".");
 		}
 		
 		flush();
@@ -219,6 +230,10 @@ public class ChronoTrigger
 			races[curRace].didNotFinish();
 		} catch (RaceException e) {
 			history.add(e.toString());
+		}
+		catch(NoSuchElementException a)
+		{
+			
 		}
 		catch(ArrayIndexOutOfBoundsException e){history.add("Cannot DNF before race is created.");}
 		
