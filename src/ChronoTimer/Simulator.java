@@ -30,7 +30,7 @@ public class Simulator {
 	//simulator class
 	//Ryan Thorne
 	//2/23/2017
-	//ver 0.2
+	//ver 0.3
 	//commit 
 	static final String COMMANDFORMAT = "((POWER)|(EXIT)|(RESET)|(TIME)|(TOG)|(CONN)|(DISC)|(EVENT)|(NEWRUN)|(ENDRUN)|(PRINT)|(EXPORT)|(NUM)|(CLR)|(SWAP)|(DNF)|(CANCEL)|(TRIG)|(START)|(FINISH))";
 	
@@ -235,14 +235,14 @@ public class Simulator {
 						report(COMMAND.EVENT.word);
 						if(tokens[cToken].matches(EVENTFORMAT))
 						{
-							sim.changeRace(cTime, Integer.parseInt(tokens[cToken]));//fix this
+							sim.setType(cTime, tokens[cToken]);//fix this
 						}
 						else
 							throw new InvalidCommandException("event format, event");
 						break;
 					case "NEWRUN": 
 						report(COMMAND.NEWRUN.word);
-						sim.newRace(cTime);
+						sim.changeRace(cTime);
 						break;
 					case "ENDRUN": 
 						report(COMMAND.ENDRUN.word);
