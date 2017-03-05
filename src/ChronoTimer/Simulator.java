@@ -191,7 +191,7 @@ public class Simulator {
 						cTime = new ChronoTime(tokens[cToken++]);
 					}
 					else
-					{
+					{ 
 						cTime = ChronoTime.now();
 					}
 					switch(tokens[cToken++])
