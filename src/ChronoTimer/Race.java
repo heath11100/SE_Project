@@ -249,7 +249,7 @@ public class Race {
 	 * @throws InvalidTimeException when the racer's status is not RACING
 	 */
 	public void finishNextRacer(ChronoTime atTime) throws RaceException, InvalidTimeException {
-		Racer nextRacer = this.racingRacers.remove();
+		Racer nextRacer = this.racingRacers.poll();
 		if (this.endTime != null) {
 			//Then the race has already ended
 			throw new RaceException("Cannot finish racer after race ended");
