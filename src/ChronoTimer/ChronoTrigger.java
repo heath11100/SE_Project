@@ -21,7 +21,7 @@ import Exceptions.RaceException;
 //eeeezs
 public class ChronoTrigger 
 {
-	private Channel[] channels = new Channel[8];
+	private Channel[] channels;
 	private ChronoTime officialTime, startTime;
 	private Race[] races = new Race[8];
 	private int curRace = 0;
@@ -41,6 +41,7 @@ public class ChronoTrigger
 				
 				history.add(e.toString());
 			}
+			channels = new Channel[8];
 			for(int i =0; i < 8; i++)
 			{
 				channels[i] = new Channel();
@@ -54,9 +55,11 @@ public class ChronoTrigger
 	{
 			officialTime = t;
 			startTime = t;
+			channels = new Channel[8];
 			for(int i = 0; i < 8; i++)
 			{
 				channels[i] = new Channel();
+				channels[i].connect("EYE");
 				System.out.println(i);
 			}
 	}
