@@ -126,8 +126,6 @@ public class ChronoTrigger
 				history.add("Cannot trigger before race is created.");
 			}
 		}
-		else
-			history.add("This channel "+c+" couldnt be triggered");
 		flush();
 	}
 
