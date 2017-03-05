@@ -9,7 +9,7 @@ public class Log
 	private String master, buffer;
 	
 	/** Constructor */
-	public Log(){master = buffer = "";}
+	public Log() {master = buffer = "";}
 	
 	/** Add a string to the log
 	 * @param str the string to be added */
