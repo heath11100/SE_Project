@@ -143,17 +143,27 @@ public class ChronoTrigger
 	public void newRace(ChronoTime t)
 	{
 		officialTime = t;
-		races[++curRace] = new Race(t);
-		if(raceType != null)
+		try{
+		if(races[curRace].isOver())
 		{
-			try {
-				races[curRace].setEventType(raceType);
-			} catch (RaceException e) {
-				history.add(e.toString());
+			races[++curRace] = new Race(t);
+			if(raceType != null)
+			{
+				try {
+					races[curRace].setEventType(raceType);
+				} catch (RaceException e) {
+					history.add(e.toString());
+				}
+				raceType = null;
 			}
-			raceType = null;
+			history.add("Created race "+curRace+".");
 		}
-		history.add("Created race "+curRace+".");
+		}
+		catch(arr)
+		{
+			
+		}
+		
 		flush();
 	}
 	public void addRacer(ChronoTime t, int num)

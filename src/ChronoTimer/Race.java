@@ -318,7 +318,13 @@ public class Race {
 	public Log getLog() {
 		return this.log;
 	}
-	
+	public boolean isOver()
+	{
+		if(this.endTime != null)
+			return true;
+		else
+			return false;
+	}
 	enum EventType {
 		IND;
 	}
