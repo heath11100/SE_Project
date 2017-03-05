@@ -47,7 +47,7 @@ public class ChronoTrigger
 				channels[i] = new Channel();
 				channels[i].connect("EYE");
 			}
-			
+			flush();
 	}
 	//setup thast allows you to set the Official Time
 	public ChronoTrigger(ChronoTime t)
@@ -59,12 +59,14 @@ public class ChronoTrigger
 				channels[i] = new Channel();
 				channels[i].connect("EYE");
 			}
+			flush();
 	}
 	//sets time
 	public void setTime(ChronoTime t, ChronoTime s)
 	{
 			officialTime = s;
 			history.add("Set time to " + t.toString());
+			flush();
 	}
 	//toggles channel
 	public void toggle(ChronoTime t, int c)
@@ -73,6 +75,7 @@ public class ChronoTrigger
 		if(c>0 && c< 9)
 			channels[c].toggle();
 		history.add("Toggled " +c+" at "+ t.toString());
+		flush();
 	}
 	//connects sensor to channel
 	public void connectSensor(ChronoTime t, int c, String s)
@@ -81,6 +84,7 @@ public class ChronoTrigger
 			channels[c].connect(s);
 		officialTime = t;
 		history.add("Connected " +c+" at "+ t.toString());
+		flush();
 	}
 	//dissconnects sensor
 	public void disSensor(ChronoTime t, int channel)
@@ -88,6 +92,7 @@ public class ChronoTrigger
 		officialTime = t;
 		channels[channel].disconnect();
 		history.add("Disconnected " +channel+" at "+ t.toString());
+		flush();
 	}
 	//triggers sensor
 	public void triggerSensor(ChronoTime t, int c)
@@ -123,6 +128,7 @@ public class ChronoTrigger
 		}
 		else
 			history.add("This channel "+c+" couldnt be triggered");
+		flush();
 	}
 
 	public void setType(ChronoTime t, String s)
@@ -135,13 +141,14 @@ public class ChronoTrigger
 		catch(NullPointerException e){
 			history.add("Cannot set type before race is created.");
 		}
-		
+		flush();
 	}
 	public void newRace(ChronoTime t)
 	{
 		officialTime = t;
 		curRace++;
-		
+		history.add("Created race "+curRace+".");
+		flush();
 	}
 	public void addRacer(ChronoTime t, int num)
 	{
@@ -154,7 +161,7 @@ public class ChronoTrigger
 		catch(NullPointerException e){
 			history.add("Cannot add racer before race is created.");
 		}
-		
+		flush();
 	}
 	public void finRace(ChronoTime t)
 	{
@@ -167,7 +174,7 @@ public class ChronoTrigger
 		catch(NullPointerException e){
 			history.add("Cannot end race before race is created.");
 		}
-		
+		flush();
 	}
 	public void printCurRace(ChronoTime t)
 	{
@@ -179,6 +186,7 @@ public class ChronoTrigger
 		catch(NullPointerException e){
 			history.add("Cannot print race before race is created.");
 		}
+		flush();
 	}
 	public void flush()
 	{
