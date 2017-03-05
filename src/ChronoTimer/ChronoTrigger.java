@@ -24,6 +24,7 @@ public class ChronoTrigger
 	private int curRace = -1;
 	private Log history = new Log();
 	private Printer printIt = new Printer();
+	private String raceType;
 	public ChronoTrigger()
 	{
 			try {
@@ -130,15 +131,28 @@ public class ChronoTrigger
 		try {
 			races[curRace].setEventType(s);
 		} catch (RaceException e1) {
+			
 			history.add(e1.toString());
+			
 		}
-		catch(ArrayIndexOutOfBoundsException e){history.add("Cannot set type before race is created.");}
+		catch(ArrayIndexOutOfBoundsException e){
+			raceType = s;
+			}
 		flush();
 	}
 	public void newRace(ChronoTime t)
 	{
 		officialTime = t;
 		races[++curRace] = new Race(t);
+		if(raceType != null)
+		{
+			try {
+				races[curRace].setEventType(raceType);
+			} catch (RaceException e) {
+				history.add(e.toString());
+			}
+			raceType = null;
+		}
 		history.add("Created race "+curRace+".");
 		flush();
 	}
