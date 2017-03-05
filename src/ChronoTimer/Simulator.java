@@ -253,6 +253,7 @@ public class Simulator {
 						break;
 					case "PRINT": //not used in sprint 1
 						report(COMMAND.PRINT.word);
+						sim.printCurRace(cTime);
 						//test data conflicts with sprint 0 details again, discuss with group add race param or no? 
 						break;
 					case "EXPORT": //not used in sprint 1
