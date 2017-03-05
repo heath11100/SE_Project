@@ -69,6 +69,8 @@ public class Simulator {
 	
 	static final int RUN = 0, END = 1;
 	
+	static final boolean _reportOn = true;
+	
 	public enum COMMAND
 	{
 		POWER ("POWER"),
@@ -112,7 +114,8 @@ public class Simulator {
 	
 	private static void report(String message)
 	{
-		System.out.println(message);
+		if(_reportOn)
+			System.out.println(message);
 	}
 	
 	public static void main(String args[])
@@ -242,7 +245,7 @@ public class Simulator {
 						break;
 					case "NEWRUN": 
 						report(COMMAND.NEWRUN.word);
-						sim.changeRace(cTime);
+						sim.newRace(cTime);
 						break;
 					case "ENDRUN": 
 						report(COMMAND.ENDRUN.word);
