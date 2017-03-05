@@ -82,7 +82,7 @@ public class ChronoTrigger
 	public void disSensor(ChronoTime t, int channel)
 	{
 		officialTime = t;
-		//for future
+		channels[channel].disconnect();
 		history.add("Disconnected " +channel+" at "+ t.toString());
 	}
 	//triggers sensor
