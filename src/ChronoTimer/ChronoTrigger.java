@@ -44,6 +44,7 @@ public class ChronoTrigger
 			for(int i =0; i <9; i++)
 			{
 				channels[i] = new Channel();
+				channels[i].connect("sensor");
 			}
 	}
 	//setup that allows you to set the Official Time
@@ -54,6 +55,7 @@ public class ChronoTrigger
 			for(int i =0; i <9; i++)
 			{
 				channels[i] = new Channel();
+				channels[i].connect("sensor");
 			}
 	}
 	//sets time
