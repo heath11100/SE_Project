@@ -21,7 +21,7 @@ public class ChronoTrigger
 	private Channel[] channels = new Channel[8];
 	private ChronoTime officialTime;
 	private Race[] races = new Race[8];
-	private int curRace = 0;
+	private int curRace = -1;
 	private Log history = new Log();
 	private Printer printIt = new Printer();
 	public ChronoTrigger()
@@ -33,10 +33,10 @@ public class ChronoTrigger
 				channels[i] = new Channel();
 				channels[i].connect("EYE");}
 			
-			history.add("Welcome to ChronoTrigger!");
+			history.add("ChronoTrigger is on.");
 			flush();
 	}
-	//setup thast allows you to set the Official Time
+	//setup that allows you to set the Official Time
 	public ChronoTrigger(ChronoTime t)
 	{
 			officialTime = t;
@@ -45,20 +45,22 @@ public class ChronoTrigger
 				channels[i] = new Channel();
 				channels[i].connect("EYE");
 			}
+			
+			history.add("ChronoTrigger is on.");
 			flush();
 	}
 	//sets time
 	public void setTime(ChronoTime t, ChronoTime s)
 	{
 			officialTime = s;
-			history.add("Set time to " + t.toString());
+			history.add("Set time to " + s.toString());
 			flush();
 	}
 	//toggles channel
 	public void toggle(ChronoTime t, int c)
 	{
 		officialTime = t;
-		if(c>0 && c< 9)
+		if(c>=0 && c< 8)
 			channels[c].toggle();
 		history.add("Toggled " +c+" at "+ t.toString());
 		flush();
@@ -66,7 +68,7 @@ public class ChronoTrigger
 	//connects sensor to channel
 	public void connectSensor(ChronoTime t, int c, String s)
 	{	
-		if(c >0&& c< 9)
+		if(c >=0&& c< 8)
 			channels[c].connect(s);
 		officialTime = t;
 		history.add("Connected " +c+" at "+ t.toString());
@@ -84,34 +86,21 @@ public class ChronoTrigger
 	public void triggerSensor(ChronoTime t, int c)
 	{
 		officialTime = t;
-		if(c == 1 && channels[c].trigger())
+		if (!channels[c].trigger())
+			history.add("Channel "+c+" is not on or is not connected.");
+		else if(c == 1)
 		{
-			try {
-				races[curRace].startNextRacer(officialTime);
-			}
-			catch(NullPointerException e){
-				history.add("Cannot trigger before race is created.");
-			}catch (RaceException e) {
-				history.add(e.toString());
-			}
-			catch(InvalidTimeException e)
-			{
-				history.add(e.toString());
-			}
+			try {races[curRace].startNextRacer(officialTime);}
+			catch(ArrayIndexOutOfBoundsException e){history.add("Cannot trigger before race is created.");}
+			catch (RaceException e) {history.add(e.toString());}
+			catch(InvalidTimeException e){history.add(e.toString());}
 		}
-		if(c == 2 && channels[c].trigger())
+		else if(c == 2)
 		{
-			try {
-				races[curRace].finishNextRacer(officialTime);
-			}
-			catch(NullPointerException e){
-				history.add("Cannot trigger before race is created.");
-			}catch (RaceException e) {
-				history.add(e.toString());
-			} catch (InvalidTimeException e) {
-				history.add(e.toString());
-			}
-			
+			try {races[curRace].finishNextRacer(officialTime);}
+			catch(ArrayIndexOutOfBoundsException e){history.add("Cannot trigger before race is created.");}
+			catch (RaceException e) {history.add(e.toString());}
+			catch(InvalidTimeException e){history.add(e.toString());}
 		}
 		flush();
 	}
@@ -131,7 +120,7 @@ public class ChronoTrigger
 	public void newRace(ChronoTime t)
 	{
 		officialTime = t;
-		curRace++;
+		races[++curRace] = new Race(t);
 		history.add("Created race "+curRace+".");
 		flush();
 	}
@@ -176,8 +165,8 @@ public class ChronoTrigger
 	public void flush()
 	{
 		//try to flush race if it exists
-		try{history.add(races[curRace].getLog().flush());}
-		catch(NullPointerException e){}
+		try{printIt.print(races[curRace].getLog().flush());}
+		catch(Exception e){}
 		printIt.print(history.flush());
 	}
 	//returns officialTime
