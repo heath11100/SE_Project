@@ -132,6 +132,15 @@ public class Racer {
 	}
 	
 	/**
+	 * Returns the total amount of time the racer was racing.
+	 * @return the elapsed time
+	 * @throws InvalidTimeException
+	 */
+	public ChronoTime getElapsedTime() throws InvalidTimeException {
+		return this.endTime.elapsedSince(this.startTime);
+	}
+	
+	/**
 	 * Returns the Racer's number.
 	 * @return the number of the Racer.
 	 */
@@ -146,6 +155,7 @@ public class Racer {
 	public Racer.Status getStatus() {
 		return this.status;
 	}
+	
 	
 	public enum Status {
 		//When the Racer is created, but has not yet started
