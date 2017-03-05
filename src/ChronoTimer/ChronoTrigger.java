@@ -25,7 +25,8 @@ public class ChronoTrigger
 	private ChronoTime officialTime, startTime;
 	private Race[] races = new Race[8];
 	private int curRace = 0;
-	private Printer log;
+	private Log history = new Log();
+	private Printer printIt = new Printer();
 	public ChronoTrigger()
 	{
 			try {
@@ -40,36 +41,42 @@ public class ChronoTrigger
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			history.add("ChronoTrigger()");
 	}
 	//setup that allows you to set the Official Time
 	public ChronoTrigger(ChronoTime t)
 	{
 			officialTime = t;
 			startTime = t;
+			history.add("ChronoTrigger("+t.toString()+")");
 	}
 	//sets time
 	public void setTime(ChronoTime t, ChronoTime s)
 	{
 			officialTime = s;
+			history.add("setTime("+t.toString()+","+s.toString()+")");
 	}
 	//toggles channel
 	public void toggle(ChronoTime t, int c)
 	{
 		officialTime = t;
+		if(c<9)
 		channels[c].toggle();
-		
+		history.add("toggle("+t.toString()+","+c+")");
 	}
 	//connects sensor to channel
 	public void connectSensor(ChronoTime t, int c, String s)
 	{
 		channels[c].connect(s);
 		officialTime = t;
+		history.add("connectSensor("+t.toString()+","+c+","+s.toString()+")");
 	}
 	//disconnects sensor
 	public void disSensor(ChronoTime t, int channel)
 	{
 		officialTime = t;
 		//for future
+		history.add("disSensor("+t.toString()+","+channel+")");
 	}
 	//triggers sensor
 	public void triggerSensor(ChronoTime t, int c)
@@ -97,21 +104,24 @@ public class ChronoTrigger
 				System.out.println(e);
 			}
 		}
+		history.add("triggerSensor("+t.toString()+","+c+")");
 	}
-	public void newRace(ChronoTime t)
-	{
-		officialTime = t;
-		races[curRace] = new Race();
-	}
+
 	public void setType(ChronoTime t, EventType e)
 	{
-		races[curRace].setEventType(e);
+		try {
+			races[curRace].setEventType(e);
+		} catch (RaceException e1) {
+			System.out.println(e1);
+		}
+		history.add("setType("+t.toString()+","+e.toString()+")");
 	}
 	public void changeRace(ChronoTime t, int i)
 	{
 		officialTime = t;
 		if(i < 9 && i > 0)
 			curRace=i;
+		history.add("changeRace("+t.toString()+","+i+")");
 	}
 	public void addRacer(ChronoTime t, int num)
 	{
@@ -121,6 +131,7 @@ public class ChronoTrigger
 		} catch (RaceException e) {
 			System.out.println(e);
 		}
+		history.add("setTime("+t.toString()+","+num+")");
 	}
 	public void finRace(ChronoTime t)
 	{
@@ -130,26 +141,45 @@ public class ChronoTrigger
 		} catch (InvalidTimeException e) {
 			System.out.println(e);
 		}
+		history.add("finRace("+t.toString()+")");
 	}
 	public void printCurRace(ChronoTime t)
 	{
 		officialTime = t;
-		races[curRace].printRace();
+		history.add(races[curRace].getLog().flush());
+		printIt.print(races[curRace].getLog().flush());
+		history.add("printCurRace("+t.toString()+")");
+	}
+	public void flush(ChronoTime t)
+	{
+		officialTime = t;
+		history.add(races[curRace].getLog().flush());
+		printIt.print(history.flush());
+		history.add("flush("+t.toString()+")");
 	}
 	//returns officialTime
 	public ChronoTime getTime()
 	{
+		history.add("getTime()");
 		return this.officialTime;
 	}
 	
 	public void dnf(ChronoTime t, int r)
 	{
-		races[curRace].didNotFinish(r);
+		try {
+			races[curRace].didNotFinish(r);
+		} catch (RaceException e) {
+			System.out.println(e);
+		}
 	}
 	
 	public void cancel(ChronoTime t, int r)
 	{
-		races[curRace].cancel(r);
+		try {
+			races[curRace].cancel(r);
+		} catch (RaceException e) {
+			System.out.println(e);
+		}
 	}
 	
 	private class Channel{
