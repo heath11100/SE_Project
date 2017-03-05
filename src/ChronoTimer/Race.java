@@ -176,6 +176,16 @@ public class Race {
 		}
 	}
 	
+	public boolean isStarted()
+	{
+		return startTime == null ? false : true;
+	}
+	
+	public boolean isEnded()
+	{
+		return endTime == null ? false : true;
+	}
+	
 	/**
 	 * Prints a list of all racers and their respective data to the console.
 	 */
