@@ -232,7 +232,9 @@ public class Race {
 			throw new RaceException("No racer to start");
 		}
 		
-		if (atTime.isBefore(this.startTime)) {
+		if (this.isEnded()) {
+			throw new RaceException("Race has already ended");
+		} else if (atTime.isBefore(this.startTime)) {
 			//Illegal time because the time the racer is starting is before the race start time
 			throw new InvalidTimeException("Invalid racer time");
 		} else if (nextRacer == null) {
@@ -260,7 +262,9 @@ public class Race {
 	 */
 	public void finishNextRacer(ChronoTime atTime) throws RaceException, InvalidTimeException {
 		Racer nextRacer = this.racingRacers.poll();
-		if (this.endTime != null) {
+		if (this.isEnded()) {
+			throw new RaceException("Race has already ended");
+		} else if (this.endTime != null) {
 			//Then the race has already ended
 			throw new RaceException("Cannot finish racer after race ended");
 			
@@ -283,7 +287,9 @@ public class Race {
 	 */
 	public void cancel() throws RaceException {
 		Racer racer = this.racingRacers.poll();
-		if (racer == null) {
+		if (this.isEnded()) {
+			throw new RaceException("Race has already ended");
+		} else if (racer == null) {
 			throw new RaceException("No Racer to cancel");
 		} else {
 			if (racer.getStatus() == Racer.Status.RACING) {
@@ -304,7 +310,9 @@ public class Race {
 	public void didNotFinish() throws RaceException {
 		Racer racer = this.racingRacers.poll();
 		
-		if (racer == null) {
+		if (this.isEnded()) {
+			throw new RaceException("Race has already ended");
+		} else if (racer == null) {
 			throw new RaceException("No Racer available");
 		} else {
 			
