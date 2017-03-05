@@ -18,7 +18,7 @@ import java.util.Set;
 import ChronoTimer.Race.EventType;
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
-//eeee
+//eeeez
 public class ChronoTrigger 
 {
 	private Channel[] channels = new Channel[8];
