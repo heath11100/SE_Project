@@ -156,6 +156,14 @@ public class Racer {
 		return this.status;
 	}
 	
+	/**
+	 * Returns the racer and their respective number
+	 */
+	@Override
+	public String toString() {
+		return "Racer[" + this.getNumber() + "]";
+	}
+	
 	
 	public enum Status {
 		//When the Racer is created, but has not yet started

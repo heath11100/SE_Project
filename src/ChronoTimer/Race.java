@@ -15,17 +15,23 @@ public class Race {
 	private ChronoTime startTime;
 	private ChronoTime endTime;
 	
+	private Log log;
+	
 	/**
 	 * Initializes a race with no racers.
 	 * @param eventType the type of event this race will be.
+	 * @throws InvalidTimeException 
 	 */
 	@Deprecated
-	public Race(EventType eventType) {
+	public Race(EventType eventType) throws InvalidTimeException {
 		this.queuedRacers = new LinkedList<Racer>();
 		this.racingRacers = new LinkedList<Racer>();
 		this.finishedRacers = new LinkedList<Racer>();
 		
 		this.eventType = eventType;
+		this.startTime = new ChronoTime(0, 0, 0, 0);
+		
+		this.log = new Log();
 	}
 	
 	public Race(EventType eventType, ChronoTime startTime) {
@@ -36,6 +42,7 @@ public class Race {
 		this.eventType = eventType;
 		
 		this.startTime = startTime;
+		this.log = new Log();
 	}
 	
 	/**
@@ -55,6 +62,7 @@ public class Race {
 			throw new RaceException("Cannot set event type after a racer has started");
 		} else {
 			this.eventType = eType;
+			this.log.add("Changed event type to " + this.eventType);
 		}
 	}
 	
@@ -73,6 +81,7 @@ public class Race {
 			throw new RaceException("Duplicate racer");
 		} else {
 			this.queuedRacers.add(racer);
+			this.log.add("Added Racer: " + racer);
 		}
 	}
 	
@@ -87,6 +96,7 @@ public class Race {
 		Racer removedRacer = getRacer(racerNumber);
 		if (removedRacer != null) {
 			queuedRacers.remove(removedRacer);
+			this.log.add("Removed Racer: " + removedRacer);
 		}
 		else {
 			throw new RaceException("Invalid racer number");
@@ -149,16 +159,19 @@ public class Race {
 	 * @param withTime corresponding to the time the race ends.
 	 */
 	public void endRace(ChronoTime endTime) throws InvalidTimeException {
+		//TODO: What happens to any unfinished racers when the race finishes?
 		if (this.endTime != null) {
 			throw new InvalidTimeException("Race already ended");
 		} else {
 			this.endTime = endTime;
+			this.log.add(endTime.getTimeStamp() + " Ended Race");
 		}
 	}
 	
 	/**
 	 * Prints a list of all racers and their respective data to the console.
 	 */
+	@Deprecated
 	public void printRace() {
 		//Queued Racers
 		for (Racer racer : queuedRacers) {
@@ -214,6 +227,9 @@ public class Race {
 			ChronoTime elapsed = atTime.elapsedSince(startTime);
 			nextRacer.start(elapsed);
 			this.racingRacers.add(nextRacer);
+			
+			//TODO: Should time be elapsed or absolute?
+			this.log.add(elapsed.getTimeStamp() + " | started racer: " + nextRacer);
 		}
 	}
 	
@@ -235,6 +251,8 @@ public class Race {
 			ChronoTime elapsed = atTime.elapsedSince(startTime);
 			nextRacer.finish(elapsed);
 			this.finishedRacers.add(nextRacer);
+			//TODO: Should time be elapsed or absolute?
+			this.log.add(elapsed.getTimeStamp() + " | finished racer: " + nextRacer);
 		} else {
 			throw new RaceException("No racer to finish");
 		}
@@ -267,6 +285,8 @@ public class Race {
 			} else {
 				throw new RaceException("Cannot cancel a racer that DNF");
 			}
+			
+			this.log.add("Cancelled racer: " + racer);
 		}
 	}
 	
@@ -286,11 +306,20 @@ public class Race {
 				
 				this.racingRacers.remove(racer);
 				this.finishedRacers.add(racer);
-				
+				this.log.add("Racer: " + racer + " - did not finish");
+
 			} catch (IllegalStateException e) {
 				throw new RaceException("Cannot DNF racer that is not racing");
 			}
 		}
+	}
+	
+	/**
+	 * The log for the Race
+	 * @return the log
+	 */
+	public Log getLog() {
+		return this.log;
 	}
 	
 	enum EventType {
