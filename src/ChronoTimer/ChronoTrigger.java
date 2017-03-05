@@ -54,29 +54,30 @@ public class ChronoTrigger
 	public void setTime(ChronoTime t, ChronoTime s)
 	{
 			officialTime = s;
-			
+			history.add("Set time to " + t.toString());
 	}
 	//toggles channel
 	public void toggle(ChronoTime t, int c)
 	{
 		officialTime = t;
-		if(c<9)
-		channels[c].toggle();
-		
+		if(c>0)
+			channels[c].toggle();
+		history.add("Toggled " +c+" at "+ t.toString());
 	}
 	//connects sensor to channel
 	public void connectSensor(ChronoTime t, int c, String s)
-	{
-		channels[c].connect(s);
+	{	
+		if(c >0)
+			channels[c].connect(s);
 		officialTime = t;
-		
+		history.add("Connected " +c+" at "+ t.toString());
 	}
 	//disconnects sensor
 	public void disSensor(ChronoTime t, int channel)
 	{
 		officialTime = t;
 		//for future
-		
+		history.add("Disconnected " +channel+" at "+ t.toString());
 	}
 	//triggers sensor
 	public void triggerSensor(ChronoTime t, int c)
@@ -104,7 +105,8 @@ public class ChronoTrigger
 				history.add(e.toString());
 			}
 		}
-		
+		else
+			history.add("This channel "+c+" couldnt be triggered");
 	}
 
 	public void setType(ChronoTime t, EventType e)
@@ -146,13 +148,12 @@ public class ChronoTrigger
 	public void printCurRace(ChronoTime t)
 	{
 		officialTime = t;
-		history.add(races[curRace].getLog().flush());
-		printIt.print(races[curRace].getLog().flush());
+		history.add(races[curRace].getLog().readAll());
+		printIt.print(races[curRace].getLog().readAll());
 		
 	}
-	public void flush(ChronoTime t)
+	public void flush()
 	{
-		officialTime = t;
 		history.add(races[curRace].getLog().flush());
 		printIt.print(history.flush());
 		
@@ -174,10 +175,10 @@ public class ChronoTrigger
 		
 	}
 	
-	public void cancel(ChronoTime t, int r)
+	public void cancel(ChronoTime t)
 	{
 		try {
-			races[curRace].cancel(r);
+			races[curRace].cancel();
 		} catch (RaceException e) {
 			history.add(e.toString());
 		}
