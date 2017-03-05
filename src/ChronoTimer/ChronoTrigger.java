@@ -29,7 +29,6 @@ public class ChronoTrigger
 	private Printer printIt = new Printer();
 	public ChronoTrigger()
 	{
-		System.out.println("hello");
 			try {
 				officialTime = new ChronoTime(1,1,1,1);
 			} catch (InvalidTimeException e) {
@@ -42,10 +41,11 @@ public class ChronoTrigger
 				
 				history.add(e.toString());
 			}
-			for(int i =0; i <9; i++)
+			for(int i =0; i < 8; i++)
 			{
 				channels[i] = new Channel();
 				channels[i].connect("EYE");
+				System.out.println(i);
 			}
 			
 	}
@@ -54,10 +54,10 @@ public class ChronoTrigger
 	{
 			officialTime = t;
 			startTime = t;
-			for(int i =0; i <9; i++)
+			for(int i = 0; i < 8; i++)
 			{
 				channels[i] = new Channel();
-				channels[i].connect("EYE");
+				System.out.println(i);
 			}
 	}
 	//sets time
