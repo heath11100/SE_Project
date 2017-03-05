@@ -69,7 +69,7 @@ public class Simulator {
 	
 	static final int RUN = 0, END = 1;
 	
-	static final boolean _reportOn = true;
+	static final boolean _reportOn = false;
 	
 	public enum COMMAND
 	{
@@ -177,7 +177,7 @@ public class Simulator {
 					warning("unhandled IOException");
 			}
 			tokens = cCmd.split("\\s");
-			report("read token: " + cCmd);
+			System.out.println(cCmd);
 			if (fread_m && tokens.length < 2)
 				warning("improper token matching in file read, did you forget a timestamp?");
 			else if(tokens.length < 1)

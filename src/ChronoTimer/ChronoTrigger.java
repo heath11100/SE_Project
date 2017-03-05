@@ -13,47 +13,33 @@ package ChronoTimer;
 	  \/_____/   \/_/ /_/   \/_____/   \/_/ \/_/   \/_____/        \/_/   \/_/ /_/   \/_/   \/_____/   \/_____/   \/_____/   \/_/ /_/ 
 	*/
 import java.util.Set;
-
-
-
-import ChronoTimer.Race.EventType;
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
 //eeeezs
 public class ChronoTrigger 
 {
 	private Channel[] channels = new Channel[8];
-	private ChronoTime officialTime, startTime;
+	private ChronoTime officialTime;
 	private Race[] races = new Race[8];
 	private int curRace = 0;
 	private Log history = new Log();
 	private Printer printIt = new Printer();
 	public ChronoTrigger()
 	{
-			try {
-				officialTime = new ChronoTime(1,1,1,1);
-			} catch (InvalidTimeException e) {
-				
-				history.add(e.toString());
-			}
-			try {
-				startTime = new ChronoTime(1,1,1,1);
-			} catch (InvalidTimeException e) {
-				
-				history.add(e.toString());
-			}
-			for(int i =0; i < 8; i++)
-			{
+			try {officialTime = new ChronoTime(0,0,0,0);}
+			catch (InvalidTimeException e) {history.add(e.toString());}
+
+			for(int i =0; i < 8; i++){
 				channels[i] = new Channel();
-				channels[i].connect("EYE");
-			}
+				channels[i].connect("EYE");}
+			
+			history.add("Welcome to ChronoTrigger!");
 			flush();
 	}
 	//setup thast allows you to set the Official Time
 	public ChronoTrigger(ChronoTime t)
 	{
 			officialTime = t;
-			startTime = t;
 			for(int i = 0; i < 8; i++)
 			{
 				channels[i] = new Channel();
