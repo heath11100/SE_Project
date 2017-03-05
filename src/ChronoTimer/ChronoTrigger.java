@@ -44,7 +44,7 @@ public class ChronoTrigger
 			for(int i =0; i < 8; i++)
 			{
 			try {officialTime = new ChronoTime(0,0,0,0);}
-			catch (InvalidTimeException e) {history.add(e.toString());}
+			catch (InvalidTimeException e) {history.add(e.getMessage());}
 			}
 			for(int j =0; j < 8; j++)
 			{
@@ -114,8 +114,8 @@ public class ChronoTrigger
 		{
 			try {races[curRace].startNextRacer(officialTime);}
 			catch(ArrayIndexOutOfBoundsException e){history.add("Cannot trigger before race is created.");}
-			catch (RaceException e) {history.add(e.toString());}
-			catch(InvalidTimeException e){history.add(e.toString());}
+			catch (RaceException e) {history.add(e.getMessage());}
+			catch(InvalidTimeException e){history.add(e.getMessage());}
 			catch(NoSuchElementException a)
 			{
 				
@@ -125,8 +125,8 @@ public class ChronoTrigger
 		{
 			try {races[curRace].finishNextRacer(officialTime);}
 			catch(ArrayIndexOutOfBoundsException e){history.add("Cannot trigger before race is created.");}
-			catch (RaceException e) {history.add(e.toString());}
-			catch(InvalidTimeException e){history.add(e.toString());}
+			catch (RaceException e) {history.add(e.getMessage());}
+			catch(InvalidTimeException e){history.add(e.getMessage());}
 			catch(NoSuchElementException a)
 			{
 				
