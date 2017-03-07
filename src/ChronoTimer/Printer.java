@@ -20,7 +20,9 @@ public class Printer
 	 * @param stream the new PrintStream */
 	public void changeStream(PrintStream stream){output = stream;}
 	
-	/** Prints the parameter queue to the output.
-	 *  NB: doesn't empty the queue, so Log.readAll() can return actual copy of master queue. */
-	public void print(String str){output.print(str);}
+	/** Flushes the parameter log's pending data to the output. */
+	public void flush(Log l){output.print(l.flush());}
+	
+	/** Prints the entire parameter log to the output. */
+	public void print(Log l){output.print(l.readAll());}
 }

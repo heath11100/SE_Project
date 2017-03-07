@@ -196,7 +196,7 @@ public class Simulator {
 						if(sim == null)
 							sim = new ChronoTrigger(cTime);
 						else{
-							System.out.println("ChronoTrigger is off.");
+							System.out.println(" [Log] ChronoTrigger is off.");
 							sim = null;}
 						break;
 					case "EXIT":

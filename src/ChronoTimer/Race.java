@@ -174,7 +174,7 @@ public class Race {
 			throw new InvalidTimeException("Race already ended");
 		} else {
 			this.endTime = endTime;
-			this.log.add(endTime.getTimeStamp() + " Ended Race");
+			this.log.add(endTime.toString() + " Ended Race");
 		}
 	}
 	
