@@ -169,9 +169,9 @@ public class Race {
 	 * @throws InvalidRaceEndException
 	 * @param withTime corresponding to the time the race ends.
 	 */
-	public void endRace(ChronoTime endTime) throws InvalidTimeException {
+	public void endRace(ChronoTime endTime) throws RaceException {
 		if (this.endTime != null) {
-			throw new InvalidTimeException("Race already ended");
+			throw new RaceException("Race already ended");
 		} else {
 			this.endTime = endTime;
 			this.log.add(endTime.toString() + " Ended Race");

@@ -14,8 +14,8 @@ public class Log
 	/** Add a string to the log
 	 * @param str the string to be added */
 	public void add(String str){
-		master += " [Log] "+str+"\n";
-		buffer += " [Log] "+str+"\n";}
+		master += " > "+str+"\n";
+		buffer += " > "+str+"\n";}
 	
 	/** Returns the buffer, then empties it. */
 	public String flush(){

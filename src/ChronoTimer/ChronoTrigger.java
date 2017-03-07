@@ -24,6 +24,7 @@ public class ChronoTrigger
 	private ChronoTime officialTime;
 	private ArrayList<Race> races = new ArrayList<>();
 	private int curRace = -1;
+	private boolean logTimes = false;
 	private Log history = new Log();
 	private Printer printer = new Printer();
 	private String raceType;
@@ -32,7 +33,7 @@ public class ChronoTrigger
 	{
 		//set official time
 		try {officialTime = ChronoTime.now();}
-		catch (InvalidTimeException e) { history.add(e.getMessage());}
+		catch (InvalidTimeException e) {history.add(e.getMessage());}
 
 		//create channels
 		channels = new Channel[8];
@@ -40,7 +41,7 @@ public class ChronoTrigger
 			channels[j] = new Channel();
 			channels[j].connect("EYE");}
 		
-		history.add("ChronoTrigger is on.");
+		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
 		flush();
 	}
 	
@@ -55,7 +56,7 @@ public class ChronoTrigger
 				channels[i] = new Channel();
 				channels[i].connect("EYE");}
 			
-		history.add("ChronoTrigger is on.");
+		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
 		flush();
 	}
 	
@@ -63,7 +64,7 @@ public class ChronoTrigger
 	public void setTime(ChronoTime commandTime, ChronoTime newOfficialTime)
 	{
 			officialTime = newOfficialTime;
-			history.add("Set time to " + newOfficialTime.toString());
+			history.add( (logTimes? officialTime+" | " : "") +"Set time to " + newOfficialTime.toString());
 			flush();
 	}
 	
@@ -78,7 +79,7 @@ public class ChronoTrigger
 		//if valid channel..
 		if(c>=0 && c< 8){
 			channels[c].toggle();
-			history.add("Toggled channel " +c);}
+			history.add( (logTimes? officialTime+" | " : "") +"Toggled channel " +c);}
 		else
 			history.add("Cannot toggle: Channel "+c+" doesn't exist.");
 		
@@ -94,7 +95,7 @@ public class ChronoTrigger
 		if(c>=0 && c< 8){
 			try{
 				channels[c].connect(type);
-				history.add("Connected "+type+" sensor to channel "+c);}
+				history.add( (logTimes? officialTime+" | " : "") +"Connected "+type+" sensor to channel "+c);}
 			//handle illegal sensor type exception
 			catch (IllegalArgumentException e){history.add(e.getMessage());}}
 		else
@@ -112,7 +113,7 @@ public class ChronoTrigger
 		//if valid channel..
 		if(c>=0 && c< 8){
 			channels[c].disconnect();
-			history.add("Disconnected sensor from channel " +c);}
+			history.add( (logTimes? officialTime+" | " : "") +"Disconnected sensor from channel " +c);}
 		else
 			history.add("Cannot disconnect: Channel "+c+" doesn't exist.");
 		
@@ -120,13 +121,17 @@ public class ChronoTrigger
 	}
 	
 	//sets type of current race or next race to be created
-	public void setType(ChronoTime commandTime, String s)
+	public void setType(ChronoTime commandTime, String type)
 	{
 		officialTime = commandTime;
 		
-		try {races.get(curRace).setEventType(s);}
-		catch (RaceException e) {history.add(e.getMessage());}
-		catch(IndexOutOfBoundsException e){raceType = s;}
+		if (races.isEmpty())
+			raceType = type;
+		else{
+			try {races.get(curRace).setEventType(type);}
+			catch (RaceException e) {history.add(e.getMessage());}
+			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+		}
 		
 		flush();
 	}
@@ -136,15 +141,17 @@ public class ChronoTrigger
 	{
 		officialTime = commandTime;
 		
-		if(curRace < 0 || races.get(curRace).isOver()){
+		if(races.isEmpty() || races.get(curRace).isOver()){
 			races.add(new Race(commandTime));
 			curRace++;
-			history.add("Created race "+curRace+".");
+			history.add( (logTimes? officialTime+" | " : "") +"Created race "+curRace+".");
 		
 			if(raceType != null){
 				try {races.get(curRace).setEventType(raceType);}
 				catch (RaceException e) {history.add(e.getMessage());}
-			raceType = null;}}
+				catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+			}
+			raceType = null;}//why this?
 		else
 			history.add("No race was created- already have current race.");
 		
@@ -157,9 +164,13 @@ public class ChronoTrigger
 	{
 		officialTime = commandTime;
 		
-		try {races.get(curRace).add(num);}
-		catch (RaceException e) {history.add(e.getMessage());}
-		catch(IndexOutOfBoundsException e){history.add("Cannot add racer before race is created.");}
+		if (races.isEmpty())
+			history.add("Cannot add racer before race is created.");
+		else{
+			try {races.get(curRace).add(num);}
+			catch (RaceException e) {history.add(e.getMessage());}
+			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+		}
 		
 		flush();
 	}
@@ -171,24 +182,23 @@ public class ChronoTrigger
 		
 		//if valid channel..
 		if(c>=0 && c< 8){
-			if (!channels[c].trigger())
-				{}//history.add("Channel "+c+" is not on or is not connected to a sensor.");
-			else{
+			//if trigger is successful and there's a current race
+			if (channels[c].trigger() && !races.isEmpty()){
 				if(c == 1)
 				{
 					try {races.get(curRace).startNextRacer(officialTime);}
-					catch(IndexOutOfBoundsException e){}//history.add("Cannot trigger before race is created.");}
-					catch (RaceException e) {history.add(e.getMessage());}
+					catch(RaceException e) {history.add(e.getMessage());}
 					catch(InvalidTimeException e){history.add(e.getMessage());}
 					catch(NoSuchElementException e){history.add(e.getMessage());}
+					catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
 				}
 				else if(c == 2)
 				{
 					try {races.get(curRace).finishNextRacer(officialTime);}
-					catch(IndexOutOfBoundsException e){}//history.add("Cannot trigger before race is created.");}
-					catch (RaceException e) {history.add(e.getMessage());}
+					catch(RaceException e) {history.add(e.getMessage());}
 					catch(InvalidTimeException e){history.add(e.getMessage());}
 					catch(NoSuchElementException e){history.add(e.getMessage());}
+					catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
 				}
 			}
 		}
@@ -202,10 +212,12 @@ public class ChronoTrigger
 	{
 		officialTime = commandTime;
 		
-		try {races.get(curRace).didNotFinish();}
-		catch (RaceException e) {history.add(e.getMessage());}
-		catch(NoSuchElementException e){history.add(e.getMessage());}
-		catch(IndexOutOfBoundsException e){history.add("Cannot DNF before race is created.");}
+		if (!races.isEmpty()){
+			try {races.get(curRace).didNotFinish();}
+			catch(RaceException e) {history.add(e.getMessage());}
+			catch(NoSuchElementException e){history.add(e.getMessage());}
+			catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+		}
 		
 		flush();
 	}
@@ -214,10 +226,12 @@ public class ChronoTrigger
 	{
 		officialTime = commandTime;
 		
-		try {races.get(curRace).cancel();}
-		catch (RaceException e) {history.add(e.getMessage());}
-		catch(NoSuchElementException e){history.add(e.getMessage());}
-		catch(IndexOutOfBoundsException e){history.add("Cannot cancel racer before race is created.");}
+		if (!races.isEmpty()){
+			try {races.get(curRace).cancel();}
+			catch(RaceException e) {history.add(e.getMessage());}
+			catch(NoSuchElementException e){history.add(e.getMessage());}
+			catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+		}
 		
 		flush();
 	}
@@ -227,9 +241,11 @@ public class ChronoTrigger
 	{
 		officialTime = commandTime;
 		
-		try {races.get(curRace).endRace(this.officialTime);}
-		catch (InvalidTimeException e) {history.add(e.getMessage());}
-		catch(IndexOutOfBoundsException e){history.add("Cannot end race before race is created.");}
+		if (!races.isEmpty()){
+			try {races.get(curRace).endRace(this.officialTime);}
+			catch (RaceException e) {history.add(e.getMessage());}
+			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+		}
 		
 		flush();
 	}
@@ -239,17 +255,15 @@ public class ChronoTrigger
 	{
 		officialTime = commandTime;
 		
-		try{printer.print(races.get(curRace).getLog());}
-		catch(IndexOutOfBoundsException e){history.add("Cannot print race before race is created.");}
-		
-		flush();
+		if (!races.isEmpty())
+			printer.print(races.get(curRace).getLog());
 	}
 	
 	public void flush()
 	{
 		//try to flush race if it exists
-		try{printer.flush(races.get(curRace).getLog());}
-		catch(Exception e){}
+		if (!races.isEmpty())
+			printer.flush(races.get(curRace).getLog());
 		
 		//flush chronotrigger history
 		printer.flush(history);
