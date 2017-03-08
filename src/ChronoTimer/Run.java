@@ -9,20 +9,26 @@ import Exceptions.*;
 /* Questions:
  * 1) Should we have a "initialized time" for Run (currently startTime)
  *  AND a "startTime" that corresponds to the time the first racer began?
+ *  - Should start when the first racer starts.
  *  
  * 2) Should we be able to add racers to the queue after the the first racer has started?
+ *  - Yes, cannot add once run has ended.
  * 
  * 3) Should we be able to remove racers from the queue after the first racer has started?
+ *  - Yes, cannot remove once run has ended.
  * 
  * 4) What should happen when the last racer finishes?
+ *  - Nothing
  * 
  * 5) What happens when ending a run before all of the racers have completed?
  *  Should we not allow a run to be ended, but instead end it when all racers have finished or DNF'd?
+ *  - DNF All racers, ASK DNF
  *  
  *  6) Should we be passing a copy of log to ChronoTrigger? If not, we might as well make it a public variable
  *  
  *  7) When do we allow the eventType to be changed? 
  *  (Currently you cannot change it once a racer has been put into the race)
+ *  - Keep as current
  */
 
 public class Run {
