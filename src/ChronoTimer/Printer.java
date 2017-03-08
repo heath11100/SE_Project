@@ -1,5 +1,6 @@
 package ChronoTimer;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 
 /**
  * The Printer class.
@@ -25,4 +26,15 @@ public class Printer
 	
 	/** Prints the entire parameter log to the output. */
 	public void print(Log l){output.print(l.readAll());}
+	
+	/** Exports the entire parameter log to a file. */
+	public void export(int run, Log l){
+		String fileName = "run"+run+".txt";
+		
+		try(PrintWriter p = new PrintWriter(fileName)){
+		    p.print(l.readAll());
+		    p.close();}
+		catch (Exception e) {
+		   e.printStackTrace();}
+	}
 }
