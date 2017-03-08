@@ -338,6 +338,7 @@ public class Race {
 	public Log getLog() {
 		return this.log;
 	}
+	
 	public boolean isOver()
 	{
 		if(this.endTime != null)
