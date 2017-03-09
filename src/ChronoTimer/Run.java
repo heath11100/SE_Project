@@ -29,6 +29,8 @@ import Exceptions.*;
  *  7) When do we allow the eventType to be changed? 
  *  (Currently you cannot change it once a racer has been put into the race)
  *  - Keep as current
+ *  
+ *  8) Should we pass a String for EventType in the constructor?
  */
 
 public class Run {
@@ -83,13 +85,47 @@ public class Run {
 	}
 	
 	/**
+	 * Determines whether or not any racer has started the run.
+	 * @return true if there is at least one racer running or at least one racer finished.
+	 */
+	private boolean hasRacerBegan() {
+		return this.runningRacers.size() > 0 || this.finishedRacers.size() > 0;
+	}
+	
+	/**
 	 * Returns a racer with a number equal to racerNumber.
 	 * This searches all racers, regardless of status (i.e., queued, running, and finished)
 	 * @param racerNumber corresponding to the racer being requested
 	 * @return the racer corresponding to racerNumber, or null if a racer could not be found
 	 */
 	private Racer getRacer(int racerNumber) {
-		return null;
+		Racer racer = null;
+		for (Racer r : this.queuedRacers) {
+			if (r.equals(racer)) {
+				racer = r;
+				break;
+			}
+		}
+		
+		if (racer == null) {
+			for (Racer r : this.runningRacers) {
+				if (r.equals(racer)) {
+					racer = r;
+					break;
+				}
+			}
+		}
+		
+		if (racer == null) {
+			for (Racer r : this.finishedRacers) {
+				if (r.equals(racer)) {
+					racer = r;
+					break;
+				}
+			}
+		}
+		
+		return racer;
 	}
 	
 	/**
@@ -107,7 +143,22 @@ public class Run {
 	 * if newEventType does not correspond to a valid event type
 	 */
 	public void setEventType(String newEventType) throws RaceException {
+		if (this.hasRacerBegan()) {
+			throw new RaceException("Cannot change event type after a racer started");
+		}
 		
+		switch (newEventType) {
+		case "IND":
+			this.eventType = EventType.IND;
+			break;
+			
+		case "PARIND":
+			this.eventType = EventType.PARIND;
+			break;
+			
+		default:
+			throw new RaceException("Invalid event type: " + newEventType);
+		}
 	}
 	
 	/**
@@ -178,7 +229,7 @@ public class Run {
 		
 	}
 	
-	enum RunType {
+	enum EventType {
 		IND,
 		PARIND;
 	}
