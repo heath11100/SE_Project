@@ -1,6 +1,8 @@
 package ChronoTimer;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import com.google.gson.Gson;
+
 
 /**
  * The Printer class.
@@ -27,13 +29,11 @@ public class Printer
 	/** Prints the entire parameter log to the output. */
 	public void print(Log l){output.print(l.readAll());}
 	
-	/** Exports the entire parameter log to a file. */
-	public void export(int run, Log l){
-		String fileName = "run"+run+".txt";
+	/** Exports the parameter run to a file. */
+	public void export(int runNumber, Run r){
+		String fileName = "run"+runNumber+".txt";
 		
-		try(PrintWriter p = new PrintWriter(fileName)){
-		    p.print(l.readAll());
-		    p.close();}
+		try(PrintWriter p = new PrintWriter(fileName)){p.write(new Gson().toJson(r));}
 		catch (Exception e) {System.out.println("Could not print to file: "+fileName);}
 	}
 }
