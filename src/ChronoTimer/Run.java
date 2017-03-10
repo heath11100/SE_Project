@@ -136,6 +136,36 @@ public class Run {
 		return this.eventType;
 	}
 	
+	
+	/**
+	 * Ends the current run. This cannot be undone.
+	 * @param atTime is the time the run ended.
+	 * @throws RaceException when attempting to end a run after a run has already been ended OR
+	 * if the run has not started
+	 * @throws InvalidTimeException when atTime is before the run start time
+	 */
+	public void endRun(ChronoTime atTime) throws RaceException, InvalidTimeException {		
+		if (this.hasEnded()) {
+			throw new RaceException("Run already ended.");
+			
+		} else if (!this.hasStarted()) {
+			throw new RaceException("Run has not started.");
+			
+		} else if (!this.startTime.isBefore(atTime)) {
+			throw new InvalidTimeException("Run has not started.");
+
+		} else {
+			this.endTime = atTime;
+			
+			for (Racer racer : this.runningRacers) {
+				this.finishedRacers.add(racer);
+				racer.didNotFinish();
+			}
+			//Remove all racers that were running.
+			this.runningRacers.clear();
+		}
+	}
+	
 	/**
 	 * Sets the event type to a new event type.
 	 * @param newEventType is a string representation of the eventType
@@ -170,7 +200,17 @@ public class Run {
 	 * or when the racerNumber does not fit within the bounds [1,9999]
 	 */
 	public void queueRacer(int racerNumber) throws RaceException {
+		Racer racer = getRacer(racerNumber);
 		
+		if (racerNumber < 1 || racerNumber > 9999) {
+			throw new RaceException("Number must be within bounds [1,9999]");
+		} else if (racer != null) {
+			throw new RaceException("Racer already exists with number: " + racerNumber);
+		} else {
+			racer = new Racer(racerNumber);
+			
+			this.queuedRacers.add(racer);
+		}
 	}
 	
 	/**
@@ -181,20 +221,57 @@ public class Run {
 	 * or when the racerNumber is not within bounds [1,9999]
 	 */
 	public void removeRacer(int racerNumber) throws RaceException {
+		Racer racer = null;
+		for (Racer r : this.queuedRacers) {
+			if (r.equals(racer)) {
+				racer = r;
+				break;
+			}
+		}
 		
+		if (racerNumber < 1 || racerNumber > 9999) {
+			throw new RaceException("Number must be within bounds [1,9999]");
+			
+		} else if (racer == null) {
+			throw new RaceException("Racer does not exist with number: " + racerNumber);
+		} else {
+			this.queuedRacers.remove(racer);			
+		}
 	}
 	
 	/**
 	 * Starts the next racer in the queue.
 	 * @param atTime is the absolute time the racer began, 
 	 * time cannot be less than the run start time OR the previous racer's start time
-	 * @throws InvalidTimeException when atTime is less than the run's start time OR 
-	 * when the next racer's startTime is less than the previous racer's startTime
+	 * @throws InvalidTimeException when atTime is less than the run's start time
 	 * @throws RaceException when there is not a racer left to start OR
-	 * when the race has already ended
+	 * when the race has already ended OR when the race has not started
 	 */
 	public void startNextRacer(ChronoTime atTime) throws InvalidTimeException, RaceException {
+		Racer nextRacer = this.queuedRacers.poll();
 		
+		if (atTime == null) {
+			throw new InvalidTimeException("NULL: Not valid time");
+			
+		} else if (!this.hasStarted()) {
+			throw new RaceException("Race has not started");
+
+		} else if (this.hasEnded()) {
+			throw new RaceException("Race has ended");
+			
+		} else if (atTime.isBefore(this.startTime)) {
+			throw new InvalidTimeException("Time is before the run start time");
+			
+		} else if (nextRacer == null) {
+			throw new RaceException("No racer to start");
+			
+		} else {
+			this.queuedRacers.remove(nextRacer);
+			this.runningRacers.add(nextRacer);
+			
+			ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
+			nextRacer.start(elapsedTime);
+		}
 	}
 	
 	/**
@@ -202,13 +279,35 @@ public class Run {
 	 * - TODO: What should happen when the last racer finishes? Should the Run end? Should it notify ChronoTrigger?
 	 * @param atTime is the absolute time the racer finished, 
 	 * time cannot be less than the run start time OR the previous racer's start time
-	 * @throws InvalidTimeException when atTime is less than the run's start time OR 
-	 * when the next racer's startTime is less than the previous racer's startTime
+	 * @throws InvalidTimeException when atTime is less than the run's start time
 	 * @throws RaceException when there is not a racer left to finish OR
-	 * when the race has already ended
+	 * when the race has already ended OR when the race has not started
 	 */
 	public void finishNextRacer(ChronoTime atTime) throws InvalidTimeException, RaceException {
+		Racer nextRacer = this.runningRacers.poll();
 		
+		if (atTime == null) {
+			throw new InvalidTimeException("NULL: Not valid time");
+			
+		}  else if (!this.hasStarted()) {
+			throw new RaceException("Race has not started");
+
+		}else if (this.hasEnded()) {
+			throw new RaceException("Race has ended");
+			
+		} else if (atTime.isBefore(this.startTime)) {
+			throw new InvalidTimeException("Time is before the run start time");
+			
+		} else if (nextRacer == null) {
+			throw new RaceException("No racer to finish");
+			
+		} else {
+			this.runningRacers.remove(nextRacer);
+			this.finishedRacers.add(nextRacer);
+			
+			ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
+			nextRacer.finish(elapsedTime);
+		}
 	}
 	
 	/**
@@ -217,7 +316,20 @@ public class Run {
 	 * when the race has already ended
 	 */
 	public void cancelNextRacer() throws RaceException {
+		Racer nextRacer = this.runningRacers.poll();
 		
+		if (this.hasEnded()) {
+			throw new RaceException("Race has ended");
+
+		} else if (nextRacer == null) {
+			throw new RaceException("No racer to cancel");
+
+		} else {
+			this.runningRacers.remove(nextRacer);
+			this.queuedRacers.add(nextRacer);
+			
+			nextRacer.cancel();
+		}
 	}
 	
 	/**
@@ -226,7 +338,20 @@ public class Run {
 	 * when the race has already ended
 	 */
 	public void didNotFinishNextRacer() throws RaceException {
+		Racer nextRacer = this.runningRacers.poll();
 		
+		if (this.hasEnded()) {
+			throw new RaceException("Race has ended");
+
+		} else if (nextRacer == null) {
+			throw new RaceException("No racer to DNF");
+
+		} else {
+			this.runningRacers.remove(nextRacer);
+			this.finishedRacers.add(nextRacer);
+			
+			nextRacer.didNotFinish();
+		}
 	}
 	
 	enum EventType {
