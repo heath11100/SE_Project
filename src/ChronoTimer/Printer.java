@@ -34,7 +34,6 @@ public class Printer
 		try(PrintWriter p = new PrintWriter(fileName)){
 		    p.print(l.readAll());
 		    p.close();}
-		catch (Exception e) {
-		   e.printStackTrace();}
+		catch (Exception e) {System.out.println("Could not print to file: "+fileName);}
 	}
 }

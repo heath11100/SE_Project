@@ -1,23 +1,13 @@
 package ChronoTimer;
-	 import java.util.ArrayList;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
-/**__    __     ______     ______   ______      _____     ______     __    __     ______     __   __     ______                     
-	/\ "-./  \   /\  __ \   /\__  _\ /\__  _\    /\  __-.  /\  __ \   /\ "-./  \   /\  __ \   /\ "-.\ \   /\  ___\                    
-	\ \ \-./\ \  \ \  __ \  \/_/\ \/ \/_/\ \/    \ \ \/\ \ \ \  __ \  \ \ \-./\ \  \ \ \/\ \  \ \ \-.  \  \ \___  \                   
-	 \ \_\ \ \_\  \ \_\ \_\    \ \_\    \ \_\     \ \____-  \ \_\ \_\  \ \_\ \ \_\  \ \_____\  \ \_\\"\_\  \/\_____\                  
-	  \/_/  \/_/   \/_/\/_/     \/_/     \/_/      \/____/   \/_/\/_/   \/_/  \/_/   \/_____/   \/_/ \/_/   \/_____/                  
-																																	
-	 ______     ______     ______     __   __     ______        ______   ______     __     ______     ______     ______     ______    
-	/\  ___\   /\  == \   /\  __ \   /\ "-.\ \   /\  __ \      /\__  _\ /\  == \   /\ \   /\  ___\   /\  ___\   /\  ___\   /\  == \   
-	\ \ \____  \ \  __<   \ \ \/\ \  \ \ \-.  \  \ \ \/\ \     \/_/\ \/ \ \  __<   \ \ \  \ \ \__ \  \ \ \__ \  \ \  __\   \ \  __<   
-	 \ \_____\  \ \_\ \_\  \ \_____\  \ \_\\"\_\  \ \_____\       \ \_\  \ \_\ \_\  \ \_\  \ \_____\  \ \_____\  \ \_____\  \ \_\ \_\ 
-	  \/_____/   \/_/ /_/   \/_____/   \/_/ \/_/   \/_____/        \/_/   \/_/ /_/   \/_/   \/_____/   \/_____/   \/_____/   \/_/ /_/ 
-	*/
 import java.util.Set;
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
-//eeeezs
+import junit.framework.TestCase;
+
 public class ChronoTrigger 
 {
 	private Channel[] channels;
@@ -125,7 +115,7 @@ public class ChronoTrigger
 	{
 		officialTime = commandTime;
 		
-		if (races.isEmpty())
+		if (races.isEmpty())	//need to check here if valid type - share checkValid(runType) method with Run?
 			raceType = type;
 		else{
 			try {races.get(curRace).setEventType(type);}
@@ -290,5 +280,137 @@ public class ChronoTrigger
 		
 		private boolean trigger(){
 			return on && sensorType != null;}
+	}
+	
+	public static class TestCT extends TestCase{
+		private ChronoTrigger ct;
+		private ChronoTime t1,t2,t3,t4;
+		
+		@Override
+		public void setUp() throws InvalidTimeException{
+			ct = new ChronoTrigger();
+			t1 = ChronoTime.now();
+			t2 = ChronoTime.now();
+			t3 = ChronoTime.now();
+			t4 = ChronoTime.now();
+		}
+		
+		public void testConstructors(){
+			//constructor 1
+			ct = new ChronoTrigger();
+			assertFalse(ct.channels == null);
+			for (int i=0; i< 8; i++){
+				assertFalse(ct.channels[i] ==null);
+				assertFalse(ct.channels[i].trigger());}
+			assertFalse(ct.history == null);
+			assertFalse(ct.printer == null);
+			assertFalse(ct.officialTime == null);
+			
+			//constructor 2
+			ct = new ChronoTrigger(t1);
+			assertFalse(ct.channels == null);
+			for (int i=0; i< 8; i++){
+				assertFalse(ct.channels[i] ==null);
+				assertFalse(ct.channels[i].trigger());}
+			assertFalse(ct.history == null);
+			assertFalse(ct.printer == null);
+			assertEquals(t1, ct.officialTime);
+		}
+		
+		public void testSetGetTime(){
+			ct.setTime(t1, t2);
+			assertEquals(ct.getTime(),t2);
+			ct.setTime(t1, t1);
+			assertEquals(ct.getTime(),t1);
+			ct.setTime(t4, t3);
+			assertEquals(ct.getTime(),t3);
+		}
+		
+		public void testChannel(){
+			//off and connected
+			for (int i=0; i< 8; i++){
+				assertFalse(ct.channels[i].trigger());
+				ct.channels[i].disconnect();}
+			
+			//on and disconnected
+			for (int i=0; i< 8; i++){
+				ct.channels[i].toggle();
+				assertFalse(ct.channels[i].trigger());}
+			
+			//on and connected
+			for (int i=0; i< 8; i++){
+				ct.channels[i].connect("EYE");
+				assertTrue(ct.channels[i].trigger());}
+			
+			//invalid sensor type
+			try {ct.channels[0].connect("invalid");}
+			catch (Exception e){assertTrue(e instanceof IllegalArgumentException);}
+			
+			//new connection replaces old
+			assertTrue(ct.channels[0].sensorType.equals("EYE"));
+			ct.channels[0].connect("PAD");
+			assertTrue(ct.channels[0].sensorType.equals("PAD"));
+		}
+		
+		public void testChannelThroughCT(){
+			//off and connected
+			for (int i=0; i< 8; i++){
+				assertFalse(ct.channels[i].trigger());
+				ct.disSensor(t1, i);}
+			
+			//on and disconnected
+			for (int i=0; i< 8; i++){
+				ct.toggle(t1, i);
+				assertFalse(ct.channels[i].trigger());}
+			
+			//on and connected
+			for (int i=0; i< 8; i++){
+				ct.connectSensor(t1, i, "EYE");
+				assertTrue(ct.channels[i].trigger());}
+			
+			//invalid sensor type
+			ct.connectSensor(t1, 0, "invalid");
+			assertTrue(ct.history.readAll().trim().endsWith("Cannot connect sensor with type 'invalid'"));
+			
+			//new connection replaces old
+			assertTrue(ct.channels[0].sensorType.equals("EYE"));
+			ct.connectSensor(t1, 0, "PAD");
+			assertTrue(ct.channels[0].sensorType.equals("PAD"));
+		}
+		
+		//officialTime should be updated by each of these commands
+		public void setOfficialTimeThruCommands(){
+			assertEquals(ct.officialTime,t1);
+			ct.toggle(t2, 0);
+			assertEquals(ct.officialTime,t2);
+			ct.connectSensor(t3, 0, "EYE");
+			assertEquals(ct.officialTime,t3);
+			ct.disSensor(t4, 0);
+			assertEquals(ct.officialTime,t4);
+			ct.setType(t1, "IND");
+			assertEquals(ct.officialTime,t1);
+			ct.newRace(t2);
+			assertEquals(ct.officialTime,t2);
+			ct.addRacer(t3, 10);
+			assertEquals(ct.officialTime,t3);
+			ct.triggerSensor(t4, 0);
+			assertEquals(ct.officialTime,t4);
+			ct.dnf(t1);
+			assertEquals(ct.officialTime,t1);
+			ct.cancel(t2);
+			assertEquals(ct.officialTime,t2);
+			ct.finRace(t3);
+			assertEquals(ct.officialTime,t3);
+			ct.printCurRace(t4);
+			assertEquals(ct.officialTime,t4);
+		}
+		
+		public void testSetType(){
+			assertEquals(ct.raceType,null);
+			ct.setType(t1, "BLAH");
+			assertEquals(ct.raceType,null);
+			ct.setType(t1, "IND");
+			assertEquals(ct.raceType,"IND");
+		}
 	}
 }
