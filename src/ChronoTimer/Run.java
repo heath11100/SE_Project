@@ -3,7 +3,6 @@ package ChronoTimer;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import ChronoTimer.Race.EventType;
 import Exceptions.*;
 
 /* Questions:
@@ -45,8 +44,7 @@ public class Run {
 	
 	private Log log;
 	
-	Run(ChronoTime startTime, EventType eventType) {
-		this.startTime = startTime;
+	Run(EventType eventType) {
 		this.eventType = eventType;
 		
 		this.queuedRacers = new LinkedList<>();
@@ -56,8 +54,8 @@ public class Run {
 		this.log = new Log();
 	}
 	
-	Run(ChronoTime startTime) {
-		this(startTime, EventType.IND);
+	Run() {
+		this(EventType.IND);
 	}
 	
 	/**
@@ -138,7 +136,8 @@ public class Run {
 	
 	
 	/**
-	 * Ends the current run. This cannot be undone.
+	 * Ends the current run. This cannot be undone. Any racers that are currently running will be set to DNF. 
+	 * Queued racers are not affected.
 	 * @param atTime is the time the run ended.
 	 * @throws RaceException when attempting to end a run after a run has already been ended OR
 	 * if the run has not started
@@ -197,7 +196,7 @@ public class Run {
 	 * @param racerNumber is used to identify the racer, no other racer may have this number, 
 	 * number must be 1 to 4 digits [1,9999]
 	 * @throws RaceException when a racer exists with racerNumber 
-	 * or when the racerNumber does not fit within the bounds [1,9999]
+	 * or when the racerNumber does not fit within the bounds [1,9999] or when the run was ended
 	 */
 	public void queueRacer(int racerNumber) throws RaceException {
 		Racer racer = getRacer(racerNumber);
@@ -206,6 +205,8 @@ public class Run {
 			throw new RaceException("Number must be within bounds [1,9999]");
 		} else if (racer != null) {
 			throw new RaceException("Racer already exists with number: " + racerNumber);
+		} else if (this.hasEnded()) { 
+			throw new RaceException("Run has already ended");
 		} else {
 			racer = new Racer(racerNumber);
 			
@@ -253,9 +254,6 @@ public class Run {
 		if (atTime == null) {
 			throw new InvalidTimeException("NULL: Not valid time");
 			
-		} else if (!this.hasStarted()) {
-			throw new RaceException("Race has not started");
-
 		} else if (this.hasEnded()) {
 			throw new RaceException("Race has ended");
 			
@@ -266,6 +264,11 @@ public class Run {
 			throw new RaceException("No racer to start");
 			
 		} else {
+			if (!this.hasStarted()) {
+				//Race has not started, set the start time to be the same as the racers.
+				this.startTime = atTime;
+			}
+			
 			this.queuedRacers.remove(nextRacer);
 			this.runningRacers.add(nextRacer);
 			

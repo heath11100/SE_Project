@@ -5,6 +5,7 @@ import java.util.Queue;
 
 import Exceptions.*;
 
+@Deprecated
 public class Race {
 	private Queue<Racer> queuedRacers;
 	private Queue<Racer> racingRacers;
