@@ -3,6 +3,10 @@ import ChronoTimer.ChronoTime;
 import Exceptions.InvalidTimeException;
 import junit.framework.TestCase;
 
+/**
+ * Tests for ChronoTime.
+ * @author Casey Van Groll
+ */
 public class TestChronoTime extends TestCase{
 
 	ChronoTime t1,t2,t3,t4,t5,t6;

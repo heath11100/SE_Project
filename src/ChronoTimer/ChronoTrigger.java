@@ -259,6 +259,10 @@ public class ChronoTrigger
 		printer.flush(history);
 	}
 	
+	/**
+	 * The Channel class.
+	 * @author Casey Van Groll
+	 */
 	private class Channel{
 		private boolean on = false;
 		private Set<String> validTypes;
@@ -282,6 +286,10 @@ public class ChronoTrigger
 			return on && sensorType != null;}
 	}
 	
+	/**
+	 * Tests for ChronoTrigger.
+	 * @author Casey Van Groll
+	 */
 	public static class TestCT extends TestCase{
 		private ChronoTrigger ct;
 		private ChronoTime t1,t2,t3,t4;
