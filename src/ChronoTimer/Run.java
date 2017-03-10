@@ -72,7 +72,7 @@ public class Run {
 	 * Determines whether or not the run has started.
 	 * @return true if the run has started, false otherwise.
 	 */
-	private boolean hasStarted() {
+	public boolean hasStarted() {
 		return this.startTime != null;
 	}
 	
@@ -80,7 +80,7 @@ public class Run {
 	 * Determines whether or not the run has ended.
 	 * @return true if the run has ended, false otherwise.
 	 */
-	private boolean hasEnded() {
+	public boolean hasEnded() {
 		return this.endTime != null;
 	}
 	
@@ -88,7 +88,7 @@ public class Run {
 	 * Determines whether or not any racer has started the run.
 	 * @return true if there is at least one racer running or at least one racer finished.
 	 */
-	private boolean hasRacerBegan() {
+	public boolean hasRacerBegan() {
 		return this.runningRacers.size() > 0 || this.finishedRacers.size() > 0;
 	}
 	

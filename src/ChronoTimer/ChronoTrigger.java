@@ -12,13 +12,16 @@ public class ChronoTrigger
 {
 	private Channel[] channels;
 	private ChronoTime officialTime;
-	private ArrayList<Race> races = new ArrayList<>();
-	private int curRace = -1;
+	private ArrayList<Run> races = new ArrayList<>();
+	private int curRun = -1;
 	private boolean logTimes = false;
 	private Log history = new Log();
 	private Printer printer = new Printer();
 	private String raceType;
-
+	/**
+	 * Default Constructor
+	 * 
+	 */
 	public ChronoTrigger()
 	{
 		//set official time
@@ -34,7 +37,11 @@ public class ChronoTrigger
 		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
 		flush();
 	}
-	
+	/**
+	 * Constructor with time parameter
+	 * @param startTime
+	 */
+
 	public ChronoTrigger(ChronoTime t)
 	{
 		//set official time
@@ -50,7 +57,11 @@ public class ChronoTrigger
 		flush();
 	}
 	
-	//sets official time
+	/**
+	 * Sets the officialTime of the race
+	 * @param commandTime
+	 * @param newOfficialTimessaaa
+	 */
 	public void setTime(ChronoTime commandTime, ChronoTime newOfficialTime)
 	{
 			officialTime = newOfficialTime;
@@ -58,10 +69,15 @@ public class ChronoTrigger
 			flush();
 	}
 	
-	//returns officialTime
+	/**
+	 * @return officialTime
+	 */
 	public ChronoTime getTime(){return officialTime;}
 	
-	//toggles channel
+	/**
+	 * Toggles channel giveny by parameter int c. Adds only if channel
+	 * exists
+	 */
 	public void toggle(ChronoTime commandTime, int c)
 	{
 		officialTime = commandTime;
@@ -76,7 +92,12 @@ public class ChronoTrigger
 		flush();
 	}
 	
-	//connects sensor to channel
+	/**
+	 * connects Sensor to the race type given by parameter type
+	 * @param commandTime
+	 * @param c
+	 * @param type
+	 */
 	public void connectSensor(ChronoTime commandTime, int c, String type)
 	{	
 		officialTime = commandTime;
@@ -95,7 +116,11 @@ public class ChronoTrigger
 		flush();
 	}
 	
-	//disconnects sensor from channel
+	/**
+	 * Disconnects Sensor c
+	 * @param commandTime
+	 * @param c
+	 */
 	public void disSensor(ChronoTime commandTime, int c)
 	{
 		officialTime = commandTime;
@@ -110,7 +135,12 @@ public class ChronoTrigger
 		flush();
 	}
 	
-	//sets type of current race or next race to be created
+	/**
+	 * This will set the type of the current race to String type.
+	 * If there is no current race, creates a new one
+	 * @param commandTime
+	 * @param type
+	 */
 	public void setType(ChronoTime commandTime, String type)
 	{
 		officialTime = commandTime;
@@ -118,7 +148,7 @@ public class ChronoTrigger
 		if (races.isEmpty())	//need to check here if valid type - share checkValid(runType) method with Run?
 			raceType = type;
 		else{
-			try {races.get(curRace).setEventType(type);}
+			try {races.get(curRun).setEventType(type);}
 			catch (RaceException e) {history.add(e.getMessage());}
 			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
 		}
@@ -126,18 +156,21 @@ public class ChronoTrigger
 		flush();
 	}
 	
-	//creates a new race
-	public void newRace(ChronoTime commandTime)
+	/**
+	 * Will create a new Run
+	 * @param commandTime
+	 */
+	public void newRun(ChronoTime commandTime)
 	{
 		officialTime = commandTime;
 		
-		if(races.isEmpty() || races.get(curRace).isOver()){
-			races.add(new Race(commandTime));
-			curRace++;
-			history.add( (logTimes? officialTime+" | " : "") +"Created race "+curRace+".");
+		if(races.isEmpty() || races.get(curRun).hasEnded()){
+			races.add(new Run(commandTime));
+			curRun++;
+			history.add( (logTimes? officialTime+" | " : "") +"Created race "+curRun+".");
 		
 			if(raceType != null){
-				try {races.get(curRace).setEventType(raceType);}
+				try {races.get(curRun).setEventType(raceType);}
 				catch (RaceException e) {history.add(e.getMessage());}
 				catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
 			}
@@ -149,7 +182,11 @@ public class ChronoTrigger
 	}
 	
 	
-	//adds a racer to the current race
+	/**
+	 * adds racer with int parameter. Will check if a race is created
+	 * @param commandTime
+	 * @param num
+	 */
 	public void addRacer(ChronoTime commandTime, int num)
 	{
 		officialTime = commandTime;
@@ -157,7 +194,7 @@ public class ChronoTrigger
 		if (races.isEmpty())
 			history.add("Cannot add racer before race is created.");
 		else{
-			try {races.get(curRace).add(num);}
+			try {races.get(curRun).queueRacer(num);}
 			catch (RaceException e) {history.add(e.getMessage());}
 			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
 		}
@@ -165,7 +202,12 @@ public class ChronoTrigger
 		flush();
 	}
 	
-	//triggers sensor
+	/**
+	 * triggers Sensor given by c. Also analyzes what this trigger
+	 * actually means as an instruction.
+	 * @param commandTime
+	 * @param c
+	 */
 	public void triggerSensor(ChronoTime commandTime, int c)
 	{
 		officialTime = commandTime;
@@ -176,7 +218,7 @@ public class ChronoTrigger
 			if (channels[c].trigger() && !races.isEmpty()){
 				if(c == 1)
 				{
-					try {races.get(curRace).startNextRacer(officialTime);}
+					try {races.get(curRun).startNextRacer(officialTime);}
 					catch(RaceException e) {history.add(e.getMessage());}
 					catch(InvalidTimeException e){history.add(e.getMessage());}
 					catch(NoSuchElementException e){history.add(e.getMessage());}
@@ -184,7 +226,7 @@ public class ChronoTrigger
 				}
 				else if(c == 2)
 				{
-					try {races.get(curRace).finishNextRacer(officialTime);}
+					try {races.get(curRun).finishNextRacer(officialTime);}
 					catch(RaceException e) {history.add(e.getMessage());}
 					catch(InvalidTimeException e){history.add(e.getMessage());}
 					catch(NoSuchElementException e){history.add(e.getMessage());}
@@ -198,12 +240,16 @@ public class ChronoTrigger
 		flush();
 	}
 	
+	/**
+	 * Next Racer will not finish
+	 * @param commandTime
+	 */
 	public void dnf(ChronoTime commandTime)
 	{
 		officialTime = commandTime;
 		
 		if (!races.isEmpty()){
-			try {races.get(curRace).didNotFinish();}
+			try {(races.get(curRun)).didNotFinishNextRacer();}
 			catch(RaceException e) {history.add(e.getMessage());}
 			catch(NoSuchElementException e){history.add(e.getMessage());}
 			catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
@@ -212,12 +258,16 @@ public class ChronoTrigger
 		flush();
 	}
 	
+	/**
+	 * Next Racer will be canceled
+	 * @param commandTime
+	 */
 	public void cancel(ChronoTime commandTime)
 	{
 		officialTime = commandTime;
 		
 		if (!races.isEmpty()){
-			try {races.get(curRace).cancel();}
+			try {races.get(curRun).cancelNextRacer();}
 			catch(RaceException e) {history.add(e.getMessage());}
 			catch(NoSuchElementException e){history.add(e.getMessage());}
 			catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
@@ -226,13 +276,16 @@ public class ChronoTrigger
 		flush();
 	}
 	
-	//end the current race
-	public void finRace(ChronoTime commandTime)
+	/**
+	 * Ends Race. Currently need a method for this in Run
+	 * @param commandTime
+	 */
+	public void finRun(ChronoTime commandTime)
 	{
 		officialTime = commandTime;
 		
 		if (!races.isEmpty()){
-			try {races.get(curRace).endRace(this.officialTime);}
+			try {races.get(curRun).endRun(this.officialTime);}
 			catch (RaceException e) {history.add(e.getMessage());}
 			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
 		}
@@ -243,21 +296,84 @@ public class ChronoTrigger
 	//prints the current race
 	public void printCurRace(ChronoTime commandTime)
 	{
+officialTime = commandTime;
+		
+		if (!races.isEmpty()){
+			try {races.get(curRun).endRun(this.officialTime);}//endRace method in run
+			catch (RaceException e) {history.add(e.getMessage());}
+			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+		}
+		
+		flush();
+
+	}
+	
+	/**
+	 * Default, prints the current Run
+	 */
+	public void printRun(ChronoTime commandTime)
+	{
 		officialTime = commandTime;
 		
 		if (!races.isEmpty())
-			printer.print(races.get(curRace).getLog());
+			printer.print(races.get(curRun).getLog());
 	}
 	
+	/**
+	 * Prints run given by runNum
+	 * @param commandTime
+	 * @param runNum
+	 */
+	public void printRun(ChronoTime commandTime, int runNum)
+	{
+		officialTime = commandTime;
+		
+		if (!races.isEmpty())
+			printer.print(races.get(runNum).getLog());
+		else
+			history.add("runNum " + runNum+ " was invalid");
+	}
+	
+	/**
+	 * Exports run to .txt, default set to curRun
+	 * @param commandTime
+	 */
+	public void exportRun(ChronoTime commandTime)
+	{
+		officialTime = commandTime;
+		
+		if (!races.isEmpty())
+			printer.print(races.get(curRun).getLog());
+	}
+	
+	/**
+	 * Exports to .txt. uses the run given by runNum
+	 * @param commandTime
+	 * @param runNum
+	 */
+	public void exportRun(ChronoTime commandTime, int runNum)
+	{
+		officialTime = commandTime;
+		
+		if (!races.isEmpty() && runNum < curRun)
+			printer.print(races.get(runNum).getLog());
+		else
+			history.add("runNum " + runNum+ " was invalid");
+	}
+	
+	/**
+	 * 
+	 */
 	public void flush()
 	{
 		//try to flush race if it exists
 		if (!races.isEmpty())
-			printer.flush(races.get(curRace).getLog());
+			printer.flush(races.get(curRun).getLog());
 		
 		//flush chronotrigger history
 		printer.flush(history);
 	}
+
 	
 	/**
 	 * The Channel class.
@@ -397,7 +513,7 @@ public class ChronoTrigger
 			assertEquals(ct.officialTime,t4);
 			ct.setType(t1, "IND");
 			assertEquals(ct.officialTime,t1);
-			ct.newRace(t2);
+			ct.newRun(t2);
 			assertEquals(ct.officialTime,t2);
 			ct.addRacer(t3, 10);
 			assertEquals(ct.officialTime,t3);
@@ -407,7 +523,7 @@ public class ChronoTrigger
 			assertEquals(ct.officialTime,t1);
 			ct.cancel(t2);
 			assertEquals(ct.officialTime,t2);
-			ct.finRace(t3);
+			ct.finRun(t3);
 			assertEquals(ct.officialTime,t3);
 			ct.printCurRace(t4);
 			assertEquals(ct.officialTime,t4);
