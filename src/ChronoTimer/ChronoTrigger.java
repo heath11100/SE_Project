@@ -343,7 +343,7 @@ officialTime = commandTime;
 		officialTime = commandTime;
 		
 		if (!races.isEmpty())
-			printer.print(races.get(curRun).getLog());
+			printer.export(curRun, races.get(curRun));
 	}
 	
 	/**
@@ -356,7 +356,7 @@ officialTime = commandTime;
 		officialTime = commandTime;
 		
 		if (!races.isEmpty() && runNum < curRun)
-			printer.print(races.get(runNum).getLog());
+			printer.export(runNum, races.get(runNum));
 		else
 			history.add("runNum " + runNum+ " was invalid");
 	}
