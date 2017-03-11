@@ -165,7 +165,7 @@ public class ChronoTrigger
 		officialTime = commandTime;
 		
 		if(races.isEmpty() || races.get(curRun).hasEnded()){
-			races.add(new Run(commandTime));
+			races.add(new Run());
 			curRun++;
 			history.add( (logTimes? officialTime+" | " : "") +"Created race "+curRun+".");
 		

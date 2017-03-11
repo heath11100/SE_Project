@@ -229,10 +229,10 @@ public class Simulator {
 							throw new InvalidCommandException("event format, event");
 						break;
 					case "NEWRUN": 
-						sim.newRace(cTime);
+						sim.newRun(cTime);
 						break;
 					case "ENDRUN": 
-						sim.finRace(cTime);
+						sim.finRun(cTime);
 						break;
 					case "PRINT": //not used in sprint 1
 						sim.printCurRace(cTime);
