@@ -2,7 +2,6 @@ package ChronoTimer;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -123,7 +122,6 @@ public class Simulator {
 		String cCmd = ""; //current command, more like the current parsing token, but i like ccmd so sue me
 		String tokens[] = {""};
 		int cToken = 0;
-		Date t = new Date();
 		
 		ChronoTime cTime;
 		cTime = null;
