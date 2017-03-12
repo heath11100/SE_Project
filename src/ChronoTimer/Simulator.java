@@ -101,10 +101,8 @@ public class Simulator {
 	 */
 	private static void warning(String message)
 	{
-		System.out.println("error encountered during argument read, issue encountered is:");
-		System.out.println(message);
-		System.out.println("expected: <filename>");
-		System.exit(1);
+		System.out.println("Error encountered during argument read:"+message);
+		System.out.println("Expected: <filename>");
 	}
 	
 	private static void report(String message)
@@ -123,13 +121,14 @@ public class Simulator {
 		String tokens[] = {""};
 		int cToken = 0;
 		
-		ChronoTime cTime;
-		cTime = null;
-		
+		ChronoTime cTime = null;
 		ChronoTrigger sim = null;
-		if(args.length != 1 && args.length != 0)
+		
+		//Set up Scanner
+		if(args.length > 1)
 		{
-			warning("improper number of arguments");
+			warning("Improper number of arguments.");
+			report("Using console commands...");
 			input = new Scanner(System.in);
 		}
 		else if(args.length == 1)
@@ -142,20 +141,24 @@ public class Simulator {
 			catch (FileNotFoundException e) 
 			{
 				warning("File not found: " + args[0]);
-				return;
+				report("Using console commands...");
+				input = new Scanner(System.in);
 			}
 		}
 		else
 		{
-			report("using console commands");
+			report("Using console commands...");
 			input = new Scanner(System.in);
 		}
 		
-		input.useDelimiter(DELIMITERS);
 		
-		//simulator loop
+		
+		//Simulator Loop
+		input.useDelimiter(DELIMITERS);
 		while (state != END)
 		{
+			
+			//Read the next line
 			cToken = 0;
 			try
 			{
@@ -168,26 +171,28 @@ public class Simulator {
 				if(fread_m && !input.hasNext())//have we reached end of file?
 					state = END;
 				else
-					warning("unhandled IOException");
+					warning("Unhandled IOException.");
 			}
+			
+			//Split command into tokens
 			tokens = cCmd.split("\\s");
 			report(cCmd);
 			if (fread_m && tokens.length < 2)
-				warning("improper token matching in file read, did you forget a timestamp?");
+				warning("Improper token matching in file read, did you forget a timestamp?");
 			else if(tokens.length < 1)
-				warning("not enough tokens");
+				warning("Not enough tokens.");
 			else
 			{
+				
 				try
 				{
+					//Set simulator time variable
 					if(fread_m)
-					{
 						cTime = new ChronoTime(tokens[cToken++]);
-					}
 					else
-					{
 						cTime = ChronoTime.now();
-					}
+					
+					//Branch based on command
 					switch(tokens[cToken++])
 					{
 					case "POWER":
@@ -214,7 +219,7 @@ public class Simulator {
 						if(tokens[cToken].matches(CHANNELFORMAT))
 							sim.toggle(cTime, Integer.parseInt(tokens[cToken++]));
 						else
-							throw new InvalidCommandException("channel format, tog");
+							throw new InvalidCommandException("Channel format, tog");
 						break;
 					case "CONN": //not used in sprint 1
 						break;
@@ -222,31 +227,28 @@ public class Simulator {
 						break;
 					case "EVENT": ;
 						if(tokens[cToken].matches(EVENTFORMAT))
-						{
 							sim.setType(cTime, tokens[cToken++]);//fix this
-						}
 						else
-							throw new InvalidCommandException("event format, event");
+							throw new InvalidCommandException("Event format, event");
 						break;
 					case "NEWRUN": 
-						sim.newRace(cTime);
+						sim.newRun(cTime);
 						break;
 					case "ENDRUN": 
-						sim.finRace(cTime);
+						sim.finRun(cTime);
 						break;
-					case "PRINT": //not used in sprint 1
+					case "PRINT":
 						sim.printCurRace(cTime);
-						//test data conflicts with sprint 0 details again, discuss with group add race param or no? 
+						//must overload this to take no args OR race number
 						break;
-					case "EXPORT": //not used in sprint 1
+					case "EXPORT":
+						//must overload this to take no args OR race number
 						break;
 					case "NUM":
 						if(tokens[cToken].matches(RUNNERFORMAT))
-						{
 							sim.addRacer(cTime, Integer.parseInt(tokens[cToken++]));
-						}
 						else
-							throw new InvalidCommandException("runner format, num");
+							throw new InvalidCommandException("Runner format, num");
 						break;
 					case "CLR":
 						//not a cancel command, not used ion sprint 1?
@@ -257,53 +259,44 @@ public class Simulator {
 //						else
 //							throw new InvalidCommandException("runner format, clr");
 						break;
-					case "SWAP": //not used in sprint 1
+					case "SWAP": //not used in sprint 2
 						break;
 					case "CANCEL":
-						sim.cancel(cTime);// no information to give here I think?
+						sim.cancel(cTime);
 						break;
 					case "DNF": 
 						sim.dnf(cTime);
 						break;
 					case "TRIG":
-						//I think toggle is the command used here?
 						if(tokens[cToken].matches(CHANNELFORMAT))
 							sim.triggerSensor(cTime, Integer.parseInt(tokens[cToken++]));
 						else
-							throw new InvalidCommandException("channel format, trig");
+							throw new InvalidCommandException("Channel format, trig");
 						break;
 					case "START":
-							//per instructions we will toggle 1 here we can change this to be using sim.start()
 						sim.triggerSensor(cTime, 1);
 						break;
 					case "FINISH":
 						sim.triggerSensor(cTime, 2);
 						break;
 					default:
-						report("Could not parse command");
+						report("Could not parse command.");
 						fparse = true;
 					}
 				}
 				catch (ArrayIndexOutOfBoundsException ex)
 				{
-					report("Innapropriate number of tokens");
+					report("Innapropriate number of tokens.");
 					fparse = true;
 				}
-				catch (NullPointerException ex)
-				{
-					report("Have not turned power on yet");
-				} 
-				catch (InvalidTimeException ex) {
-					// TODO Auto-generated catch block
-					report("error: incorrect time format");
-				} 
+				catch (NullPointerException ex){report("Have not turned power on yet.");} 
+				catch (InvalidTimeException ex) {report("Error: incorrect time format.");} 
 				catch (InvalidCommandException ex) {
-					// TODO Auto-generated catch block
 					report("error: " + ex.getMessage());
 					fparse = true;
 				}
 				if(cToken != tokens.length)
-					report("error: too many characters");
+					report("Error: too many words in command.");
 			}
 			
 		}

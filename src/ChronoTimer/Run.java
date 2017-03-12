@@ -44,7 +44,7 @@ public class Run {
 	
 	private Log log;
 	
-	Run(EventType eventType) {
+	public Run(EventType eventType) {
 		this.eventType = eventType;
 		
 		this.queuedRacers = new LinkedList<>();
@@ -54,7 +54,7 @@ public class Run {
 		this.log = new Log();
 	}
 	
-	Run() {
+	public Run() {
 		this(EventType.IND);
 	}
 	
@@ -133,7 +133,6 @@ public class Run {
 	public EventType getEventType() {
 		return this.eventType;
 	}
-	
 	
 	/**
 	 * Ends the current run. This cannot be undone. Any racers that are currently running will be set to DNF. 
@@ -250,6 +249,15 @@ public class Run {
 	 */
 	public void startNextRacer(ChronoTime atTime) throws InvalidTimeException, RaceException {
 		Racer nextRacer = this.queuedRacers.poll();
+		ChronoTime _tempStartTime = null;
+		
+		if (!this.hasStarted()) {
+			//Race has not started, 
+			//set the start time to be the same as the racers.
+			_tempStartTime = atTime;
+		} else {
+			_tempStartTime = this.startTime;
+		}
 		
 		if (atTime == null) {
 			throw new InvalidTimeException("NULL: Not valid time");
@@ -257,17 +265,14 @@ public class Run {
 		} else if (this.hasEnded()) {
 			throw new RaceException("Race has ended");
 			
-		} else if (atTime.isBefore(this.startTime)) {
+		} else if (atTime.isBefore(_tempStartTime)) {
 			throw new InvalidTimeException("Time is before the run start time");
 			
 		} else if (nextRacer == null) {
 			throw new RaceException("No racer to start");
 			
 		} else {
-			if (!this.hasStarted()) {
-				//Race has not started, set the start time to be the same as the racers.
-				this.startTime = atTime;
-			}
+			this.startTime = _tempStartTime;
 			
 			this.queuedRacers.remove(nextRacer);
 			this.runningRacers.add(nextRacer);
@@ -357,7 +362,7 @@ public class Run {
 		}
 	}
 	
-	enum EventType {
+	public enum EventType {
 		IND,
 		PARIND;
 	}
