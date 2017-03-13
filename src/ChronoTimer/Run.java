@@ -99,7 +99,7 @@ public class Run {
 	private Racer getRacer(int racerNumber) {
 		Racer racer = null;
 		for (Racer r : this.queuedRacers) {
-			if (r.equals(racer)) {
+			if (r.getNumber() == racerNumber) {
 				racer = r;
 				break;
 			}
@@ -107,7 +107,7 @@ public class Run {
 		
 		if (racer == null) {
 			for (Racer r : this.runningRacers) {
-				if (r.equals(racer)) {
+				if (r.getNumber() == racerNumber) {
 					racer = r;
 					break;
 				}
@@ -116,7 +116,7 @@ public class Run {
 		
 		if (racer == null) {
 			for (Racer r : this.finishedRacers) {
-				if (r.equals(racer)) {
+				if (r.getNumber() == racerNumber) {
 					racer = r;
 					break;
 				}
