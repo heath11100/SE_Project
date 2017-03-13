@@ -528,13 +528,5 @@ officialTime = commandTime;
 			ct.printCurRace(t4);
 			assertEquals(ct.officialTime,t4);
 		}
-		
-		public void testSetType(){
-			assertEquals(ct.raceType,null);
-			ct.setType(t1, "BLAH");
-			assertEquals(ct.raceType,null);
-			ct.setType(t1, "IND");
-			assertEquals(ct.raceType,"IND");
-		}
 	}
 }

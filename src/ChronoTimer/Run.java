@@ -161,6 +161,8 @@ public class Run {
 			}
 			//Remove all racers that were running.
 			this.runningRacers.clear();
+			
+			this.log.add("Ended run at time: " + atTime);
 		}
 	}
 	
@@ -187,6 +189,8 @@ public class Run {
 		default:
 			throw new RaceException("Invalid event type: " + newEventType);
 		}
+		
+		this.log.add("Set event type to " + newEventType);
 	}
 	
 	/**
@@ -210,6 +214,8 @@ public class Run {
 			racer = new Racer(racerNumber);
 			
 			this.queuedRacers.add(racer);
+			
+			this.log.add("Queued racer");
 		}
 	}
 	
@@ -235,7 +241,9 @@ public class Run {
 		} else if (racer == null) {
 			throw new RaceException("Racer does not exist with number: " + racerNumber);
 		} else {
-			this.queuedRacers.remove(racer);			
+			this.queuedRacers.remove(racer);	
+			
+			this.log.add("Removed racer");
 		}
 	}
 	
@@ -279,6 +287,8 @@ public class Run {
 			
 			ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
 			nextRacer.start(elapsedTime);
+			
+			this.log.add("" + atTime + " Next racer started");
 		}
 	}
 	
@@ -315,6 +325,8 @@ public class Run {
 			
 			ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
 			nextRacer.finish(elapsedTime);
+			
+			this.log.add("" + atTime + " Next racer finished");
 		}
 	}
 	
@@ -337,6 +349,8 @@ public class Run {
 			this.queuedRacers.add(nextRacer);
 			
 			nextRacer.cancel();
+			
+			this.log.add("Cancelled next racer");
 		}
 	}
 	
@@ -359,6 +373,8 @@ public class Run {
 			this.finishedRacers.add(nextRacer);
 			
 			nextRacer.didNotFinish();
+			
+			this.log.add("Next racer did not finish");
 		}
 	}
 	
