@@ -17,7 +17,7 @@ public class ChronoTrigger
 	private boolean logTimes = false;
 	private Log history = new Log();
 	private Printer printer = new Printer();
-	private String raceType;
+	private String eventType;
 	/**
 	 * Default Constructor
 	 * 
@@ -146,7 +146,7 @@ public class ChronoTrigger
 		officialTime = commandTime;
 		
 		if (runs.isEmpty())	//need to check here if valid type - share checkValid(runType) method with Run?
-			raceType = type;
+			eventType = type;
 		else{
 			try {runs.get(curRun).setEventType(type);}
 			catch (RaceException e) {history.add(e.getMessage());}
@@ -169,12 +169,12 @@ public class ChronoTrigger
 			curRun++;
 			history.add( (logTimes? officialTime+" | " : "") +"Created race "+curRun+".");
 		
-			if(raceType != null){
-				try {runs.get(curRun).setEventType(raceType);}
+			if(eventType != null){
+				try {runs.get(curRun).setEventType(eventType);}
 				catch (RaceException e) {history.add(e.getMessage());}
 				catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
 			}
-			raceType = null;}//why this?
+			eventType = null;}//why this?
 		else
 			history.add("No race was created- already have current race.");
 		
