@@ -41,6 +41,11 @@ public class Simulator {
 	static final String CHANNELFORMAT = "[1-8]";
 	
 	/**
+	 * for export and print
+	 */
+	static final String RACEFORMAT = "[0-9]+";
+	
+	/**
 	 * for later use
 	 */
 	static final String SENSORFORMAT = "EYE|GATE|PAD";
@@ -236,10 +241,17 @@ public class Simulator {
 						sim.finRun(cTime);
 						break;
 					case "PRINT":
-						sim.printCurRace(cTime);
+						if(tokens[cToken].matches(RACEFORMAT))
+							sim.printRun(cTime, Integer.parseInt(tokens[cToken++]));
+						else
+							sim.printRun(cTime);
 						//must overload this to take no args OR race number
 						break;
 					case "EXPORT":
+						if(tokens[cToken].matches(RACEFORMAT))
+							sim.exportRun(cTime, Integer.parseInt(tokens[cToken++]));
+						else
+							sim.exportRun(cTime);
 						//must overload this to take no args OR race number
 						break;
 					case "NUM":
