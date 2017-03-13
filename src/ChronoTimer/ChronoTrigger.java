@@ -12,7 +12,7 @@ public class ChronoTrigger
 {
 	private Channel[] channels;
 	private ChronoTime officialTime;
-	private ArrayList<Run> races = new ArrayList<>();
+	private ArrayList<Run> runs = new ArrayList<>();
 	private int curRun = -1;
 	private boolean logTimes = false;
 	private Log history = new Log();
@@ -145,10 +145,10 @@ public class ChronoTrigger
 	{
 		officialTime = commandTime;
 		
-		if (races.isEmpty())	//need to check here if valid type - share checkValid(runType) method with Run?
+		if (runs.isEmpty())	//need to check here if valid type - share checkValid(runType) method with Run?
 			raceType = type;
 		else{
-			try {races.get(curRun).setEventType(type);}
+			try {runs.get(curRun).setEventType(type);}
 			catch (RaceException e) {history.add(e.getMessage());}
 			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
 		}
@@ -164,13 +164,13 @@ public class ChronoTrigger
 	{
 		officialTime = commandTime;
 		
-		if(races.isEmpty() || races.get(curRun).hasEnded()){
-			races.add(new Run());
+		if(runs.isEmpty() || runs.get(curRun).hasEnded()){
+			runs.add(new Run());
 			curRun++;
 			history.add( (logTimes? officialTime+" | " : "") +"Created race "+curRun+".");
 		
 			if(raceType != null){
-				try {races.get(curRun).setEventType(raceType);}
+				try {runs.get(curRun).setEventType(raceType);}
 				catch (RaceException e) {history.add(e.getMessage());}
 				catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
 			}
@@ -191,10 +191,10 @@ public class ChronoTrigger
 	{
 		officialTime = commandTime;
 		
-		if (races.isEmpty())
+		if (runs.isEmpty())
 			history.add("Cannot add racer before race is created.");
 		else{
-			try {races.get(curRun).queueRacer(num);}
+			try {runs.get(curRun).queueRacer(num);}
 			catch (RaceException e) {history.add(e.getMessage());}
 			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
 		}
@@ -215,10 +215,10 @@ public class ChronoTrigger
 		//if valid channel..
 		if(c>=0 && c< 8){
 			//if trigger is successful and there's a current race
-			if (channels[c].trigger() && !races.isEmpty()){
+			if (channels[c].trigger() && !runs.isEmpty()){
 				if(c == 1)
 				{
-					try {races.get(curRun).startNextRacer(officialTime);}
+					try {runs.get(curRun).startNextRacer(officialTime);}
 					catch(RaceException e) {history.add(e.getMessage());}
 					catch(InvalidTimeException e){history.add(e.getMessage());}
 					catch(NoSuchElementException e){history.add(e.getMessage());}
@@ -226,7 +226,7 @@ public class ChronoTrigger
 				}
 				else if(c == 2)
 				{
-					try {races.get(curRun).finishNextRacer(officialTime);}
+					try {runs.get(curRun).finishNextRacer(officialTime);}
 					catch(RaceException e) {history.add(e.getMessage());}
 					catch(InvalidTimeException e){history.add(e.getMessage());}
 					catch(NoSuchElementException e){history.add(e.getMessage());}
@@ -248,8 +248,8 @@ public class ChronoTrigger
 	{
 		officialTime = commandTime;
 		
-		if (!races.isEmpty()){
-			try {(races.get(curRun)).didNotFinishNextRacer();}
+		if (!runs.isEmpty()){
+			try {(runs.get(curRun)).didNotFinishNextRacer();}
 			catch(RaceException e) {history.add(e.getMessage());}
 			catch(NoSuchElementException e){history.add(e.getMessage());}
 			catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
@@ -266,8 +266,8 @@ public class ChronoTrigger
 	{
 		officialTime = commandTime;
 		
-		if (!races.isEmpty()){
-			try {races.get(curRun).cancelNextRacer();}
+		if (!runs.isEmpty()){
+			try {runs.get(curRun).cancelNextRacer();}
 			catch(RaceException e) {history.add(e.getMessage());}
 			catch(NoSuchElementException e){history.add(e.getMessage());}
 			catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
@@ -284,8 +284,8 @@ public class ChronoTrigger
 	{
 		officialTime = commandTime;
 		
-		if (!races.isEmpty()){
-			try {races.get(curRun).endRun(this.officialTime);}
+		if (!runs.isEmpty()){
+			try {runs.get(curRun).endRun(this.officialTime);}
 			catch (RaceException e) {history.add(e.getMessage());}
 			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
 		}
@@ -298,8 +298,8 @@ public class ChronoTrigger
 	{
 officialTime = commandTime;
 		
-		if (!races.isEmpty()){
-			try {races.get(curRun).endRun(this.officialTime);}//endRace method in run
+		if (!runs.isEmpty()){
+			try {runs.get(curRun).endRun(this.officialTime);}//endRace method in run
 			catch (RaceException e) {history.add(e.getMessage());}
 			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
 		}
@@ -315,8 +315,8 @@ officialTime = commandTime;
 	{
 		officialTime = commandTime;
 		
-		if (!races.isEmpty())
-			printer.print(races.get(curRun).getLog());
+		if (!runs.isEmpty())
+			printer.print(runs.get(curRun).getLog());
 	}
 	
 	/**
@@ -328,8 +328,8 @@ officialTime = commandTime;
 	{
 		officialTime = commandTime;
 		
-		if (!races.isEmpty())
-			printer.print(races.get(runNum).getLog());
+		if (!runs.isEmpty())
+			printer.print(runs.get(runNum).getLog());
 		else
 			history.add("runNum " + runNum+ " was invalid");
 	}
@@ -342,8 +342,8 @@ officialTime = commandTime;
 	{
 		officialTime = commandTime;
 		
-		if (!races.isEmpty())
-			printer.export(curRun, races.get(curRun));
+		if (!runs.isEmpty())
+			printer.export(curRun, runs.get(curRun));
 	}
 	
 	/**
@@ -355,8 +355,8 @@ officialTime = commandTime;
 	{
 		officialTime = commandTime;
 		
-		if (!races.isEmpty() && runNum < curRun)
-			printer.export(runNum, races.get(runNum));
+		if (!runs.isEmpty() && runNum < curRun)
+			printer.export(runNum, runs.get(runNum));
 		else
 			history.add("runNum " + runNum+ " was invalid");
 	}
@@ -367,8 +367,8 @@ officialTime = commandTime;
 	public void flush()
 	{
 		//try to flush race if it exists
-		if (!races.isEmpty())
-			printer.flush(races.get(curRun).getLog());
+		if (!runs.isEmpty())
+			printer.flush(runs.get(curRun).getLog());
 		
 		//flush chronotrigger history
 		printer.flush(history);

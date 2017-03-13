@@ -116,7 +116,6 @@ public class Simulator {
 		Scanner input;
 		boolean fread_m = false;	//tells the simulator whether to keep track of its own time or use the provided file times
 		int state = RUN;	//changes so that we can terminate the simulator
-		boolean fparse = false;	//built in detection of failed parse will try to parse that particular command in the next loop
 		String cCmd = ""; //current command, more like the current parsing token, but i like ccmd so sue me
 		String tokens[] = {""};
 		int cToken = 0;
@@ -164,7 +163,6 @@ public class Simulator {
 			{
 				//cCmd = fparse ? tokens[tokens.length - 1] : input.next().trim().toUpperCase();
 				cCmd = input.next().trim().toUpperCase();
-				fparse = false;
 			}
 			catch (NoSuchElementException ex)
 			{
@@ -281,19 +279,16 @@ public class Simulator {
 						break;
 					default:
 						report("Could not parse command.");
-						fparse = true;
 					}
 				}
 				catch (ArrayIndexOutOfBoundsException ex)
 				{
 					report("Innapropriate number of tokens.");
-					fparse = true;
 				}
-				catch (NullPointerException ex){report("Have not turned power on yet.");} 
-				catch (InvalidTimeException ex) {report("Error: incorrect time format.");} 
+				catch (NullPointerException ex){report("Have not turned power on yet.");}
+				catch (InvalidTimeException ex) {report("Error: incorrect time format.");}
 				catch (InvalidCommandException ex) {
 					report("error: " + ex.getMessage());
-					fparse = true;
 				}
 				if(cToken != tokens.length)
 					report("Error: too many words in command.");
