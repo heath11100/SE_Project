@@ -296,14 +296,13 @@ public class Run {
 	 * OR when the racerNumber does not fit within the bounds [1,9999]
 	 * OR when the run was ended
 	 */
-	public void queueRacer(int racerNumber, int lane) throws RaceException {		
+	public void queueRacer(int racerNumber) throws RaceException {		
 		if (racerNumber < 1 || racerNumber > 9999) {
 			throw new RaceException("Number must be within bounds [1,9999]");
 			
-		} else if (!this.isValidLane(lane)) {
-			throw new RaceException("Invalid lane: " + lane);
+		}
 			
-		} else if (!this.canQueueRacer(racerNumber)) {
+		 else if (!this.canQueueRacer(racerNumber)) {
 			throw new RaceException("Racer already exists with number: " + racerNumber);
 			
 		} else if (this.hasEnded()) { 
