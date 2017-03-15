@@ -7,38 +7,18 @@ import java.util.Queue;
 import Exceptions.*;
 
 /* Questions:
- * 1) Should we have a "initialized time" for Run (currently startTime)
- *  AND a "startTime" that corresponds to the time the first racer began?
- *  - Should start when the first racer starts.
+ *  1) Can racers have the same number in different lanes? I implemented it so they cannot.
  *  
- * 2) Should we be able to add racers to the queue after the the first racer has started?
- *  - Yes, cannot add once run has ended.
- * 
- * 3) Should we be able to remove racers from the queue after the first racer has started?
- *  - Yes, cannot remove once run has ended.
- * 
- * 4) What should happen when the last racer finishes?
- *  - Nothing
- * 
- * 5) What happens when ending a run before all of the racers have completed?
- *  Should we not allow a run to be ended, but instead end it when all racers have finished or DNF'd?
- *  - DNF All racers, ASK DNF
+ *  2) Should I add lane creation to the log?
  *  
- *  6) Should we be passing a copy of log to ChronoTrigger? If not, we might as well make it a public variable
+ *  3) When switching between a PARIND to IND, what should happen to all of the queues?
  *  
- *  7) When do we allow the eventType to be changed? 
- *  (Currently you cannot change it once a racer has been put into the race)
- *  - Keep as current
+ *  4) We start the run when the first racer begins. What happens if the first, and only, racer is cancelled
+ *  	so they are moved back to the start queue?
  *  
- *  8) Should we pass a String for EventType in the constructor?
- *  
- *  
- *  NEW QUESTIONS:
- *  9) Can racers have the same number in different lanes? I implemented it so they cannot.
- *  
- *  10) Should I add lane creation to the log?
- *  
- *  11) When switching between a PARIND to IND, what should happen to all of the queues?
+ *  5) At what point should we prevent a lane creation?
+ *  	- Currently there is not a restriction
+ *  	- I think it makes sense to prevent it after the race has started.
  */
 
 public class Run {
@@ -68,10 +48,20 @@ public class Run {
 	}
 	
 	/**
+	 * Determines whether or not a lane number is valid. A lane number is valid when it is in bounds [1,8] AND 
+	 * the lane number is less than or equal to the number of lanes available.
+	 * @param laneNumber corresponding to index+1 in the lists
+	 * @return true if lane number is valid, false otherwise.
+	 */
+	private boolean isValidLane(int laneNumber) {
+		return (laneNumber >= 1 && laneNumber <= 8) && (laneNumber <= this.queuedLists.size());
+	}
+	
+	/**
 	 * Get the log the run maintains to keep track of all changes to the run.
 	 * @return the log
 	 */
-	Log getLog() {
+	public Log getLog() {
 		return this.log;
 	}
 	
@@ -127,6 +117,8 @@ public class Run {
 	/**
 	 * Removes the last lane from the list.
 	 * @return the number of the removed lane.
+	 * @throws RaceException when there is not a lane to remove
+	 * @throws IllegalStateException when the lists are not the same size (this would be an internal error)
 	 */
 	public int removeLane() throws RaceException {
 		int size = this.queuedLists.size();
@@ -145,16 +137,6 @@ public class Run {
 		}
 		
 		return this.queuedLists.size()+1;
-	}
-	
-	/**
-	 * Determines whether or not a lane number is valid. A lane number is valid when it is in bounds [1,8] AND 
-	 * the lane number is less than or equal to the number of lanes available.
-	 * @param laneNumber corresponding to index+1 in the lists
-	 * @return true if lane number is valid, false otherwise.
-	 */
-	private boolean isValidLane(int laneNumber) {
-		return (laneNumber >= 1 && laneNumber <= 8) && (laneNumber <= this.queuedLists.size());
 	}
 	
 	/**
