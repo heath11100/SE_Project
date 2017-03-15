@@ -8,17 +8,19 @@ import Exceptions.*;
 
 /* Questions:
  *  1) Can racers have the same number in different lanes? I implemented it so they cannot.
- *  
+ *  	- NOPE
  *  2) Should I add lane creation to the log?
- *  
+ *  	- NOPE
  *  3) When switching between a PARIND to IND, what should happen to all of the queues?
- *  
+ *  	- WHAT is currently happening
  *  4) We start the run when the first racer begins. What happens if the first, and only, racer is cancelled
  *  	so they are moved back to the start queue?
+ *  	- Run continues going
  *  
  *  5) At what point should we prevent a lane creation?
  *  	- Currently there is not a restriction
  *  	- I think it makes sense to prevent it after the race has started.
+ *  	- Once race has started we should prevent lane creation.
  */
 
 public class Run {
@@ -27,18 +29,18 @@ public class Run {
 	
 	private EventType eventType;
 	
-	private ArrayList<Queue<Racer>> queuedLists;
-	private ArrayList<Queue<Racer>> runningLists;
-	private ArrayList<Queue<Racer>> finishedLists;
+	private Queue<Racer> queuedRacers;
+	private ArrayList<Queue<Racer>> runningLanes;
+	private Queue<Racer> finishedRacers;
 	
 	private Log log;
 	
 	public Run(EventType eventType) {
 		this.eventType = eventType;
 		
-		this.queuedLists = new ArrayList<>();
-		this.runningLists = new ArrayList<>();
-		this.finishedLists = new ArrayList<>();
+		this.queuedRacers = new LinkedList<>();
+		this.runningLanes = new ArrayList<>();
+		this.finishedRacers = new LinkedList<>();
 		
 		this.log = new Log();
 	}
@@ -54,7 +56,7 @@ public class Run {
 	 * @return true if lane number is valid, false otherwise.
 	 */
 	private boolean isValidLane(int laneNumber) {
-		return (laneNumber >= 1 && laneNumber <= 8) && (laneNumber <= this.queuedLists.size());
+		return (laneNumber >= 1 && laneNumber <= 8) && (laneNumber <= this.runningLanes.size());
 	}
 	
 	/**
@@ -90,28 +92,29 @@ public class Run {
 		return this.eventType;
 	}
 	
-	
 	/**
 	 * Creates a new lane for runners to be added to.
 	 * @return lane number corresponding to the lane just created.
 	 * @throws RaceException when attempting to create a multiple lanes for an IND run
+	 * OR if the run has started
+	 * OR if the run has ended
+	 * OR if the number of lanes will exceed 8 (after creating this new one)
 	 */
 	public int newLane() throws RaceException {
 		//Verify event type & lane count.
-		if (this.queuedLists.size() >= 1 && this.getEventType() == EventType.IND) {
+		if (this.runningLanes.size() >= 1 && this.getEventType() == EventType.IND) {
 			throw new RaceException("Cannot create more than one lane with event type IND");
+		} else if (this.hasStarted()) {
+			throw new RaceException("Cannot create new lane after run started");
+		} else if (this.hasEnded()) {
+			throw new RaceException("Cannot create new lane after run ended");
+		} else if (this.runningLanes.size() >= 8) {
+			throw new RaceException("Cannot have more than 8 lanes.");
 		}
 		
-		this.queuedLists.add(new LinkedList<Racer>());
-		this.runningLists.add(new LinkedList<Racer>());
-		this.finishedLists.add(new LinkedList<Racer>());
+		this.runningLanes.add(new LinkedList<Racer>());
 		
-		if (this.queuedLists.size() != this.runningLists.size() && 
-				this.runningLists.size() != this.finishedLists.size()) {
-			throw new IllegalStateException("The lists are not synchronized, sizes are not all equal.");
-		}
-		
-		return this.queuedLists.size();
+		return this.runningLanes.size();
 	}
 	
 	/**
@@ -121,22 +124,15 @@ public class Run {
 	 * @throws IllegalStateException when the lists are not the same size (this would be an internal error)
 	 */
 	public int removeLane() throws RaceException {
-		int size = this.queuedLists.size();
+		int size = this.runningLanes.size();
 		
 		if (size == 0) {
 			throw new RaceException("No lane to remove");
 		}
 		
-		this.queuedLists.remove(size - 1);
-		this.runningLists.remove(size - 1);
-		this.finishedLists.remove(size - 1);
+		this.runningLanes.remove(size - 1);
 		
-		if (this.queuedLists.size() != this.runningLists.size() && 
-				this.runningLists.size() != this.finishedLists.size()) {
-			throw new IllegalStateException("The lists are not synchronized, sizes are not all equal.");
-		}
-		
-		return this.queuedLists.size()+1;
+		return this.runningLanes.size()+1;
 	}
 	
 	/**
@@ -160,62 +156,34 @@ public class Run {
 		} else {
 			this.endTime = atTime;
 			
-			
-			for (int queueIndex = 0; queueIndex < this.queuedLists.size(); queueIndex++) {
-				Queue<Racer> runningQueue = this.runningLists.get(queueIndex);
-				
-				for (Racer racer : runningQueue) {
+			for (Queue<Racer> queue : this.runningLanes) {
+				//Iterate through every running queue
+				for (Racer racer : queue) {
 					//Add the racer to the corresponding finished queue
-					this.finishedLists.get(queueIndex).add(racer);
+					this.finishedRacers.add(racer);
 					racer.didNotFinish();
 				}
 				
-				//Remove all racers that were running from the queue
-				runningQueue.clear();
+				queue.clear();
 				
 				this.log.add("Ended run at time: " + atTime);
-
 			}
 		}
 	}
 	
 	/**
 	 * Determines whether or not it is OK to change the event type.
-	 * You can only change the event type BEFORE a racer is put into the run.
+	 * You can only change the event type BEFORE the race begins.
 	 * @return true if you can change the event type, false otherwise.
 	 */
-	private boolean canChangeEventType() {
-		boolean isValid = true;
+	private boolean canChangeEventType() {		
+		int runningSize = 0;
 		
-		for (Queue<Racer> queue : this.queuedLists) {
-			isValid = queue.size() == 0;
-			
-			if (!isValid) {
-				break;
-			}
+		for (Queue<Racer> queue : this.runningLanes) {
+			runningSize += queue.size();
 		}
 		
-		if (isValid) {
-			for (Queue<Racer> queue : this.runningLists) {
-				isValid = queue.size() == 0;
-				
-				if (!isValid) {
-					break;
-				}
-			}
-		}
-		
-		if (isValid) {
-			for (Queue<Racer> queue : this.finishedLists) {
-				isValid = queue.size() == 0;
-				
-				if (!isValid) {
-					break;
-				}
-			}
-		}
-		
-		return isValid;
+		return runningSize == 0 && this.finishedRacers.size() == 0;		
 	}
 	
 	/**
@@ -235,9 +203,7 @@ public class Run {
 			this.eventType = EventType.IND;
 			
 			//Remove all existing lanes
-			this.queuedLists.clear();
-			this.runningLists.clear();
-			this.finishedLists.clear();
+			this.runningLanes.clear();
 			
 			//Add one lane back to each of the lists
 			this.newLane();
@@ -263,22 +229,12 @@ public class Run {
 	 * @return true if the racer can be queued, false otherwise.
 	 */
 	private boolean canQueueRacer(int racerNumber) {
-		//Only valid if there is
+		//Only valid if there is not a racer with that number.
 		boolean isValid = true;
-		
-		for (Queue<Racer> queue : this.queuedLists) {
-			
-			for (Racer racer : queue) {
-				if (racer.getNumber() == racerNumber) {
-					isValid = false;
-				}
 				
-				if (!isValid) {
-					break;
-				}
-			}
-			
-			if (!isValid) {
+		for (Racer racer : this.queuedRacers) {
+			if (racer.getNumber() == racerNumber) {
+				isValid = false;
 				break;
 			}
 		}
@@ -299,7 +255,6 @@ public class Run {
 	public void queueRacer(int racerNumber) throws RaceException {		
 		if (racerNumber < 1 || racerNumber > 9999) {
 			throw new RaceException("Number must be within bounds [1,9999]");
-			
 		}
 			
 		 else if (!this.canQueueRacer(racerNumber)) {
@@ -310,8 +265,7 @@ public class Run {
 			
 		} else {
 			Racer racer = new Racer(racerNumber);
-			
-			this.queuedLists.get(lane -1).add(racer);
+			this.queuedRacers.add(racer);
 						
 			this.log.add("Queued racer");
 		}
@@ -332,9 +286,8 @@ public class Run {
 			throw new RaceException("Invalid lane: " + lane);
 			
 		} else {
-			Queue<Racer> queuedQueue = this.queuedLists.get(lane - 1);
 			Racer racer = null;
-			for (Racer r : queuedQueue) {
+			for (Racer r : this.queuedRacers) {
 				if (r.equals(racer)) {
 					racer = r;
 					break;
@@ -345,7 +298,7 @@ public class Run {
 				throw new RaceException("No racer to remove");
 				
 			} else {
-				queuedQueue.remove(racer);
+				queuedRacers.remove(racer);
 				
 				this.log.add("Removed racer");
 			}
@@ -387,16 +340,15 @@ public class Run {
 			throw new RaceException("Invalid lane: " + lane);
 			
 		} else {
-			Queue<Racer> queuedQueue = this.queuedLists.get(lane - 1);
-			Racer nextRacer = queuedQueue.poll();
+			Racer nextRacer = queuedRacers.poll();
 			
 			if (nextRacer == null) {
 				throw new RaceException("No racer to start");
 				
 			} else {
 				this.startTime = _tempStartTime;
-				queuedQueue.remove(nextRacer);
-				this.runningLists.get(lane - 1).add(nextRacer);
+				queuedRacers.remove(nextRacer);
+				this.runningLanes.get(lane - 1).add(nextRacer);
 								
 				ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
 				nextRacer.start(elapsedTime);
@@ -434,7 +386,7 @@ public class Run {
 		} else if (!this.isValidLane(lane)) {
 			
 		} else {
-			Queue<Racer> runningQueue = this.runningLists.get(lane - 1);
+			Queue<Racer> runningQueue = this.runningLanes.get(lane - 1);
 			Racer nextRacer = runningQueue.poll();
 			
 			if (nextRacer == null) {
@@ -442,7 +394,7 @@ public class Run {
 				
 			} else {
 				runningQueue.remove(nextRacer);
-				this.finishedLists.get(lane - 1).add(nextRacer);
+				this.finishedRacers.add(nextRacer);
 								
 				ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
 				nextRacer.finish(elapsedTime);
@@ -466,7 +418,7 @@ public class Run {
 			throw new RaceException("Race has ended");
 			
 		} else {
-			Queue<Racer> runningQueue = this.runningLists.get(lane - 1);
+			Queue<Racer> runningQueue = this.runningLanes.get(lane - 1);
 			Racer nextRacer = runningQueue.poll();
 			
 			if (nextRacer == null) {
@@ -475,8 +427,8 @@ public class Run {
 			} else {
 				runningQueue.remove(nextRacer);
 				
-				this.queuedLists.get(lane - 1).add(nextRacer);
-				
+				this.queuedRacers.add(nextRacer);
+								
 				nextRacer.didNotFinish();
 				
 				this.log.add("Next racer did not finish");
@@ -499,7 +451,7 @@ public class Run {
 			throw new RaceException("Race has ended");
 			
 		} else {
-			Queue<Racer> runningQueue = this.runningLists.get(lane - 1);
+			Queue<Racer> runningQueue = this.runningLanes.get(lane - 1);
 			Racer nextRacer = runningQueue.poll();
 			
 			if (nextRacer == null) {
@@ -507,8 +459,7 @@ public class Run {
 				
 			} else {
 				runningQueue.remove(nextRacer);
-				
-				this.finishedLists.get(lane - 1).add(nextRacer);
+				this.finishedRacers.add(nextRacer);
 				
 				nextRacer.didNotFinish();
 				
