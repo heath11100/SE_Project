@@ -194,7 +194,7 @@ public class ChronoTrigger
 		if (runs.isEmpty())
 			history.add("Cannot add racer before race is created.");
 		else{
-			try {runs.get(curRun).queueRacer(num);}
+			try {runs.get(curRun).queueRacer(num, curRun);}
 			catch (RaceException e) {history.add(e.getMessage());}
 			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
 		}
@@ -218,7 +218,7 @@ public class ChronoTrigger
 			if (channels[c].trigger() && !runs.isEmpty()){
 				if(c == 1)
 				{
-					try {runs.get(curRun).startNextRacer(officialTime);}
+					try {runs.get(curRun).startNextRacer(officialTime, curRun);}
 					catch(RaceException e) {history.add(e.getMessage());}
 					catch(InvalidTimeException e){history.add(e.getMessage());}
 					catch(NoSuchElementException e){history.add(e.getMessage());}
@@ -226,7 +226,7 @@ public class ChronoTrigger
 				}
 				else if(c == 2)
 				{
-					try {runs.get(curRun).finishNextRacer(officialTime);}
+					try {runs.get(curRun).finishNextRacer(officialTime, curRun);}
 					catch(RaceException e) {history.add(e.getMessage());}
 					catch(InvalidTimeException e){history.add(e.getMessage());}
 					catch(NoSuchElementException e){history.add(e.getMessage());}
@@ -249,7 +249,7 @@ public class ChronoTrigger
 		officialTime = commandTime;
 		
 		if (!runs.isEmpty()){
-			try {(runs.get(curRun)).didNotFinishNextRacer();}
+			try {(runs.get(curRun)).didNotFinishNextRacer(curRun);}
 			catch(RaceException e) {history.add(e.getMessage());}
 			catch(NoSuchElementException e){history.add(e.getMessage());}
 			catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
@@ -267,7 +267,7 @@ public class ChronoTrigger
 		officialTime = commandTime;
 		
 		if (!runs.isEmpty()){
-			try {runs.get(curRun).cancelNextRacer();}
+			try {runs.get(curRun).cancelNextRacer(curRun);}
 			catch(RaceException e) {history.add(e.getMessage());}
 			catch(NoSuchElementException e){history.add(e.getMessage());}
 			catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
