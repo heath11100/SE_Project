@@ -7,7 +7,7 @@ import java.util.Set;
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
 import junit.framework.TestCase;
-
+//hello
 public class ChronoTrigger 
 {
 	private Channel[] channels;
