@@ -15,7 +15,7 @@ public class TestRun_PARIND extends TestCase {
 	
 	private int racerNumber1, racerNumber2, racerNumber3, racerNumber4, racerNumber5;
 	
-	ChronoTime time1, time2, time3;
+	ChronoTime time1, time2, time3, time4;
 	
 	@Override 
 	public void setUp() throws InvalidTimeException {
@@ -30,6 +30,7 @@ public class TestRun_PARIND extends TestCase {
 		time1 = new ChronoTime(0,0,0,0);
 		time2 = new ChronoTime(1,0,0,0);
 		time3 = new ChronoTime(2,0,0,0);
+		time4 = new ChronoTime(3,0,0,0);
 	}
 	
 	
@@ -159,4 +160,94 @@ public class TestRun_PARIND extends TestCase {
 		}
 	}
 	
+	/**
+	 * Test Running multiple racers with
+	 */
+	
+	public void testFinishingRacers() {
+		//Add new lane.
+		try {
+			run.newLane();
+		} catch (RaceException e) {
+			fail("Should not fail in this instance.");
+		}
+		
+		//Add racer 1.
+		try {
+			run.queueRacer(racerNumber1);
+		} catch (RaceException e) {
+			fail("Should not fail in this instance.");
+		}
+		
+		//Add racer 2.
+		try {
+			run.queueRacer(racerNumber2);
+		} catch (RaceException e) {
+			fail("Should not fail in this instance.");
+		}
+		
+		//Add new lane.
+		try {
+			run.newLane();
+		} catch (RaceException e) {
+			fail("Should not fail in this instance.");
+		}
+		
+		//Add new lane.
+		try {
+			run.newLane();
+		} catch (RaceException e) {
+			fail("Should not fail in this instance.");
+		}
+		
+		//Add racer 3.
+		try {
+			run.queueRacer(racerNumber3);
+		} catch (RaceException e) {
+			fail("Should not fail in this instance.");
+		}
+
+		//Add racer 4.
+		try {
+			run.queueRacer(racerNumber4);
+		} catch (RaceException e) {
+			fail("Should not fail in this instance.");
+		}
+		
+		//Start racer 1, lane 1
+		try {
+			run.startNextRacer(time1, 1);
+		} catch (Exception e) {
+			fail("Should not fail in this instance.");
+		}
+		
+		//Start racer 2, lane 3
+		try {
+			run.startNextRacer(time2, 3);
+		} catch (Exception e) {
+			fail("Should not fail in this instance.");
+		}
+		
+		//Finish racer 1, lane 1
+		try {
+			run.startNextRacer(time2, 3);
+			run.finishNextRacer(time3, 1);
+		} catch (Exception e) {
+			fail("Should not fail in this instance.");
+		}
+		
+		//Add racer 5.
+		try {
+			run.queueRacer(racerNumber5);
+		} catch (RaceException e) {
+			fail("Should not fail in this instance.");
+		}
+		
+		//Start racer 3, lane 2
+		try {
+			run.startNextRacer(time4, 2);
+		} catch (Exception e) {
+			fail("Should not fail in this instance.");
+		}
+	}
 }
