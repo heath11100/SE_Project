@@ -18,7 +18,7 @@ public class ChronoTrigger
 	private Log history = new Log();
 	private Printer printer = new Printer();
 	private String eventType;
-	private int[] lanes = new int[4];
+	private int[] lanes = new int[8];
 	/**
 	 * Default Constructor
 	 * 
@@ -34,7 +34,8 @@ public class ChronoTrigger
 		for(int j =0; j < 8; j++){
 			channels[j] = new Channel();
 			channels[j].connect("EYE");}
-		
+		for(int k = 0; k < 8; k++)
+			lanes[k] = k;
 		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
 		flush();
 	}
@@ -53,7 +54,8 @@ public class ChronoTrigger
 		for(int i = 0; i < 8; i++){
 				channels[i] = new Channel();
 				channels[i].connect("EYE");}
-			
+		for(int k = 0; k < 8; k++)
+			lanes[k] = k;
 		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
 		flush();
 	}
