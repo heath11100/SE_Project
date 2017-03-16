@@ -5,136 +5,255 @@ import Exceptions.*;
 import junit.framework.TestCase;
 
 public class TestRun extends TestCase {
-	private Run runIND, runPARIND;
+	private Run run;
 	
-	private int racerNumber1, racerNumber2;
+	private int racerNumber;
 	
 	ChronoTime time1, time2, time3;
 	
 	@Override 
 	public void setUp() throws InvalidTimeException {
-		runIND = new Run();
-		runPARIND = new Run(Run.EventType.PARIND);
+		run = new Run();
 		
-		racerNumber1 = 1234;
-		racerNumber2 = 5678;
+		racerNumber = 1234;
 		
 		time1 = new ChronoTime(0,0,0,0);
 		time2 = new ChronoTime(1,0,0,0);
 		time3 = new ChronoTime(2,0,0,0);
 	}
 	
-	public void testHasStarted() {
-		//Assert that runIND has not started (since no racer started)
-		assertFalse(runIND.hasStarted());
+	/**
+	 * Tests to ensure that the constructor for Run(EventType eventType) properly sets the event type.
+	 */
+	public void testRunInitializerIND() {
+		run = new Run(Run.EventType.IND);
 		
+		assertEquals(run.getEventType(), Run.EventType.IND);
+	}
+	
+	/**
+	 * Tests to ensure that the default constructor Run() properly sets the event type as IND.
+	 */
+	public void testRunDefaultInitializer() {
+		run = new Run();
+		
+		assertEquals(run.getEventType(), Run.EventType.IND);
+	}
+	
+	/**
+	 * Ensures that the log for run is not null.
+	 */
+	public void testLogNotNull() {
+		assertTrue(run.getLog() != null);
+	}
+	
+	
+	
+	//TEST Set Event Type
+	public void testEventTypeIND() {
 		try {
-			runIND.queueRacer(racerNumber1);
+			run.setEventType("IND");
+			
+			assertEquals(run.getEventType(), Run.EventType.IND);
 		} catch (RaceException e) {
-			fail("Queueing racerNumber1 should Not fail in this instance.");
+			fail("Should not fail for IND type.");
+		}
+	}
+	
+	public void testEventTypePARIND() {
+		try {
+			run.setEventType("PARIND");
+			
+			assertEquals(run.getEventType(), Run.EventType.PARIND);
+		} catch (RaceException e) {
+			fail("Should not fail for PARIND type.");
+		}
+	}
+	
+	public void testInvalidType() {
+		try {
+			run.setEventType("INDPAR");
+			fail("Should fail for INDPAR type.");
+		} catch (Exception e) {
+			assertTrue(e instanceof RaceException);
+		}
+	}
+	
+	public void testEventTypeChangeAfterRacerStart() {	
+		int laneNumber = -1;
+		try {
+			laneNumber = run.newLane();
+		} catch (RaceException e) {
+			fail("Could not create a new lane for run");
 		}
 		
-		//Should not start when queueing racers.
-		assertFalse(runIND.hasStarted());
+		if (laneNumber == -1) {
+			fail("Lane number was not properly initialized");
+		}
 		
 		try {
-			runIND.startNextRacer(time1);
+			run.queueRacer(racerNumber);
+			
+		} catch (RaceException e) {
+			fail("Queueing racerNumber should Not fail in this instance.");
+		}
+		
+		try {
+			run.setEventType("PARIND");	
+		} catch (RaceException e) {
+			fail("Should not fail for queued racer.");
+		}
+		
+		
+		try {
+			run.startNextRacer(time1, laneNumber);
 		} catch (InvalidTimeException | RaceException e) {
-			System.out.println(e.getMessage());
 			fail("Starting next racer should NOT fail in this instance.");
 		}
 		
-		//Run has started since first racer started.
-		assertTrue(runIND.hasStarted());
+		try {
+			run.setEventType("IND");	
+			fail("Should fail for queued racer.");
+		} catch (RaceException e) { }
 	}
 	
-	public void testHasEnded() {
-		//Assert that runIND has not started (since no racer started)
-		assertFalse(runIND.hasEnded());
-		
+	/**
+	 * Successfully queues a racer (with raceNumber, in lane 1)
+	 */
+	private void queueRacer() throws RaceException {
+		run.newLane();
+		run.queueRacer(racerNumber);
+	}
+	
+	/**
+	 * Starts one racer in lane 1 with racerNumber.
+	 * @throws RaceException
+	 */
+	private void startRacer() throws RaceException {
+		queueRacer();
 		try {
-			runIND.queueRacer(racerNumber1);
+			run.startNextRacer(time1, 1);
+		} catch (InvalidTimeException e1) {
+			fail("Time shoudl not be invalid in this instance.");
+		}
+	}
+	
+	
+	//MARK: Has Ended Testing.
+	/**
+	 * Tests that hasEnded returns false right after the Run is instantiated.
+	 */
+	public void testHasEndedAfterInstantiation() {
+		assertFalse(run.hasEnded());
+	}
+	
+	/**
+	 * Tests that hasEnded returns false after the first racer starts.
+	 */
+	public void testHasEndedAfterRacerStarts() {
+		try {
+			startRacer();
 		} catch (RaceException e) {
-			fail("Queueing racerNumber1 should Not fail in this instance.");
+			fail("Should not fail in this instance.");
 		}
 		
-		//Should not end when queueing racers.
-		assertFalse(runIND.hasEnded());
-		
-		try {
-			runIND.startNextRacer(time1);
-		} catch (InvalidTimeException | RaceException e) {
-			fail("Starting next racer should NOT fail in this instance.");
-		}
-		
-		//Should not end when starting a racer.
-		assertFalse(runIND.hasEnded());
-		
-		try {
-			runIND.finishNextRacer(time2);
-		} catch (InvalidTimeException | RaceException e) {
-			fail("Finishing next racer should NOT fail in this instance.");
-		}
-		
-		//Run should not end when ending a racer, even if it is
-		// the last racer.
-		assertFalse(runIND.hasEnded());
-		
-		try {
-			runIND.endRun(time3);
-		} catch (RaceException | InvalidTimeException e) {
-			fail("Ending run should NOT fail in this instance.");
-		}
-		
-		assertTrue(runIND.hasEnded());
+		assertFalse(run.hasEnded());
 	}
 	
-	public void testHasRacerBegan() {
-		//Assert that runIND hasRacerBegan() == false;
-		assertFalse(runIND.hasRacerBegan());
-		
+	/**
+	 * Tests that hasEnded returns false after the first racer ends.
+	 */
+	public void testHasEndedAfterFirstRacerEnds()  {
 		try {
-			runIND.queueRacer(racerNumber1);
+			startRacer();
 		} catch (RaceException e) {
-			fail("Queueing racerNumber1 should Not fail in this instance.");
+			fail("Should not fail in this instance.");
 		}
 		
-		//Should not "hasRacerBegan" when queueing racers.
-		assertFalse(runIND.hasRacerBegan());
-		
-		try {
-			runIND.startNextRacer(time1);
-		} catch (InvalidTimeException | RaceException e) {
-			fail("Starting next racer should NOT fail in this instance.");
-		}
-		
-		//Should hasracerbegan
-		assertTrue(runIND.hasRacerBegan());
-		
-		try {
-			runIND.finishNextRacer(time2);
-		} catch (InvalidTimeException | RaceException e) {
-			fail("Finishing next racer should NOT fail in this instance.");
-		}
-		
-		assertTrue(runIND.hasRacerBegan());
-		
-		try {
-			runIND.endRun(time3);
-		} catch (RaceException | InvalidTimeException e) {
-			fail("Ending run should NOT fail in this instance.");
-		}
-		
-		assertTrue(runIND.hasRacerBegan());
+		assertFalse(run.hasEnded());
 	}
 	
-	//MARK: End Run Tests
+	/**
+	 * Tests that hasEnded returns true after the race has ended.
+	 */
+	public void testHasEndedAfterEndRun() {
+		try {
+			startRacer();
+		} catch (RaceException e) {
+			fail("Should not fail in this instance.");
+		}
+		
+		try {
+			run.endRun(time2);
+		} catch (Exception e) {
+			fail("Should not fail in this instance.");
+		}
+		
+		assertTrue(run.hasEnded());
+	}
+	
+	//MARK: Has Started Testing.
+	/**
+	 * Tests that hasStarted returns false right after the Run is instantiated.
+	 */
+	public void testHasStartedAfterInstantiation() {
+		assertFalse(run.hasStarted());
+	}
+	
+	/**
+	 * Tests that hasStarted returns false after queuing a racer.
+	 */
+	public void testHasStartedAfterQueuingRacer() {
+		try {
+			queueRacer();
+		} catch (RaceException e) {
+			fail("Should not fail when queuing a racer in this instance.");
+		}
+		
+		assertFalse(run.hasStarted());
+	}
+	
+	/**
+	 * Tests that hasStarted returns true after the first racer starts.
+	 */
+	public void testHasStartedAfterRacerStarts() {
+		try {
+			queueRacer();
+		} catch (RaceException e) {
+			fail("Should not fail when queuing a racer in this instance.");
+		}
+		
+		try {
+			run.startNextRacer(time1, 1);
+		} catch (InvalidTimeException e) {
+			fail("Time shoudl not be invalid in this instance.");
+
+		} catch (RaceException e) {
+			fail("Starting racer should not fail in this instance.");
+		}
+		
+		assertTrue(run.hasStarted());
+	}
+	
+	
+	//MARK: Test End Run
 	
 	public void testEndRunInvalidTime() {
+		int laneNumber = -1;
 		try {
-			runIND.queueRacer(racerNumber1);
+			laneNumber = run.newLane();
+		} catch (RaceException e) {
+			fail("Could not create a new lane for run");
+		}
+		
+		if (laneNumber == -1) {
+			fail("Lane number was not properly initialized");
+		}
+		
+		try {
+			run.queueRacer(racerNumber);
 
-			runIND.startNextRacer(time2);
+			run.startNextRacer(time2, laneNumber);
 			
 		} catch (InvalidTimeException | RaceException e) {
 			fail("Starting next racer should NOT fail in this instance.");
@@ -143,7 +262,7 @@ public class TestRun extends TestCase {
 		//Run has now started with startTime time2.
 		//Test a bad endRun time.
 		try {
-			runIND.endRun(time1);
+			run.endRun(time1);
 			
 			fail("Should not pass when time is before the start time");
 		} catch (InvalidTimeException e) {
@@ -154,8 +273,19 @@ public class TestRun extends TestCase {
 	}
 	
 	public void testEndRunWithNotStartedRun() {
+		int laneNumber = -1;
 		try {
-			runIND.queueRacer(racerNumber1);
+			laneNumber = run.newLane();
+		} catch (RaceException e) {
+			fail("Could not create a new lane for run");
+		}
+		
+		if (laneNumber == -1) {
+			fail("Lane number was not properly initialized");
+		}
+		
+		try {
+			run.queueRacer(racerNumber);
 			
 		} catch (RaceException e) {
 			fail("Queueing next racer should NOT fail in this instance.");
@@ -163,7 +293,7 @@ public class TestRun extends TestCase {
 		
 		//Run has a racer, but has NOT started.
 		try {
-			runIND.endRun(time1);
+			run.endRun(time1);
 			
 			fail("Should not pass when run has not started.");
 		} catch (InvalidTimeException e) {
@@ -174,10 +304,21 @@ public class TestRun extends TestCase {
 	}
 	
 	public void testEndRunAfterRunEnd() {
+		int laneNumber = -1;
 		try {
-			runIND.queueRacer(racerNumber1);
+			laneNumber = run.newLane();
+		} catch (RaceException e) {
+			fail("Could not create a new lane for run");
+		}
+		
+		if (laneNumber == -1) {
+			fail("Lane number was not properly initialized");
+		}
+		
+		try {
+			run.queueRacer(racerNumber);
 
-			runIND.startNextRacer(time1);
+			run.startNextRacer(time1, laneNumber);
 			
 		} catch (InvalidTimeException | RaceException e) {
 			fail("Starting next racer should NOT fail in this instance.");
@@ -186,9 +327,9 @@ public class TestRun extends TestCase {
 		//Run has now started with startTime time2.
 		//Test ending run after run has ended
 		try {
-			runIND.endRun(time2);
+			run.endRun(time2);
 			
-			runIND.endRun(time3);
+			run.endRun(time3);
 			
 			fail("Should not pass when time is before the start time");
 		} catch (InvalidTimeException e) {
@@ -196,55 +337,6 @@ public class TestRun extends TestCase {
 		} catch (RaceException e) {
 			assertTrue("Should fail because run has already ended.",true);
 		}
-	}
-	
-	
-	//TEST Set Event Type
-	public void testEventTypeIND() {
-		try {
-			runIND.setEventType("IND");
-			
-			assertEquals(runIND.getEventType(), Run.EventType.IND);
-		} catch (RaceException e) {
-			fail("Should not fail for IND type.");
-		}
-	}
-	
-	public void testEventTypePARIND() {
-		try {
-			runIND.setEventType("PARIND");
-			
-			assertEquals(runIND.getEventType(), Run.EventType.PARIND);
-		} catch (RaceException e) {
-			fail("Should not fail for PARIND type.");
-		}
-	}
-	
-	public void testEventTypeChangeAfterRacerStart() {		
-		try {
-			runIND.queueRacer(racerNumber1);
-			
-		} catch (RaceException e) {
-			fail("Queueing racerNumber1 should Not fail in this instance.");
-		}
-		
-		try {
-			runIND.setEventType("PARIND");			
-		} catch (RaceException e) {
-			fail("Should not fail for queued racer.");
-		}
-		
-		
-		try {
-			runIND.startNextRacer(time1);
-		} catch (InvalidTimeException | RaceException e) {
-			fail("Starting next racer should NOT fail in this instance.");
-		}
-		
-		try {
-			runIND.setEventType("IND");	
-			fail("Should fail for queued racer.");
-		} catch (RaceException e) { }
 	}
 	
 }

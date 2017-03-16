@@ -7,7 +7,7 @@ import java.util.Set;
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
 import junit.framework.TestCase;
-
+//hello
 public class ChronoTrigger 
 {
 	private Channel[] channels;
@@ -18,6 +18,7 @@ public class ChronoTrigger
 	private Log history = new Log();
 	private Printer printer = new Printer();
 	private String eventType;
+	private int[] lanes = new int[4];
 	/**
 	 * Default Constructor
 	 * 
@@ -151,6 +152,16 @@ public class ChronoTrigger
 			try {runs.get(curRun).setEventType(type);}
 			catch (RaceException e) {history.add(e.getMessage());}
 			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+			if(type == "IND")
+			{
+				lanes[0] = 1;
+				lanes[1] = 1;
+			}
+			if(type == "PAR")
+			{
+				lanes[0] = 1;
+				lanes[1] = 2;
+			}
 		}
 		
 		flush();
@@ -218,15 +229,33 @@ public class ChronoTrigger
 			if (channels[c].trigger() && !runs.isEmpty()){
 				if(c == 1)
 				{
-					try {runs.get(curRun).startNextRacer(officialTime);}
+					try {
+						runs.get(curRun).startNextRacer(officialTime, lanes[0]);
+						}
 					catch(RaceException e) {history.add(e.getMessage());}
 					catch(InvalidTimeException e){history.add(e.getMessage());}
 					catch(NoSuchElementException e){history.add(e.getMessage());}
 					catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
 				}
-				else if(c == 2)
+				if(c == 2)
 				{
-					try {runs.get(curRun).finishNextRacer(officialTime);}
+					try {runs.get(curRun).finishNextRacer(officialTime, lanes[0]);}
+					catch(RaceException e) {history.add(e.getMessage());}
+					catch(InvalidTimeException e){history.add(e.getMessage());}
+					catch(NoSuchElementException e){history.add(e.getMessage());}
+					catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+				}
+				if(c == 3)
+				{
+					try {runs.get(curRun).startNextRacer(officialTime, lanes[1]);}
+					catch(RaceException e) {history.add(e.getMessage());}
+					catch(InvalidTimeException e){history.add(e.getMessage());}
+					catch(NoSuchElementException e){history.add(e.getMessage());}
+					catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+				}
+				if(c == 4)
+				{
+					try {runs.get(curRun).finishNextRacer(officialTime, lanes[1]);}
 					catch(RaceException e) {history.add(e.getMessage());}
 					catch(InvalidTimeException e){history.add(e.getMessage());}
 					catch(NoSuchElementException e){history.add(e.getMessage());}
@@ -249,7 +278,7 @@ public class ChronoTrigger
 		officialTime = commandTime;
 		
 		if (!runs.isEmpty()){
-			try {(runs.get(curRun)).didNotFinishNextRacer();}
+			try {(runs.get(curRun)).didNotFinishNextRacer(curRun);}
 			catch(RaceException e) {history.add(e.getMessage());}
 			catch(NoSuchElementException e){history.add(e.getMessage());}
 			catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
@@ -267,7 +296,7 @@ public class ChronoTrigger
 		officialTime = commandTime;
 		
 		if (!runs.isEmpty()){
-			try {runs.get(curRun).cancelNextRacer();}
+			try {runs.get(curRun).cancelNextRacer(curRun);}
 			catch(RaceException e) {history.add(e.getMessage());}
 			catch(NoSuchElementException e){history.add(e.getMessage());}
 			catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
