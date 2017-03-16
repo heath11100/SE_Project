@@ -241,17 +241,24 @@ public class Simulator {
 						sim.finRun(cTime);
 						break;
 					case "PRINT":
-						if(tokens[cToken].matches(RACEFORMAT))
-							sim.printRun(cTime, Integer.parseInt(tokens[cToken++]));
-						else
+						if(cToken == tokens.length)
 							sim.printRun(cTime);
+						else
+							if(tokens[cToken].matches(RACEFORMAT))
+								sim.printRun(cTime, Integer.parseInt(tokens[cToken++]));
+							else
+								throw new InvalidCommandException("Race format, print");
+						
 						//must overload this to take no args OR race number
 						break;
 					case "EXPORT":
-						if(tokens[cToken].matches(RACEFORMAT))
-							sim.exportRun(cTime, Integer.parseInt(tokens[cToken++]));
-						else
+						if(cToken == tokens.length)
 							sim.exportRun(cTime);
+						else
+							if(tokens[cToken].matches(RACEFORMAT))
+								sim.exportRun(cTime, Integer.parseInt(tokens[cToken++]));
+							else
+								throw new InvalidCommandException("Race format, export");
 						//must overload this to take no args OR race number
 						break;
 					case "NUM":
@@ -297,7 +304,7 @@ public class Simulator {
 				{
 					report("Innapropriate number of tokens.");
 				}
-				catch (NullPointerException ex){report("Have not turned power on yet.");}
+				catch (NullPointerException ex){report("Have not turned power on ye");}
 				catch (InvalidTimeException ex) {report("Error: incorrect time format.");}
 				catch (InvalidCommandException ex) {
 					report("error: " + ex.getMessage());
