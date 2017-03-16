@@ -267,7 +267,7 @@ public class Run {
 			Racer racer = new Racer(racerNumber);
 			this.queuedRacers.add(racer);
 						
-			this.log.add("Queued racer");
+			this.log.add("Queued "+racer);
 		}
 	}
 	
@@ -300,7 +300,7 @@ public class Run {
 			} else {
 				queuedRacers.remove(racer);
 				
-				this.log.add("Removed racer");
+				this.log.add("Removed "+racer);
 			}
 		}
 	}
@@ -353,7 +353,7 @@ public class Run {
 				ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
 				nextRacer.start(elapsedTime);
 				
-				this.log.add("" + atTime + " Next racer started");
+				this.log.add("" + atTime +" "+nextRacer+" started");
 			}
 		}
 	}
@@ -399,7 +399,7 @@ public class Run {
 				ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
 				nextRacer.finish(elapsedTime);
 				
-				this.log.add("" + atTime + " Next racer finished");
+				this.log.add("" + atTime +" "+nextRacer+" finished");
 			}
 		}
 	}
@@ -431,12 +431,12 @@ public class Run {
 								
 				nextRacer.didNotFinish();
 				
-				this.log.add("Next racer did not finish");
+				this.log.add(nextRacer+" cancelled");
 			}
 		}
 	}
 	
-	/**
+	/** 
 	 * Sets the next racer, to finish, as a Did Not Finish (DNF) finish type.
 	 * @param lane is the lane the next racer to DNF is in
 	 * @throws RaceException when there is not a racer to set DNF for
@@ -463,7 +463,7 @@ public class Run {
 				
 				nextRacer.didNotFinish();
 				
-				this.log.add("Next racer did not finish");
+				this.log.add(nextRacer+" did not finish");
 			}
 		}
 	}

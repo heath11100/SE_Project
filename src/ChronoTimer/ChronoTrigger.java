@@ -35,7 +35,7 @@ public class ChronoTrigger
 			channels[j] = new Channel();
 			channels[j].connect("EYE");}
 		for(int k = 0; k < 8; k++)
-			lanes[k] = k;
+			lanes[k] = k+1;
 		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
 		flush();
 	}
@@ -55,7 +55,7 @@ public class ChronoTrigger
 				channels[i] = new Channel();
 				channels[i].connect("EYE");}
 		for(int k = 0; k < 8; k++)
-			lanes[k] = k;
+			lanes[k] = k+1;
 		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
 		flush();
 	}
@@ -273,7 +273,7 @@ public class ChronoTrigger
 	
 	/**
 	 * Next Racer will not finish
-	 * @param commandTime
+	 * @param commandTime 
 	 */
 	public void dnf(ChronoTime commandTime)
 	{
