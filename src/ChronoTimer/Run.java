@@ -212,6 +212,13 @@ public class Run {
 			
 		case "PARIND":
 			this.eventType = EventType.PARIND;
+			
+			this.runningLanes.clear();
+			
+			//Add two lanes back to each of the lists
+			this.newLane();
+			this.newLane();
+			
 			break;
 			
 		default:
