@@ -148,7 +148,9 @@ public class Run {
 			throw new RaceException("Run already ended.");
 			
 		} else if (!this.hasStarted()) {
-			throw new RaceException("Run has not started.");
+			this.startTime = atTime;
+			this.endTime = atTime;
+			//throw new RaceException("Run has not started.");
 			
 		} else if (!this.startTime.isBefore(atTime)) {
 			throw new InvalidTimeException("Run has not started.");
