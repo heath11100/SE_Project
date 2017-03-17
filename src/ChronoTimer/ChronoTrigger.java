@@ -316,6 +316,7 @@ public class ChronoTrigger
 		officialTime = commandTime;
 		
 		if (!runs.isEmpty()){
+			
 			try {runs.get(curRun).endRun(this.officialTime);}
 			catch (RaceException e) {history.add(e.getMessage());}
 			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
@@ -348,6 +349,11 @@ officialTime = commandTime;
 		
 		if (!runs.isEmpty())
 			printer.print(runs.get(curRun).getLog());
+		else {
+			Log log = new Log();
+			log.add("No run to print.");
+			printer.print(log);
+		}
 	}
 	
 	/**

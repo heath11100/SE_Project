@@ -43,6 +43,8 @@ public class Run {
 		this.finishedRacers = new LinkedList<>();
 		
 		this.log = new Log();
+		
+		this.log.add("Created run");
 	}
 	
 	public Run() {
@@ -166,11 +168,11 @@ public class Run {
 					racer.didNotFinish();
 				}
 				
-				queue.clear();
-				
-				this.log.add("Ended run at time: " + atTime);
+				queue.clear();				
 			}
 		}
+		this.log.add("Ended run at " + atTime);
+
 	}
 	
 	/**
@@ -198,6 +200,13 @@ public class Run {
 	public void setEventType(String newEventType) throws RaceException {
 		if (!this.canChangeEventType()) {
 			throw new RaceException("Cannot change event type after a racer started");
+			
+		}  else if (this.hasStarted()) {
+			throw new RaceException("Cannot change event type once run started");
+
+		} else if (this.hasEnded()) {
+			throw new RaceException("Cannot change event type once run ended");
+
 		}
 		
 		switch (newEventType) {
@@ -227,7 +236,7 @@ public class Run {
 			throw new RaceException("Invalid event type: " + newEventType);
 		}
 		
-		this.log.add("Set event type to " + newEventType);
+		this.log.add("Event type is " + newEventType);
 	}
 	
 	/**
@@ -363,8 +372,13 @@ public class Run {
 								
 				ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
 				nextRacer.start(elapsedTime);
-				
-				this.log.add("" + atTime +" "+nextRacer+" started");
+							
+				//Log which lane the racer started in for PARIND only
+				if (this.eventType == EventType.PARIND) {
+					this.log.add("" + atTime +" "+nextRacer+" started in lane " + lane);
+				} else {
+					this.log.add("" + atTime +" "+nextRacer+" started");
+				}
 			}
 		}
 	}
@@ -411,7 +425,12 @@ public class Run {
 				ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
 				nextRacer.finish(elapsedTime);
 				
-				this.log.add("" + atTime +" "+nextRacer+" finished");
+				//Log which lane the racer ended in for PARIND only
+				if (this.eventType == EventType.PARIND) {
+					this.log.add("" + atTime +" "+nextRacer+" finished in lane " + lane);
+				} else {
+					this.log.add("" + atTime +" "+nextRacer+" finished");
+				}
 			}
 		}
 	}

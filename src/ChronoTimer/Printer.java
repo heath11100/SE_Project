@@ -27,7 +27,7 @@ public class Printer
 	public void flush(Log l){output.print(l.flush());}
 	
 	/** Prints the entire parameter log to the output. */
-	public void print(Log l){output.print(l.readAll());}
+	public void print(Log l){ output.print(l.readAll()); }
 	
 	/** Exports the parameter run to a file. */
 	public void export(int runNumber, Run r){

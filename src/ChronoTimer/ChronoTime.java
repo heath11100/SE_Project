@@ -133,7 +133,8 @@ public class ChronoTime {
 		//calculate seconds and subtract from remaining
 		int seconds = remaining / 100;
 		remaining%=100;
-		return hours+":"+minutes+":"+seconds+"."+remaining;
+		
+		return String.format("%02d:%02d:%02d.%02d", hours, minutes, seconds, remaining);
 	}
 
 	public static ChronoTime now() throws InvalidTimeException{
