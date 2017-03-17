@@ -344,7 +344,9 @@ public class Run {
 			throw new InvalidTimeException("Time is before the run start time");
 			
 		} else if (!this.isValidLane(lane)) {
-			throw new RaceException("Invalid lane: " + lane);
+			return;
+			// No longer throwing error for invalid lanes?
+			//throw new RaceException("Invalid lane: " + lane);
 			
 		} else {
 			Racer nextRacer = queuedRacers.poll();
@@ -391,7 +393,8 @@ public class Run {
 			throw new InvalidTimeException("Time cannot be before the run start time");
 			
 		} else if (!this.isValidLane(lane)) {
-			
+			// No longer throwing error for invalid lanes?
+			//throw new RaceException("Invalid lane: " + lane);
 		} else {
 			Queue<Racer> runningQueue = this.runningLanes.get(lane - 1);
 			Racer nextRacer = runningQueue.poll();
@@ -425,20 +428,20 @@ public class Run {
 			throw new RaceException("Race has ended");
 			
 		} else {
-			Queue<Racer> runningQueue = this.runningLanes.get(lane - 1);
-			Racer nextRacer = runningQueue.poll();
+			LinkedList<Racer> runningQueue = (LinkedList<Racer>) this.runningLanes.get(lane - 1);
+			Racer lastRacer = runningQueue.get(0);
 			
-			if (nextRacer == null) {
+			if (lastRacer == null) {
 				throw new RaceException("No racer to cancel");
 				
 			} else {
-				runningQueue.remove(nextRacer);
+				runningQueue.remove(lastRacer);
 				
-				this.queuedRacers.add(nextRacer);
+				this.queuedRacers.add(lastRacer);
 								
-				nextRacer.didNotFinish();
+				lastRacer.cancel();
 				
-				this.log.add(nextRacer+" cancelled");
+				this.log.add(lastRacer+" cancelled");
 			}
 		}
 	}
@@ -458,19 +461,19 @@ public class Run {
 			throw new RaceException("Race has ended");
 			
 		} else {
-			Queue<Racer> runningQueue = this.runningLanes.get(lane - 1);
-			Racer nextRacer = runningQueue.poll();
+			LinkedList<Racer> runningQueue = (LinkedList<Racer>) this.runningLanes.get(lane - 1);
+			Racer lastRacer = runningQueue.get(0);
 			
-			if (nextRacer == null) {
+			if (lastRacer == null) {
 				throw new RaceException("No racer to DNF");
 				
 			} else {
-				runningQueue.remove(nextRacer);
-				this.finishedRacers.add(nextRacer);
+				runningQueue.remove(lastRacer);
+				this.finishedRacers.add(lastRacer);
 				
-				nextRacer.didNotFinish();
+				lastRacer.didNotFinish();
 				
-				this.log.add(nextRacer+" did not finish");
+				this.log.add(lastRacer+" did not finish");
 			}
 		}
 	}
