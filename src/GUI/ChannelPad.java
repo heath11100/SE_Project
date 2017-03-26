@@ -14,13 +14,15 @@ import javax.swing.JPanel;
 
 public class ChannelPad extends JPanel{
 	private static final long serialVersionUID = 1L;
-	JButton[] channelTrigger;
-	JCheckBox[] channelEnable;
-	JPanel sub1, sub2;
-	GridBagConstraints c;
+	private Handler handler;
+	private JButton[] trigger;
+	private JCheckBox[] toggle;
+	private JPanel sub1, sub2;
+	private GridBagConstraints c;
 	
 	
-	protected ChannelPad(){
+	protected ChannelPad(Handler handler){
+		this.handler=handler;
 		setLayout(new GridBagLayout());
 		createLeftPanel();
 		createRightPanel();
@@ -55,25 +57,27 @@ public class ChannelPad extends JPanel{
 		sub2.setLayout(new GridLayout(6,4));
 		
 		JLabel[] labels = new JLabel[8];
-		channelTrigger = new JButton[8];
-		channelEnable = new JCheckBox[8];
+		trigger = new JButton[8];
+		toggle = new JCheckBox[8];
 		
 		for (int i=0;i<8;i++){
 			labels[i] = new JLabel(""+(i+1));
 			labels[i].setHorizontalAlignment(JLabel.CENTER);
-			channelTrigger[i] = new JButton();
-			channelEnable[i] = new JCheckBox();
-			channelEnable[i].setHorizontalAlignment(JCheckBox.CENTER);
+			trigger[i] = new JButton();
+			trigger[i].addActionListener(new Listener(handler,"TRIGGER "+(i+1)));
+			toggle[i] = new JCheckBox();
+			toggle[i].addActionListener(new Listener(handler,"TOGGLE "+(i+1)));
+			toggle[i].setHorizontalAlignment(JCheckBox.CENTER);
 		}
 		
 		
 		sub2.add(labels[0]);sub2.add(labels[2]);sub2.add(labels[4]);sub2.add(labels[6]);
-		sub2.add(channelTrigger[0]);sub2.add(channelTrigger[2]);sub2.add(channelTrigger[4]);sub2.add(channelTrigger[6]);
-		sub2.add(channelEnable[0]);sub2.add(channelEnable[2]);sub2.add(channelEnable[4]);sub2.add(channelEnable[6]);
+		sub2.add(trigger[0]);sub2.add(trigger[2]);sub2.add(trigger[4]);sub2.add(trigger[6]);
+		sub2.add(toggle[0]);sub2.add(toggle[2]);sub2.add(toggle[4]);sub2.add(toggle[6]);
 		
 		sub2.add(labels[1]);sub2.add(labels[3]);sub2.add(labels[5]);sub2.add(labels[7]);
-		sub2.add(channelTrigger[1]);sub2.add(channelTrigger[3]);sub2.add(channelTrigger[5]);sub2.add(channelTrigger[7]);
-		sub2.add(channelEnable[1]);sub2.add(channelEnable[3]);sub2.add(channelEnable[5]);sub2.add(channelEnable[7]);
+		sub2.add(trigger[1]);sub2.add(trigger[3]);sub2.add(trigger[5]);sub2.add(trigger[7]);
+		sub2.add(toggle[1]);sub2.add(toggle[3]);sub2.add(toggle[5]);sub2.add(toggle[7]);
 		
 		
 		
