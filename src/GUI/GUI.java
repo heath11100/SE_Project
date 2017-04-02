@@ -5,12 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.*;
-
-import ChronoTimer.ChronoTrigger;
 
 public class GUI {
 
@@ -31,13 +26,14 @@ public class GUI {
 
 	// Displays
 	JTextArea displayText,printerText;
-	JScrollPane displayScroll, printerScroll;
 
 	//Handles commands issued from GUI
 	Handler handler;
 	
 	public GUI() {
-		handler = new Handler(this);
+		displayText = new JTextArea();
+		printerText = new JTextArea();
+		handler = new Handler(displayText,printerText);
 		createTopView();
 		createBackView();
 		frame.setVisible(true);
@@ -128,15 +124,15 @@ public class GUI {
 		printerPower.addActionListener(new Listener(handler,"PRINTER POWER"));
 		panels[2].add(printerPower,c);
 
-		printerText = new JTextArea();
 		printerText.setEditable(false);
-		printerScroll = new JScrollPane(printerText,
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		printerScroll.setPreferredSize(new Dimension(250,250));
+		printerText.setPreferredSize(new Dimension(250,250));
+		//printerScroll = new JScrollPane(printerText,
+				//JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		//printerScroll.setPreferredSize(new Dimension(250,250));
 		c = new GridBagConstraints();
 		c.gridx = 0;c.gridy = 1;
 		c.weightx = c.weighty = 1;
-		panels[2].add(printerScroll,c);
+		panels[2].add(printerText,c);
 	}
 
 	/**
@@ -180,15 +176,15 @@ public class GUI {
 	 * South panel- Display
 	 */
 	private void createPanel4() {
-		displayText = new JTextArea();
 		displayText.setEditable(false);
-		displayScroll = new JScrollPane(displayText,
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		displayScroll.setPreferredSize(new Dimension(600,300));
+		displayText.setPreferredSize(new Dimension(600,300));
+		//displayScroll = new JScrollPane(displayText,
+			//	JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		//displayScroll.setPreferredSize(new Dimension(600,300));
 		c = new GridBagConstraints();
 		c.gridx = 0;c.gridy = 0;
 		c.weightx = c.weighty = 1;
-		panels[4].add(displayScroll,c);
+		panels[4].add(displayText,c);
 		c.gridx = 0;c.gridy = 1;
 		panels[4].add(new JLabel("Queue / Running / Final Time"),c);
 	}
