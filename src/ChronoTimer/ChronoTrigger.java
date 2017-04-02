@@ -19,6 +19,7 @@ public class ChronoTrigger
 	private Printer printer = new Printer();
 	private String eventType;
 	private int[] lanes = new int[8];
+	private boolean power;
 	/**
 	 * Default Constructor
 	 * 
@@ -67,15 +68,22 @@ public class ChronoTrigger
 	 */
 	public void setTime(ChronoTime commandTime, ChronoTime newOfficialTime)
 	{
+		if(power)
+		{
 			officialTime = newOfficialTime;
 			history.add( (logTimes? officialTime+" | " : "") +"Set time to " + newOfficialTime.toString());
 			flush();
+		}
 	}
 	
 	/**
 	 * @return officialTime
 	 */
-	public ChronoTime getTime(){return officialTime;}
+	public ChronoTime getTime(){
+		if(power)
+		{return officialTime;}
+		else
+			return null;}
 	
 	/**
 	 * Toggles channel giveny by parameter int c. Adds only if channel
@@ -83,6 +91,8 @@ public class ChronoTrigger
 	 */
 	public void toggle(ChronoTime commandTime, int c)
 	{
+		if(power)
+		{
 		officialTime = commandTime;
 		
 		//if valid channel..
@@ -91,7 +101,7 @@ public class ChronoTrigger
 			history.add( (logTimes? officialTime+" | " : "") +"Toggled channel " +c);}
 		else
 			history.add("Cannot toggle: Channel "+c+" doesn't exist.");
-		
+		}
 		flush();
 	}
 	
@@ -103,6 +113,8 @@ public class ChronoTrigger
 	 */
 	public void connectSensor(ChronoTime commandTime, int c, String type)
 	{	
+		if(power)
+		{
 		officialTime = commandTime;
 		
 		//if valid channel..
@@ -114,7 +126,7 @@ public class ChronoTrigger
 			catch (IllegalArgumentException e){history.add(e.getMessage());}}
 		else
 			history.add("Cannot connect: Channel "+c+" doesn't exist.");
-
+		}
 		
 		flush();
 	}
@@ -126,6 +138,8 @@ public class ChronoTrigger
 	 */
 	public void disSensor(ChronoTime commandTime, int c)
 	{
+		if(power)
+		{
 		officialTime = commandTime;
 		
 		//if valid channel..
@@ -134,10 +148,25 @@ public class ChronoTrigger
 			history.add( (logTimes? officialTime+" | " : "") +"Disconnected sensor from channel " +c);}
 		else
 			history.add("Cannot disconnect: Channel "+c+" doesn't exist.");
-		
+		}
 		flush();
 	}
-	
+	/**
+	 * turn power on
+	 */
+	public void powerOn(ChronoTime commandTime)
+	{
+		power = true;
+		officialTime = commandTime;
+	}
+	/**
+	 * turn power off
+	 */
+	public void powerOff(ChronoTime commandTime)
+	{
+		power = false;
+		officialTime = commandTime;
+	}
 	/**
 	 * This will set the type of the current race to String type.
 	 * If there is no current race, creates a new one
@@ -146,26 +175,28 @@ public class ChronoTrigger
 	 */
 	public void setType(ChronoTime commandTime, String type)
 	{
-		officialTime = commandTime;
-		
-		if (runs.isEmpty())	//need to check here if valid type - share checkValid(runType) method with Run?
-			eventType = type;
-		else{
-			try {runs.get(curRun).setEventType(type);}
-			catch (RaceException e) {history.add(e.getMessage());}
-			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
-			if(type == "IND")
-			{
-				lanes[0] = 1;
-				lanes[1] = 1;
-			}
-			if(type == "PAR")
-			{
-				lanes[0] = 1;
-				lanes[1] = 2;
+		if(power)
+		{
+			officialTime = commandTime;
+			
+			if (runs.isEmpty())	//need to check here if valid type - share checkValid(runType) method with Run?
+				eventType = type;
+			else{
+				try {runs.get(curRun).setEventType(type);}
+				catch (RaceException e) {history.add(e.getMessage());}
+				catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+				if(type == "IND")
+				{
+					lanes[0] = 1;
+					lanes[1] = 1;
+				}
+				if(type == "PAR")
+				{
+					lanes[0] = 1;
+					lanes[1] = 2;
+				}
 			}
 		}
-		
 		flush();
 	}
 	
@@ -175,22 +206,24 @@ public class ChronoTrigger
 	 */
 	public void newRun(ChronoTime commandTime)
 	{
-		officialTime = commandTime;
-		
-		if(runs.isEmpty() || runs.get(curRun).hasEnded()){
-			runs.add(new Run());
-			curRun++;
-			history.add( (logTimes? officialTime+" | " : "") +"Created race "+curRun+".");
-		
-			if(eventType != null){
-				try {runs.get(curRun).setEventType(eventType);}
-				catch (RaceException e) {history.add(e.getMessage());}
-				catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
-			}
-			eventType = null;}//why this?
-		else
-			history.add("No race was created- already have current race.");
-		
+		if(power)
+		{
+			officialTime = commandTime;
+			
+			if(runs.isEmpty() || runs.get(curRun).hasEnded()){
+				runs.add(new Run());
+				curRun++;
+				history.add( (logTimes? officialTime+" | " : "") +"Created race "+curRun+".");
+			
+				if(eventType != null){
+					try {runs.get(curRun).setEventType(eventType);}
+					catch (RaceException e) {history.add(e.getMessage());}
+					catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+				}
+				eventType = null;}//why this?
+			else
+				history.add("No race was created- already have current race.");
+		}
 		flush();
 	}
 	
@@ -202,16 +235,18 @@ public class ChronoTrigger
 	 */
 	public void addRacer(ChronoTime commandTime, int num)
 	{
-		officialTime = commandTime;
-		
-		if (runs.isEmpty())
-			history.add("Cannot add racer before race is created.");
-		else{
-			try {runs.get(curRun).queueRacer(num);}
-			catch (RaceException e) {history.add(e.getMessage());}
-			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+		if(power)
+		{
+			officialTime = commandTime;
+			
+			if (runs.isEmpty())
+				history.add("Cannot add racer before race is created.");
+			else{
+				try {runs.get(curRun).queueRacer(num);}
+				catch (RaceException e) {history.add(e.getMessage());}
+				catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+			}
 		}
-		
 		flush();
 	}
 	
@@ -223,45 +258,48 @@ public class ChronoTrigger
 	 */
 	public void triggerSensor(ChronoTime commandTime, int c)
 	{
-		officialTime = commandTime;
-		
-		//if valid channel..
-		if(c>=0 && c< 8){
-			//if trigger is successful and there's a current race
-			if (channels[c].trigger() && !runs.isEmpty()){
-				if(c == 1)
-				{
-					try {
-						runs.get(curRun).startNextRacer(officialTime, lanes[0]);
-						}
-					catch(RaceException e) {history.add(e.getMessage());}
-					catch(InvalidTimeException e){history.add(e.getMessage());}
-					catch(NoSuchElementException e){history.add(e.getMessage());}
-					catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
-				}
-				if(c == 2)
-				{
-					try {runs.get(curRun).finishNextRacer(officialTime, lanes[0]);}
-					catch(RaceException e) {history.add(e.getMessage());}
-					catch(InvalidTimeException e){history.add(e.getMessage());}
-					catch(NoSuchElementException e){history.add(e.getMessage());}
-					catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
-				}
-				if(c == 3)
-				{
-					try {runs.get(curRun).startNextRacer(officialTime, lanes[1]);}
-					catch(RaceException e) {history.add(e.getMessage());}
-					catch(InvalidTimeException e){history.add(e.getMessage());}
-					catch(NoSuchElementException e){history.add(e.getMessage());}
-					catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
-				}
-				if(c == 4)
-				{
-					try {runs.get(curRun).finishNextRacer(officialTime, lanes[1]);}
-					catch(RaceException e) {history.add(e.getMessage());}
-					catch(InvalidTimeException e){history.add(e.getMessage());}
-					catch(NoSuchElementException e){history.add(e.getMessage());}
-					catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+		if(power)
+		{
+			officialTime = commandTime;
+			
+			//if valid channel..
+			if(c>=0 && c< 8){
+				//if trigger is successful and there's a current race
+				if (channels[c].trigger() && !runs.isEmpty()){
+					if(c == 1)
+					{
+						try {
+							runs.get(curRun).startNextRacer(officialTime, lanes[0]);
+							}
+						catch(RaceException e) {history.add(e.getMessage());}
+						catch(InvalidTimeException e){history.add(e.getMessage());}
+						catch(NoSuchElementException e){history.add(e.getMessage());}
+						catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+					}
+					if(c == 2)
+					{
+						try {runs.get(curRun).finishNextRacer(officialTime, lanes[0]);}
+						catch(RaceException e) {history.add(e.getMessage());}
+						catch(InvalidTimeException e){history.add(e.getMessage());}
+						catch(NoSuchElementException e){history.add(e.getMessage());}
+						catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+					}
+					if(c == 3)
+					{
+						try {runs.get(curRun).startNextRacer(officialTime, lanes[1]);}
+						catch(RaceException e) {history.add(e.getMessage());}
+						catch(InvalidTimeException e){history.add(e.getMessage());}
+						catch(NoSuchElementException e){history.add(e.getMessage());}
+						catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+					}
+					if(c == 4)
+					{
+						try {runs.get(curRun).finishNextRacer(officialTime, lanes[1]);}
+						catch(RaceException e) {history.add(e.getMessage());}
+						catch(InvalidTimeException e){history.add(e.getMessage());}
+						catch(NoSuchElementException e){history.add(e.getMessage());}
+						catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+					}
 				}
 			}
 		}
@@ -277,15 +315,17 @@ public class ChronoTrigger
 	 */
 	public void dnf(ChronoTime commandTime)
 	{
-		officialTime = commandTime;
-		
-		if (!runs.isEmpty()){
-			try {(runs.get(curRun)).didNotFinishNextRacer(curRun);}
-			catch(RaceException e) {history.add(e.getMessage());}
-			catch(NoSuchElementException e){history.add(e.getMessage());}
-			catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+		if(power)
+		{
+			officialTime = commandTime;
+			
+			if (!runs.isEmpty()){
+				try {(runs.get(curRun)).didNotFinishNextRacer(curRun);}
+				catch(RaceException e) {history.add(e.getMessage());}
+				catch(NoSuchElementException e){history.add(e.getMessage());}
+				catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+			}
 		}
-		
 		flush();
 	}
 	
@@ -295,15 +335,17 @@ public class ChronoTrigger
 	 */
 	public void cancel(ChronoTime commandTime)
 	{
-		officialTime = commandTime;
-		
-		if (!runs.isEmpty()){
-			try {runs.get(curRun).cancelNextRacer(curRun);}
-			catch(RaceException e) {history.add(e.getMessage());}
-			catch(NoSuchElementException e){history.add(e.getMessage());}
-			catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+		if(power)
+		{
+			officialTime = commandTime;
+			
+			if (!runs.isEmpty()){
+				try {runs.get(curRun).cancelNextRacer(curRun);}
+				catch(RaceException e) {history.add(e.getMessage());}
+				catch(NoSuchElementException e){history.add(e.getMessage());}
+				catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+			}
 		}
-		
 		flush();
 	}
 	
@@ -313,29 +355,33 @@ public class ChronoTrigger
 	 */
 	public void finRun(ChronoTime commandTime)
 	{
-		officialTime = commandTime;
-		
-		if (!runs.isEmpty()){
+		if(power)
+		{
+			officialTime = commandTime;
 			
-			try {runs.get(curRun).endRun(this.officialTime);}
-			catch (RaceException e) {history.add(e.getMessage());}
-			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+			if (!runs.isEmpty()){
+				
+				try {runs.get(curRun).endRun(this.officialTime);}
+				catch (RaceException e) {history.add(e.getMessage());}
+				catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+			}
 		}
-		
 		flush();
 	}
 	
 	//prints the current race
 	public void printCurRace(ChronoTime commandTime)
 	{
-officialTime = commandTime;
-		
-		if (!runs.isEmpty()){
-			try {runs.get(curRun).endRun(this.officialTime);}//endRace method in run
-			catch (RaceException e) {history.add(e.getMessage());}
-			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+		if(power)
+		{
+			officialTime = commandTime;
+			
+			if (!runs.isEmpty()){
+				try {runs.get(curRun).endRun(this.officialTime);}//endRace method in run
+				catch (RaceException e) {history.add(e.getMessage());}
+				catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+			}
 		}
-		
 		flush();
 
 	}
@@ -345,14 +391,17 @@ officialTime = commandTime;
 	 */
 	public void printRun(ChronoTime commandTime)
 	{
-		officialTime = commandTime;
-		
-		if (!runs.isEmpty())
-			printer.print(runs.get(curRun).getLog());
-		else {
-			Log log = new Log();
-			log.add("No run to print.");
-			printer.print(log);
+		if(power)
+		{
+			officialTime = commandTime;
+			
+			if (!runs.isEmpty())
+				printer.print(runs.get(curRun).getLog());
+			else {
+				Log log = new Log();
+				log.add("No run to print.");
+				printer.print(log);
+			}
 		}
 	}
 	
@@ -363,12 +412,15 @@ officialTime = commandTime;
 	 */
 	public void printRun(ChronoTime commandTime, int runNum)
 	{
-		officialTime = commandTime;
-		
-		if (!runs.isEmpty())
-			printer.print(runs.get(runNum).getLog());
-		else
-			history.add("runNum " + runNum+ " was invalid");
+		if(power)
+		{
+			officialTime = commandTime;
+			
+			if (!runs.isEmpty())
+				printer.print(runs.get(runNum).getLog());
+			else
+				history.add("runNum " + runNum+ " was invalid");
+		}
 	}
 	
 	/**
@@ -377,10 +429,13 @@ officialTime = commandTime;
 	 */
 	public void exportRun(ChronoTime commandTime)
 	{
-		officialTime = commandTime;
-		
-		if (!runs.isEmpty())
-			printer.export(curRun, runs.get(curRun));
+		if(power)
+		{
+			officialTime = commandTime;
+			
+			if (!runs.isEmpty())
+				printer.export(curRun, runs.get(curRun));
+		}
 	}
 	
 	/**
@@ -390,25 +445,30 @@ officialTime = commandTime;
 	 */
 	public void exportRun(ChronoTime commandTime, int runNum)
 	{
-		officialTime = commandTime;
-		
-		if (!runs.isEmpty() && runNum < curRun)
-			printer.export(runNum, runs.get(runNum));
-		else
-			history.add("runNum " + runNum+ " was invalid");
+		if(power)
+		{
+			officialTime = commandTime;
+			
+			if (!runs.isEmpty() && runNum < curRun)
+				printer.export(runNum, runs.get(runNum));
+			else
+				history.add("runNum " + runNum+ " was invalid");
+		}
 	}
-	
 	/**
 	 * 
 	 */
 	public void flush()
 	{
-		//try to flush race if it exists
-		if (!runs.isEmpty())
-			printer.flush(runs.get(curRun).getLog());
-		
-		//flush chronotrigger history
-		printer.flush(history);
+		if(power)
+		{
+			//try to flush race if it exists
+			if (!runs.isEmpty())
+				printer.flush(runs.get(curRun).getLog());
+			
+			//flush chronotrigger history
+			printer.flush(history);
+		}
 	}
 
 	
