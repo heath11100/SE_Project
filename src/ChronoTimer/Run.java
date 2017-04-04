@@ -6,6 +6,14 @@ import java.util.Queue;
 
 import Exceptions.*;
 
+/*
+Questions:
+	1) How will I give information to be displayed by the ChronoTrigger?
+	2) When printing Racers, how do I distinguish between a dummy racer and an actual racer?
+
+Notes:
+	- Should the racer compute the "elapsed time" from two absolute times?
+ */
 
 public class Run {
 	private ChronoTime startTime;
@@ -16,9 +24,16 @@ public class Run {
 	private Queue<Racer> queuedRacers;
 	private ArrayList<Queue<Racer>> runningLanes;
 	private Queue<Racer> finishedRacers;
+	private int nextRacerToMarkIndex = 0;
 	
 	private Log log;
-	
+
+	private final int MIN_BIB_NUMBER = 1;
+	private final int MAX_BIB_NUMBER = 9999;
+	private final int MAX_RACERS = 9999;
+
+	private final int MAX_LANES = 8;
+
 	public Run(EventType eventType) {
 		this.eventType = eventType;
 		
@@ -42,7 +57,7 @@ public class Run {
 	 * @return true if lane number is valid, false otherwise.
 	 */
 	private boolean isValidLane(int laneNumber) {
-		return (laneNumber >= 1 && laneNumber <= 8) && (laneNumber <= this.runningLanes.size());
+		return (laneNumber >= 1 && laneNumber <= MAX_LANES) && (laneNumber <= this.runningLanes.size());
 	}
 	
 	/**
@@ -309,7 +324,7 @@ public class Run {
 	 * OR when eventType is GRP
 	 */
 	public void removeRacer(int racerNumber, int lane) throws RaceException {
-		if (racerNumber < 1 || racerNumber > 9999) {
+		if (racerNumber < MIN_BIB_NUMBER || racerNumber > MAX_BIB_NUMBER) {
 			throw new RaceException("Number must be within bounds [1,9999]");
 
 
@@ -423,7 +438,6 @@ public class Run {
 	 * OR when the run has already ended
 	 * OR there is not another racer to finish for IND and PARIND event types
 	 * OR the maximum number of runners have finished (9999) for GRP event type.
-	 * TODO: Update this for GRP
 	 */
 	public void finishNextRacer(ChronoTime atTime, int lane) throws InvalidTimeException, RaceException {
 
@@ -465,13 +479,52 @@ public class Run {
 				this.log.add(racerLogString);
 			}
 		} else if (this.eventType == EventType.GRP) {
-			if (this.finishedRacers.size() == 9999) {
+			if (this.finishedRacers.size() == MAX_RACERS) {
 				throw new RaceException("Maximum number of racers have already finished.");
 			}
-			//TODO: Implementation needed.
+
+			final int currentSize = this.finishedRacers.size();
+			//Negative number denotes that it is a placeholder racer.
+			int racerNumber = (currentSize+1) * (-1);
+			//Create racer with negative bib number because they are place holder.
+			Racer newRacer = new Racer(racerNumber);
+
+			newRacer.start(this.startTime);
+			newRacer.finish(atTime);
+
+			this.finishedRacers.add(newRacer);
 		}
 	}
-	
+
+	/**
+	 * Marks the next racer in the finish queue with a bibnumber (versus the default number.
+	 * @param racerNumber corresponding to the next racer to be marked.
+	 * @throws RaceException when there is not another racer to mark with a bib number
+	 * OR eventType is not GRP
+     */
+	public void markNextRacer(int racerNumber) throws RaceException {
+		if (this.eventType == EventType.IND || this.eventType == EventType.PARIND) {
+			throw new RaceException("Cannot mark next racer with event " + this.eventType);
+
+		} else if (this.nextRacerToMarkIndex >= this.finishedRacers.size()) {
+			throw new RaceException("No racer to mark");
+		}
+
+		Racer dummyRacer = ((LinkedList<Racer>)this.finishedRacers).get(this.nextRacerToMarkIndex);
+		Racer newRacer = new Racer(dummyRacer.getNumber());
+
+		newRacer.start(dummyRacer.getStartTime());
+		try {
+			newRacer.finish(dummyRacer.getEndTime());
+		} catch (InvalidTimeException e) {
+			throw new RaceException("Racer to be marked had invalid finish time");
+		}
+
+		//Increment the bib marker
+		//Bib marker index is used mark the next dummy racer
+		this.nextRacerToMarkIndex++;
+	}
+
 	/**
 	 * Cancels the next racer to finish putting that racer at the end of the queued racers.
 	 * @throws RaceException when there is not a racer to cancel
