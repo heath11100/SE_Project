@@ -1,7 +1,7 @@
 package GUI;
 
-import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -25,6 +25,12 @@ public class NumPad extends JPanel{
 		add(pound);
 	}
 	
+	protected void press(int i){
+		if (i == 10) star.doClick();
+		else if (i == 11) pound.doClick();
+		else	numbers[i].doClick();
+	}
+	
 	private void createButtons(){
 		numbers = new JButton[10];
 		for (int i=0;i<10;i++){
@@ -35,6 +41,4 @@ public class NumPad extends JPanel{
 		pound = new JButton("#");
 		pound.addActionListener(new Listener(handler, "POUND"));
 	}
-	
-	
 }

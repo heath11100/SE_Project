@@ -5,6 +5,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
 import javax.swing.*;
 
 public class GUI {
@@ -31,6 +36,7 @@ public class GUI {
 	Handler handler;
 	
 	public GUI() {
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyTrigger());
 		displayText = new JTextArea();
 		printerText = new JTextArea();
 		handler = new Handler(displayText,printerText);
@@ -220,7 +226,7 @@ public class GUI {
 		for (int i=0;i<8;i++){
 			channelPlugs[i] = new JCheckBox();
 			channelPlugs[i].setHorizontalAlignment(JCheckBox.CENTER);
-			channelPlugs[i].addActionListener(new Listener(handler, new String[] {"PLUG "+(i+1),"UNPLUG "+(i+1)} ));}
+			channelPlugs[i].addActionListener(new Listener(handler, new String[] {"PLUG "+(i+1),"UNPLUG "+(i+1)}));}
 		
 		backFrame.add(labels[0]);
 		backFrame.add(labels[2]);
@@ -244,5 +250,40 @@ public class GUI {
 		displayText.append(s+"\n");
 	}
 
+	private class KeyTrigger implements KeyEventDispatcher{
+		@Override
+		public boolean dispatchKeyEvent(KeyEvent k) {
+			if (k.getID() != KeyEvent.KEY_PRESSED) return false;
+			switch (k.getKeyCode()){
+			case KeyEvent.VK_ESCAPE: if (!k.isShiftDown())power.doClick(); else printerPower.doClick(); break;
+			case KeyEvent.VK_F: function.doClick();break;
+			case KeyEvent.VK_UP: up.doClick();break;
+			case KeyEvent.VK_DOWN: down.doClick();break;
+			case KeyEvent.VK_LEFT: left.doClick();break;
+			case KeyEvent.VK_RIGHT: right.doClick();break;
+			case KeyEvent.VK_TAB: swap.doClick();break;
+			case KeyEvent.VK_NUMPAD0: numPad.press(0);break;
+			case KeyEvent.VK_NUMPAD1: numPad.press(1);break;
+			case KeyEvent.VK_NUMPAD2: numPad.press(2);break;
+			case KeyEvent.VK_NUMPAD3: numPad.press(3);break;
+			case KeyEvent.VK_NUMPAD4: numPad.press(4);break;
+			case KeyEvent.VK_NUMPAD5: numPad.press(5);break;
+			case KeyEvent.VK_NUMPAD6: numPad.press(6);break;
+			case KeyEvent.VK_NUMPAD7: numPad.press(7);break;
+			case KeyEvent.VK_NUMPAD8: numPad.press(8);break;
+			case KeyEvent.VK_NUMPAD9: numPad.press(9);break;
+			case KeyEvent.VK_BACK_SPACE: numPad.press(10);break;
+			case KeyEvent.VK_ENTER: numPad.press(11);break;
+			case KeyEvent.VK_1: channelPad.press(!k.isShiftDown()? 1: 9);break;
+			case KeyEvent.VK_2: channelPad.press(!k.isShiftDown()? 2: 10);break;
+			case KeyEvent.VK_3: channelPad.press(!k.isShiftDown()? 3: 11);break;
+			case KeyEvent.VK_4: channelPad.press(!k.isShiftDown()? 4: 12);break;
+			case KeyEvent.VK_5: channelPad.press(!k.isShiftDown()? 5: 13);break;
+			case KeyEvent.VK_6: channelPad.press(!k.isShiftDown()? 6: 14);break;
+			case KeyEvent.VK_7: channelPad.press(!k.isShiftDown()? 7: 15);break;
+			case KeyEvent.VK_8: channelPad.press(!k.isShiftDown()? 8: 16);break;
+		}return true;
+	}}
+	
 	public static void main(String[] args) {new GUI();}
 }
