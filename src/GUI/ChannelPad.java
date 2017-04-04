@@ -1,11 +1,10 @@
 package GUI;
 
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -51,6 +50,13 @@ public class ChannelPad extends JPanel{
 		labels[5].setText("Enable/Disable");	sub1.add(labels[5]);
 	}
 	
+	protected void press(int i){
+		if (i < 9)
+			trigger[i-1].doClick();
+		else
+			toggle[i-9].doClick();
+	}
+	
 	private void createRightPanel(){
 		sub2 = new JPanel();
 		//sub2.setBackground(new Color(200,0,0));
@@ -78,14 +84,5 @@ public class ChannelPad extends JPanel{
 		sub2.add(labels[1]);sub2.add(labels[3]);sub2.add(labels[5]);sub2.add(labels[7]);
 		sub2.add(trigger[1]);sub2.add(trigger[3]);sub2.add(trigger[5]);sub2.add(trigger[7]);
 		sub2.add(toggle[1]);sub2.add(toggle[3]);sub2.add(toggle[5]);sub2.add(toggle[7]);
-		
-		
-		
-		
-		
-		
-		
-		
-		
 	}
 }
