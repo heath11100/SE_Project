@@ -7,14 +7,15 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import javax.swing.*;
 
 public class GUI {
 
-	private final int FRAME_WIDTH = 1200, FRAME_HEIGHT = 700, BACK_WIDTH=400,BACK_HEIGHT = 200;
+	private final int FRAME_WIDTH = 1200, FRAME_HEIGHT = 700, BACK_WIDTH=400,BACK_HEIGHT = 120;
 
 	// Containers
 	JFrame frame, backFrame;
@@ -23,7 +24,7 @@ public class GUI {
 
 	// Buttons
 	JButton power, printerPower, function, up, down, left, right, swap;
-	JCheckBox[] channelPlugs;
+	JComboBox<String>[] channelPlugs;
 
 	// Pads
 	NumPad numPad;
@@ -78,7 +79,7 @@ public class GUI {
 
 				// must use a dummy panel to give extra space to middle column
 				if (x == 2) {
-					c.insets = new Insets(0, 0, 0, 300);
+					c.insets = new Insets(0, 0, 0, FRAME_WIDTH/4);
 					frame.add(new JPanel(), c);
 					c.insets = new Insets(0, 0, 0, 0);}
 				else
@@ -222,11 +223,22 @@ public class GUI {
 			labels[i] = new JLabel(""+(i+1));
 			labels[i].setHorizontalAlignment(JLabel.CENTER);}
 		
-		channelPlugs = new JCheckBox[8];
+		channelPlugs = new JComboBox[8];
 		for (int i=0;i<8;i++){
-			channelPlugs[i] = new JCheckBox();
-			channelPlugs[i].setHorizontalAlignment(JCheckBox.CENTER);
-			channelPlugs[i].addActionListener(new Listener(handler, new String[] {"PLUG "+(i+1),"UNPLUG "+(i+1)}));}
+			channelPlugs[i] = new JComboBox<String>(new String[]{" NONE"," EYE"," GATE"," PAD"});
+			channelPlugs[i].setSelectedIndex(0);
+			channelPlugs[i].addActionListener(
+					new ActionListener(){
+						public void actionPerformed(ActionEvent e) {
+							@SuppressWarnings("unchecked")
+							JComboBox<String> b = (JComboBox<String>) e.getSource();
+							String type = (String) b.getSelectedItem();
+							int i;
+							for (i=0 ;i<8;i++)
+								if (b == channelPlugs[i]) break;
+							handler.issue("PLUG "+(i+1)+type);
+						}});
+		}
 		
 		backFrame.add(labels[0]);
 		backFrame.add(labels[2]);
