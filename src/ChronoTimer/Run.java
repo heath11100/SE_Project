@@ -27,6 +27,7 @@ public class Run {
 	private int nextRacerToMarkIndex = 0;
 	
 	private Log log;
+	private Card card;
 
 	private final int MIN_BIB_NUMBER = 1;
 	private final int MAX_BIB_NUMBER = 9999;
@@ -68,6 +69,10 @@ public class Run {
 		return this.log;
 	}
 	
+	public Card getCard()
+	{
+		return this.card;
+	}
 	/**
 	 * Determines whether or not the run has started.
 	 * @return true if the run has started, false otherwise.
