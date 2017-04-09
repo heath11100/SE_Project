@@ -17,6 +17,11 @@ public class Card extends UIPrint {
 		this.setRows(20);
 	}
 	
+	public void writeTo()
+	{
+		this.setText(header + body + footer);
+	}
+	
 	public void setHeader(Queue<Racer> newHeader) {
 		//don't care about times for queue, right?
 		header = "";

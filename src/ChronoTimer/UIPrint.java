@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import javax.swing.JTextArea;
 
-public class UIPrint extends JTextArea{
-	
+public abstract class UIPrint extends JTextArea{
+	abstract void writeTo();
 	
 }
