@@ -17,9 +17,11 @@ public class Card extends UIPrint {
 		this.setRows(20);
 	}
 	
-	public void writeTo()
+	@Override
+	public String writeTo()
 	{
 		this.setText(header + body + footer);
+		return "RACE";
 	}
 	
 	public void setHeader(Queue<Racer> newHeader) {
@@ -45,5 +47,15 @@ public class Card extends UIPrint {
 			footer = "Racer["+r.getNumber()+"] "+r.getElapsedTime()+"\n" +footer;
 		
 		this.replaceRange(footer, headerSize+bodySize+2, headerSize+bodySize+footerSize+1);
+	}
+
+	@Override
+	public void up() {
+		//until we decide to do something with these, these are really just for the menu class
+	}
+
+	@Override
+	public void down() {
+		//until we decide to do something with these, these are really just for the menu class
 	}
 }

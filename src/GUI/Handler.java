@@ -5,7 +5,14 @@ import javax.swing.Timer;
 
 import ChronoTimer.ChronoTime;
 import ChronoTimer.ChronoTrigger;
+import ChronoTimer.Menu;
+import ChronoTimer.UIPrint;
 import Exceptions.InvalidTimeException;
+
+/*
+ * Ryan Thorne
+ * Matt Damon's ChronoTrigger
+ */
 
 public class Handler {
 
@@ -15,8 +22,9 @@ public class Handler {
 	guis GUIState;
 	String curNum;
 	boolean race;
+	UIPrint disp;
 
-	enum guis {
+	public enum guis {
 		off, // synonymous with the cts.off state
 		start, // extra, unused right now? for when we are powering up the
 				// machine, similar to the off state.
@@ -31,7 +39,7 @@ public class Handler {
 		displayArea = d;
 		printArea = p;
 		main = new ChronoTrigger();
-		GUIState = guis.off;// ??? TODO @ Friday meeting
+		GUIState = guis.off;
 		curNum = "";
 		race = false;
 		Timer updater = new Timer(1000, new Listener(this, "UPDATE"));
@@ -48,7 +56,7 @@ public class Handler {
 			switch (command) 
 			{
 			case "UPDATE":
-				
+				disp.writeTo();
 				break;
 
 			/**
@@ -60,15 +68,13 @@ public class Handler {
 				switch (GUIState) 
 				{
 				case fcn:
-					// maneuver up in menu
+					disp.up();
 					break;
 				case wait:
 					// should allow user to navigate the scroll view for this
 					// run
-					if (race) 
-					{
-
-					}
+					disp.up();
+					break;
 				default:
 
 				}
@@ -77,15 +83,11 @@ public class Handler {
 				switch (GUIState) 
 				{
 				case fcn:
-					// maneuver up in menu
+					disp.down();
 					break;
 				case wait:
-					// should allow user to navigate the scroll view for this
-					// run
-					if (race) 
-					{
-
-					}
+					disp.down();
+					break;
 				default:
 
 				}
@@ -127,11 +129,15 @@ public class Handler {
 				{
 				case wait:
 					// start function protocol
-
-					if (race) 
-					{
-
-					}
+					disp = new Menu(race);
+					GUIState = guis.fcn;
+					break;
+				case fcn: 
+				case num:
+				case event:
+					// start function protocol
+					GUIState = guis.wait;
+					disp = main.getCard();//need this method
 					break;
 				default:
 
@@ -440,7 +446,8 @@ public class Handler {
 			default:
 
 			}
-			// update output? here or earlier?
+			
+			
 			return true;
 		} catch (InvalidTimeException e) 
 		{
