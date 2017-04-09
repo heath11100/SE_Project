@@ -23,14 +23,16 @@ public class Menu extends UIPrint {
 			"RESET"
 		};
 	
+	final String RACEOFF = "NEWRUN";
+	
+
 	int position;
 	ArrayList<String> curList; 
 	
-	final String RACEOFF = "NEWRUN";
 	
 	public Menu(boolean race)
 	{
-		curList = new ArrayList();
+		curList = new ArrayList<String>();
 		if(race)
 			for(String s: RACEON)
 				curList.add(s);
@@ -39,8 +41,11 @@ public class Menu extends UIPrint {
 		for(String s: ALWAYSFUNCTION)
 			curList.add(s);
 		position = 0;
+		this.setText("");
+		this.setRows(20);
 	}
 	
+	//TODO make this more efficient, try not to rebuild the string every time
 	@Override
 	public String writeTo() 
 	{
@@ -50,11 +55,12 @@ public class Menu extends UIPrint {
 		{
 			if(i == position)
 			{
-				display += ">";
+				display += "> ";
 				toReturn = curList.get(i);
 			}
 			display += curList.get(i) + "\n";//not sure how to start new line?				
 		}
+		this.setText(display);
 		return toReturn;
 	}
 

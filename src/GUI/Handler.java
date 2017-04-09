@@ -3,15 +3,13 @@ package GUI;
 import javax.swing.JTextArea;
 import javax.swing.Timer;
 
-import ChronoTimer.ChronoTime;
-import ChronoTimer.ChronoTrigger;
-import ChronoTimer.Menu;
-import ChronoTimer.UIPrint;
+import ChronoTimer.*;
 import Exceptions.InvalidTimeException;
 
 /*
  * Ryan Thorne
  * Matt Damon's ChronoTrigger
+ * ver 0.1
  */
 
 public class Handler {
@@ -32,13 +30,16 @@ public class Handler {
 				// nothing? if no race
 		fcn, // in the function menus
 		num, // choosing a number for entry
-		event // choosing an event type
+		event, // choosing an event type
+		print,	//selecting a race to print
+		export	//selecting a race to export
 	}
 
 	public Handler(JTextArea d, JTextArea p) {
 		displayArea = d;
 		printArea = p;
 		main = new ChronoTrigger();
+		//need to set the default printer as well here
 		GUIState = guis.off;
 		curNum = "";
 		race = false;
@@ -68,8 +69,7 @@ public class Handler {
 				switch (GUIState) 
 				{
 				case fcn:
-					disp.up();
-					break;
+				case event:
 				case wait:
 					// should allow user to navigate the scroll view for this
 					// run
@@ -83,8 +83,7 @@ public class Handler {
 				switch (GUIState) 
 				{
 				case fcn:
-					disp.down();
-					break;
+				case event:
 				case wait:
 					disp.down();
 					break;
@@ -100,8 +99,17 @@ public class Handler {
 				switch (GUIState) 
 				{
 				case fcn:
-					// maneuver up in menu
+					// maneuver back in menu
 					GUIState = guis.wait;
+					disp = main.getCard();//need this method, hard
+					break;
+				case event:
+					disp = new Menu(race);
+				case num:
+				case print:
+				case export:
+					curNum = "";
+					GUIState = guis.fcn;
 					break;
 				default:
 
@@ -112,7 +120,48 @@ public class Handler {
 			 * equivalent to an enter? only on function
 			 */
 			case "RIGHT":
-				// this and star should have roughly the same behavior?
+			case "POUND":
+				switch (GUIState) 
+				{
+				case fcn:
+					enterCommand(disp.writeTo());//this will put me in the correct state
+					break;
+				case num:
+					if(curNum != "")
+					{
+						main.addRacer(ChronoTime.now(), Integer.parseInt(curNum));
+						GUIState = guis.wait;
+						disp = main.getCard();//need this method, hard
+					}
+					break;
+				case event:
+					main.setType(ChronoTime.now(), disp.writeTo());
+					GUIState = guis.wait;
+					disp = main.getCard();//need this method, hard
+					break;
+				case print:
+					if(curNum != "")
+						main.printRun(ChronoTime.now(), Integer.parseInt(curNum));
+					else
+						main.printRun(ChronoTime.now());
+					GUIState = guis.wait;
+					disp = main.getCard();//need this method, hard
+					break;
+					//later
+				case export:
+					if(curNum != "")
+						main.exportRun(ChronoTime.now(), Integer.parseInt(curNum));
+					else
+						main.exportRun(ChronoTime.now());
+					GUIState = guis.wait;
+					disp = main.getCard();//need this method, hard
+					break;
+					//later
+				default:
+					// do nothing
+				}
+				
+				// enter key
 				break;
 
 			/**
@@ -132,12 +181,15 @@ public class Handler {
 					disp = new Menu(race);
 					GUIState = guis.fcn;
 					break;
-				case fcn: 
 				case num:
+				case fcn: 
 				case event:
-					// start function protocol
+				case print:
+				case export:
+					// stop function protocol
+					curNum = "";
 					GUIState = guis.wait;
-					disp = main.getCard();//need this method
+					disp = main.getCard();//need this method, hard
 					break;
 				default:
 
@@ -149,6 +201,7 @@ public class Handler {
 				{
 				case off:
 					main.powerOn(ChronoTime.now());
+					disp = main.getCard();//need this method, hard
 					GUIState = guis.wait;
 					break;
 				default:
@@ -159,7 +212,7 @@ public class Handler {
 			case "PRINTER POWER":
 				// no idea what we are doing here, need another class for
 				// printer state?
-				// TODO @Friday
+				// TODO @Sunday
 				break;
 			case "STAR":
 				switch (GUIState) 
@@ -168,14 +221,14 @@ public class Handler {
 					curNum = "";
 					break;
 				case fcn:
-					// return to defaultState
+					GUIState = guis.wait;
+					disp = main.getCard();//need this method, hard
+					break;
 				default:
 					// do nothing
 				}
 				break;
-			case "POUND":
-				// enter key
-				break;
+				
 			// i wish i had the foresight to break this one up oh well
 			case "TRIGGER 1":
 				main.triggerSensor(ChronoTime.now(), 1);
@@ -324,6 +377,8 @@ public class Handler {
 			case "NUM 1":
 				switch (GUIState) 
 				{
+				case export:
+				case print:
 				case num:
 					if (curNum.length() < 4)
 						curNum += "1";
@@ -335,6 +390,8 @@ public class Handler {
 			case "NUM 2":
 				switch (GUIState) 
 				{
+				case export:
+				case print:
 				case num:
 					if (curNum.length() < 4)
 						curNum += "2";
@@ -348,6 +405,8 @@ public class Handler {
 			case "NUM 3":
 				switch (GUIState) 
 				{
+				case export:
+				case print:
 				case num:
 					if (curNum.length() < 4)
 						curNum += "3";
@@ -359,6 +418,8 @@ public class Handler {
 			case "NUM 4":
 				switch (GUIState) 
 				{
+				case export:
+				case print:
 				case num:
 					if (curNum.length() < 4)
 						curNum += "4";
@@ -371,6 +432,8 @@ public class Handler {
 			case "NUM 5":
 				switch (GUIState) 
 				{
+				case export:
+				case print:
 				case num:
 					if (curNum.length() < 4)
 						curNum += "5";
@@ -383,6 +446,8 @@ public class Handler {
 			case "NUM 6":
 				switch (GUIState) 
 				{
+				case export:
+				case print:
 				case num:
 					if (curNum.length() < 4)
 						curNum += "6";
@@ -395,6 +460,8 @@ public class Handler {
 			case "NUM 7":
 				switch (GUIState) 
 				{
+				case export:
+				case print:
 				case num:
 					if (curNum.length() < 4)
 						curNum += "7";
@@ -407,6 +474,8 @@ public class Handler {
 			case "NUM 8":
 				switch (GUIState) 
 				{
+				case export:
+				case print:
 				case num:
 					if (curNum.length() < 4)
 						curNum += "8";
@@ -419,6 +488,8 @@ public class Handler {
 			case "NUM 9":
 				switch (GUIState) 
 				{
+				case export:
+				case print:
 				case num:
 					if (curNum.length() < 4)
 						curNum += "9";
@@ -431,6 +502,8 @@ public class Handler {
 			case "NUM 0":
 				switch (GUIState) 
 				{
+				case export:
+				case print:
 				case num:
 					if (curNum.length() < 4 && curNum.length() > 0)// extra
 																	// check so
@@ -453,7 +526,76 @@ public class Handler {
 		{
 			System.out.println("casey why?");
 		}
+		disp.append("\n" + curNum);
 		// if we do not succesfully execute, return false
 		return false;
+	}
+	
+	/**
+	 * this function handles function calls out of the Menu 
+	 * @param command the command to parse
+	 * @return false means no more information is needed and the command is completed, true means that the command is not completed, it needs more information
+	 */
+	
+	private boolean enterCommand(String command)
+	{
+		try
+		{
+			switch (command)
+			{
+			case "NUM":
+				GUIState = guis.num;
+				return true;
+			case "CLEAR":
+				GUIState = guis.wait;
+				disp = main.getCard();//need this method, hard
+				//clear does nothing?
+				return false;
+			case "CANCEL":
+				GUIState = guis.wait;
+				disp = main.getCard();//need this method, hard
+				main.cancel(ChronoTime.now());
+				return false;
+			case "DNF":
+				GUIState = guis.wait;
+				disp = main.getCard();//need this method, hard
+				main.dnf(ChronoTime.now());
+				return false;
+			case "ENDRUN":
+				GUIState = guis.wait;
+				disp = main.getCard();//need this method, hard
+				race = false;
+				main.finRun(ChronoTime.now());
+				return false;
+			case "EVENT":
+				GUIState = guis.event;
+				disp = new EventMenu();
+				return true;
+			case "PRINT":
+				GUIState = guis.print;
+				return true;
+			case "EXPORT":
+				GUIState = guis.export;
+				return true;
+			case "RESET":
+				GUIState = guis.wait;
+				disp = main.getCard();//need this method, hard
+				main.powerOff(ChronoTime.now());
+				main.powerOn(ChronoTime.now());
+				return false;
+			case "NEWRUN":
+				GUIState = guis.wait;
+				disp = main.getCard();//need this method, hard
+				race = true;
+				main.newRun(ChronoTime.now());
+				return false;
+			default:
+				return false;
+			}
+		} catch (InvalidTimeException e) 
+		{
+			System.out.println("casey why?");
+			return false;
+		}
 	}
 }
