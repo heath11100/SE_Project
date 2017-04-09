@@ -27,7 +27,7 @@ public class Run {
 	private int nextRacerToMarkIndex = 0;
 	
 	private Log log;
-	private Card card;
+	private Card card = new Card(3,10);
 
 	private final int MIN_BIB_NUMBER = 1;
 	private final int MAX_BIB_NUMBER = 9999;
