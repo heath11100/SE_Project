@@ -212,9 +212,7 @@ public class Handler {
 				}
 				break;
 			case "PRINTER POWER":
-				// no idea what we are doing here, need another class for
-				// printer state?
-				// TODO @Sunday
+				printerPower = !printerPower;
 				break;
 			case "STAR":
 				switch (GUIState) 
