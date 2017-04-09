@@ -20,6 +20,7 @@ public class Handler {
 	guis GUIState;
 	String curNum;
 	boolean race;
+	boolean printerPower;
 	UIPrint disp;
 
 	public enum guis {
@@ -38,6 +39,7 @@ public class Handler {
 	public Handler(JTextArea d, JTextArea p) {
 		displayArea = d;
 		printArea = p;
+		printerPower = false;
 		main = new ChronoTrigger();
 		//need to set the default printer as well here
 		GUIState = guis.off;
@@ -572,8 +574,14 @@ public class Handler {
 				disp = new EventMenu();
 				return true;
 			case "PRINT":
-				GUIState = guis.print;
-				return true;
+				if(printerPower)
+				{
+					GUIState = guis.print;
+					return true;
+				}
+				GUIState = guis.wait;
+				disp = main.getCard();//need this method, hard
+				return false;
 			case "EXPORT":
 				GUIState = guis.export;
 				return true;
