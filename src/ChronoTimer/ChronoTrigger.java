@@ -470,8 +470,14 @@ public class ChronoTrigger
 			printer.flush(history);
 		}
 	}
-
-	
+	/**
+	 * Returns the Card of the current race
+	 * @return card of current run
+	 */
+	public Card getCard()
+	{
+		return runs.get(curRun).getCard();
+	}
 	/**
 	 * The Channel class.
 	 * @author Casey Van Groll
