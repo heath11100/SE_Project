@@ -61,6 +61,7 @@ public class Menu extends UIPrint {
 			display += curList.get(i) + "\n";//not sure how to start new line?				
 		}
 		this.setText(display);
+		System.out.println(display + "trialtrialtrial ");
 		return toReturn;
 	}
 

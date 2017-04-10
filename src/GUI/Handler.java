@@ -48,6 +48,7 @@ public class Handler {
 		Timer updater = new Timer(1000, new Listener(this, "UPDATE"));
 		updater.setInitialDelay(100);
 		updater.start();
+		disp = new Card(0,0);
 	}
 
 	protected boolean issue(String command) 
@@ -203,7 +204,7 @@ public class Handler {
 				{
 				case off:
 					main.powerOn(ChronoTime.now());
-					disp = main.getCard();//need this method, hard
+					disp = new Card(0,0);
 					GUIState = guis.wait;
 					break;
 				default:
@@ -524,10 +525,12 @@ public class Handler {
 			return true;
 		} catch (InvalidTimeException e) 
 		{
-			System.out.println("casey why?");
+			System.out.println("time exception");
 		}
 		disp.append("\n" + curNum);
 		// if we do not succesfully execute, return false
+		System.out.println(disp.getText());
+		displayArea.append(disp.getText());
 		return false;
 	}
 	

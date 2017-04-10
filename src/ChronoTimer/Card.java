@@ -21,6 +21,7 @@ public class Card extends UIPrint {
 	public String writeTo()
 	{
 		this.setText(header + body + footer);
+		System.out.println(header + body + footer);
 		return "RACE";
 	}
 	
