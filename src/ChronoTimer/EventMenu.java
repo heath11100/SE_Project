@@ -29,6 +29,7 @@ public class EventMenu extends UIPrint {
 	
 	private void updateDisplay()
 	{
+		display = "";
 		position = newPosition;
 		for(int i = 0; i < TYPES.length; i++)
 		{
@@ -36,6 +37,7 @@ public class EventMenu extends UIPrint {
 				display += "> ";
 			display += TYPES[i] + "\n";//not sure how to start new line?
 		}
+		this.setText(display);
 	}
 
 	@Override
