@@ -520,19 +520,19 @@ public class Handler {
 			default:
 
 			}
-			
+
+			displayArea.setText(disp.getText());
+			disp.append("\n" + curNum);
 			
 			return true;
 		} catch (InvalidTimeException e) 
 		{
 			System.out.println("time exception");
 		}
-		disp.append("\n" + curNum);
-		// if we do not succesfully execute, return false
-		System.out.println(disp.getText());
-		displayArea.append(disp.getText());
 		return false;
 	}
+	
+	
 	
 	/**
 	 * this function handles function calls out of the Menu 
@@ -594,9 +594,9 @@ public class Handler {
 				return false;
 			case "NEWRUN":
 				GUIState = guis.wait;
+				main.newRun(ChronoTime.now());
 				disp = main.getCard();//need this method, hard
 				race = true;
-				main.newRun(ChronoTime.now());
 				return false;
 			default:
 				return false;

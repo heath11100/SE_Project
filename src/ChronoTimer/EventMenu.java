@@ -41,15 +41,15 @@ public class EventMenu extends UIPrint {
 	@Override
 	public void up() {
 		// TODO Auto-generated method stub
-		newPosition = (newPosition + 1) % TYPES.length;
+		newPosition--;
+		if(newPosition < 0)
+			newPosition = TYPES.length - 1;
 	}
 
 	@Override
 	public void down() {
 		// TODO Auto-generated method stub
-		newPosition--;
-		if(newPosition < 0)
-			newPosition = TYPES.length - 1;
+		newPosition = (newPosition + 1) % TYPES.length;
 	}
 
 }

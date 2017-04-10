@@ -61,7 +61,7 @@ public class Menu extends UIPrint {
 			display += curList.get(i) + "\n";//not sure how to start new line?				
 		}
 		this.setText(display);
-		System.out.println(display + "trialtrialtrial ");
+		//System.out.println(display + "trialtrialtrial ");
 		return toReturn;
 	}
 
@@ -69,16 +69,16 @@ public class Menu extends UIPrint {
 	@Override
 	public void up() {
 		// TODO Auto-generated method stub
-		position = (position + 1) % curList.size();
+		position--;
+		if(position < 0)
+			position = curList.size() - 1;
 	}
 
 
 	@Override
 	public void down() {
 		// TODO Auto-generated method stub
-		position--;
-		if(position < 0)
-			position = curList.size() - 1;
+		position = (position + 1) % curList.size();
 	}
 
 }
