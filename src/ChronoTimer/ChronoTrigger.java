@@ -423,6 +423,18 @@ public class ChronoTrigger
 		}
 	}
 	
+	public void printRun(ChronoTime commandTime, int runNum, Printer curPrint)
+	{
+		if(power)
+		{
+			officialTime = commandTime;
+			
+			if (!runs.isEmpty())
+				curPrint.print(runs.get(runNum).getLog());
+			else
+				history.add("runNum " + runNum+ " was invalid");
+		}
+	}
 	/**
 	 * Exports run to .txt, default set to curRun
 	 * @param commandTime
