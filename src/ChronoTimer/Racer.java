@@ -66,7 +66,7 @@ public class Racer {
 	
 	/**
 	 * Sets the Racer's status to FINISHED and sets the Racer's endTime to endTime.
-	 * @param finishTime the time corresponding to when the Racer finished a Race
+	 * @param endTime the time corresponding to when the Racer finished a Race
 	 * @precondition The Racer has status RACING
 	 * @postcondition The Racer has status FINISHED
 	 * @throws InvalidTimeException when endTime is before startTime
@@ -137,7 +137,17 @@ public class Racer {
 	 * @throws InvalidTimeException
 	 */
 	public ChronoTime getElapsedTime() throws InvalidTimeException {
-		return this.endTime.elapsedSince(this.startTime);
+
+		if (this.startTime == null) {
+			//0 elapsed time.
+			return new ChronoTime(0,0,0,0);
+
+		} else if (this.endTime == null) {
+			return ChronoTime.now().elapsedSince(this.startTime);
+
+		} else {
+			return this.endTime.elapsedSince(this.startTime);
+		}
 	}
 	
 	/**

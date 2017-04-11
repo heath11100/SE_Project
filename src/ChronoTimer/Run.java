@@ -68,11 +68,62 @@ public class Run {
 	public Log getLog() {
 		return this.log;
 	}
-	
+
+	/**
+	 * Get the card of the run which displays information relative to the event type.
+	 * The card and the information it displays per event type is shown below:
+	 *
+	 * Event Type - IND:
+	 * 	Header:
+	 * 	- Next three racers to start
+	 * 	Body:
+	 * 	- Current racers racing
+	 * 	Footer:
+	 * 	- Last Racer to finish
+	 *
+	 *
+	 * Event Type - PARIND:
+	 * 	Header:
+	 * 	- Next pair to run
+	 * 	Body:
+	 * 	- NOTHING
+	 * 	Footer:
+	 * 	- Finish times of the last pair to finish
+	 *
+	 *
+	 * Event Type - GRP:
+	 * 	Header:
+	 * 	- Running time
+	 * 	Body:
+	 * 	- NOTHING
+	 * 	Footer:
+	 * 	- Last finish time
+	 *
+	 * @return null if the run has not yet started, a valid card otherwise.
+     */
 	public Card getCard()
 	{
+		if (!this.hasStarted()) {
+			//Run has not started, therefore there is not a card.
+			return null;
+		}
+
+		//Format card based on event type.
+		switch (this.eventType) {
+			case IND:
+
+				break;
+
+			case PARIND:
+				break;
+
+			case GRP:
+				break;
+		}
+
 		return this.card;
 	}
+
 	/**
 	 * Determines whether or not the run has started.
 	 * @return true if the run has started, false otherwise.
