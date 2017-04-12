@@ -38,9 +38,7 @@ public class Racer {
 	 * @param number the identification number corresponding to the racer.
 	 */
 	public Racer(int number) throws IllegalArgumentException {
-		if (number < 1) {
-			throw new IllegalArgumentException("Racer cannot have a number less than 1");
-		} else if (number > 9999) {
+	if (number > 9999) {
 			throw new IllegalArgumentException("Racer cannot have a number greater than 4 digits");
 		} else {
 			this.number = number;
@@ -171,7 +169,14 @@ public class Racer {
 	 */
 	@Override
 	public String toString() {
-		return "Racer[" + this.getNumber() + "]";
+
+		if (this.getNumber() < 0) {
+			//Dummy Racer
+			//Flip the number to be positive and then add astrisks
+			return "Racer[**" + this.getNumber()*(-1) + "**]";
+		} else {
+			return "Racer[" + this.getNumber() + "]";
+		}
 	}
 	
 	
