@@ -1,5 +1,6 @@
 package GUI;
 
+import java.util.NoSuchElementException;
 import java.util.TimerTask;
 
 import javafx.scene.text.Font;
@@ -64,7 +65,6 @@ public class Handler {
 	protected boolean issue(String command) 
 	{
 		if(command != "UPDATE") System.out.println(command);
-		displayArea.append(command);
 		// switch each command to determine course of action
 		try 
 		{
@@ -146,6 +146,7 @@ public class Handler {
 						main.addRacer(ChronoTime.now(), Integer.parseInt(curNum));
 						GUIState = guis.wait;
 						disp = main.getCard();
+						curNum = "";
 					}
 					break;
 				case event:
@@ -548,18 +549,18 @@ public class Handler {
 
 				break;
 			default:
-
+				throw new NoSuchElementException("could not parse command");
 			}
 
 			displayArea.setText(disp.getText());
-			disp.append("\n" + curNum);
+			displayArea.append("\n" + curNum);
 			
 			return true;
 		} catch (InvalidTimeException e) 
 		{
 			System.out.println("time exception");
-		}
 		return false;
+		}
 	}
 	
 	
@@ -611,16 +612,27 @@ public class Handler {
 					return true;
 				}
 				GUIState = guis.wait;
-				disp = main.getCard();
+				if(race)
+					disp = main.getCard();
+				else
+					disp = new Card(0, 0);
 				return false;
 			case "EXPORT":
 				GUIState = guis.export;
 				return true;
 			case "RESET":
-				GUIState = guis.wait;
-				disp = main.getCard();
+				GUIState = guis.start;
+				disp = new SplashScreen();
 				main.powerOff(ChronoTime.now());
 				main.powerOn(ChronoTime.now());
+				new java.util.Timer().schedule(new TimerTask() {
+					
+					@Override
+					public void run() {
+						disp = new Card(0, 0);
+						GUIState = guis.wait;
+					}
+				}, STARTDELAY);
 				return false;
 			case "NEWRUN":
 				GUIState = guis.wait;
