@@ -271,13 +271,7 @@ public class Simulator {
 							throw new InvalidCommandException("Runner format, num");
 						break;
 					case "CLR":
-						//not a cancel command, not used ion sprint 1?
-//						if(tokens[cToken].matches(RUNNERFORMAT))
-//						{
-//							//idk what this command should do
-//						}
-//						else
-//							throw new InvalidCommandException("runner format, clr");
+						//no action yet provided
 						break;
 					case "SWAP": //not used in sprint 2
 						break;
