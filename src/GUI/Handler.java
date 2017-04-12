@@ -1,5 +1,10 @@
 package GUI;
 
+import java.util.NoSuchElementException;
+import java.util.TimerTask;
+
+import javafx.scene.text.Font;
+
 import javax.swing.JTextArea;
 import javax.swing.Timer;
 
@@ -22,6 +27,11 @@ public class Handler {
 	boolean race;
 	boolean printerPower;
 	UIPrint disp;
+	Timer updater;
+	
+	final int TIMERDELAY = 100;
+	final int STARTDELAY = 1000;
+	
 
 	public enum guis {
 		off, // synonymous with the cts.off state
@@ -38,6 +48,7 @@ public class Handler {
 
 	public Handler(JTextArea d, JTextArea p) {
 		displayArea = d;
+		displayArea.setFont(new java.awt.Font(java.awt.Font.MONOSPACED, java.awt.Font.PLAIN, 12));
 		printArea = p;
 		printerPower = false;
 		main = new ChronoTrigger();
@@ -45,7 +56,7 @@ public class Handler {
 		GUIState = guis.off;
 		curNum = "";
 		race = false;
-		Timer updater = new Timer(1000, new Listener(this, "UPDATE"));
+		updater = new Timer(TIMERDELAY, new Listener(this, "UPDATE"));
 		updater.setInitialDelay(100);
 		updater.start();
 		disp = new Card(0,0);
@@ -53,7 +64,7 @@ public class Handler {
 
 	protected boolean issue(String command) 
 	{
-		displayArea.append(command);
+		if(command != "UPDATE") System.out.println(command);
 		// switch each command to determine course of action
 		try 
 		{
@@ -104,7 +115,7 @@ public class Handler {
 				case fcn:
 					// maneuver back in menu
 					GUIState = guis.wait;
-					disp = main.getCard();//need this method, hard
+					disp = main.getCard();
 					break;
 				case event:
 					disp = new Menu(race);
@@ -134,13 +145,17 @@ public class Handler {
 					{
 						main.addRacer(ChronoTime.now(), Integer.parseInt(curNum));
 						GUIState = guis.wait;
-						disp = main.getCard();//need this method, hard
+						disp = main.getCard();
+						curNum = "";
 					}
 					break;
 				case event:
 					main.setType(ChronoTime.now(), disp.writeTo());
 					GUIState = guis.wait;
-					disp = main.getCard();//need this method, hard
+					if(race)
+						disp = main.getCard();
+					else
+						disp = new Card(0, 0);
 					break;
 				case print:
 					if(curNum != "")
@@ -148,7 +163,10 @@ public class Handler {
 					else
 						main.printRun(ChronoTime.now());
 					GUIState = guis.wait;
-					disp = main.getCard();//need this method, hard
+					if(race)
+						disp = main.getCard();
+					else
+						disp = new Card(0, 0);
 					break;
 					//later
 				case export:
@@ -157,7 +175,10 @@ public class Handler {
 					else
 						main.exportRun(ChronoTime.now());
 					GUIState = guis.wait;
-					disp = main.getCard();//need this method, hard
+					if(race)
+						disp = main.getCard();
+					else
+						disp = new Card(0, 0);
 					break;
 					//later
 				default:
@@ -192,7 +213,7 @@ public class Handler {
 					// stop function protocol
 					curNum = "";
 					GUIState = guis.wait;
-					disp = main.getCard();//need this method, hard
+					disp = main.getCard();
 					break;
 				default:
 
@@ -204,8 +225,18 @@ public class Handler {
 				{
 				case off:
 					main.powerOn(ChronoTime.now());
-					disp = new Card(0,0);
-					GUIState = guis.wait;
+					disp = new SplashScreen();
+					GUIState = guis.start;
+					
+					new java.util.Timer().schedule(new TimerTask() {
+						
+						@Override
+						public void run() {
+							disp = new Card(0, 0);
+							GUIState = guis.wait;
+						}
+					}, STARTDELAY);
+					
 					break;
 				default:
 					main.powerOff(ChronoTime.now());
@@ -223,7 +254,7 @@ public class Handler {
 					break;
 				case fcn:
 					GUIState = guis.wait;
-					disp = main.getCard();//need this method, hard
+					disp = main.getCard();
 					break;
 				default:
 					// do nothing
@@ -518,18 +549,18 @@ public class Handler {
 
 				break;
 			default:
-
+				throw new NoSuchElementException("could not parse command");
 			}
 
 			displayArea.setText(disp.getText());
-			disp.append("\n" + curNum);
+			displayArea.append("\n" + curNum);
 			
 			return true;
 		} catch (InvalidTimeException e) 
 		{
 			System.out.println("time exception");
-		}
 		return false;
+		}
 	}
 	
 	
@@ -551,22 +582,22 @@ public class Handler {
 				return true;
 			case "CLEAR":
 				GUIState = guis.wait;
-				disp = main.getCard();//need this method, hard
+				disp = main.getCard();
 				//clear does nothing?
 				return false;
 			case "CANCEL":
 				GUIState = guis.wait;
-				disp = main.getCard();//need this method, hard
+				disp = main.getCard();
 				main.cancel(ChronoTime.now());
 				return false;
 			case "DNF":
 				GUIState = guis.wait;
-				disp = main.getCard();//need this method, hard
+				disp = main.getCard();
 				main.dnf(ChronoTime.now());
 				return false;
 			case "ENDRUN":
 				GUIState = guis.wait;
-				disp = main.getCard();//need this method, hard
+				disp = main.getCard();
 				race = false;
 				main.finRun(ChronoTime.now());
 				return false;
@@ -581,21 +612,32 @@ public class Handler {
 					return true;
 				}
 				GUIState = guis.wait;
-				disp = main.getCard();//need this method, hard
+				if(race)
+					disp = main.getCard();
+				else
+					disp = new Card(0, 0);
 				return false;
 			case "EXPORT":
 				GUIState = guis.export;
 				return true;
 			case "RESET":
-				GUIState = guis.wait;
-				disp = main.getCard();//need this method, hard
+				GUIState = guis.start;
+				disp = new SplashScreen();
 				main.powerOff(ChronoTime.now());
 				main.powerOn(ChronoTime.now());
+				new java.util.Timer().schedule(new TimerTask() {
+					
+					@Override
+					public void run() {
+						disp = new Card(0, 0);
+						GUIState = guis.wait;
+					}
+				}, STARTDELAY);
 				return false;
 			case "NEWRUN":
 				GUIState = guis.wait;
 				main.newRun(ChronoTime.now());
-				disp = main.getCard();//need this method, hard
+				disp = main.getCard();
 				race = true;
 				return false;
 			default:

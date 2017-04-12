@@ -124,6 +124,7 @@ public class Simulator {
 		String cCmd = ""; //current command, more like the current parsing token, but i like ccmd so sue me
 		String tokens[] = {""};
 		int cToken = 0;
+		boolean power = false;
 		
 		ChronoTime cTime = null;
 		ChronoTrigger sim = null;
@@ -155,7 +156,7 @@ public class Simulator {
 			input = new Scanner(System.in);
 		}
 		
-		
+		sim = new ChronoTrigger();
 		
 		//Simulator Loop
 		input.useDelimiter(DELIMITERS);
@@ -199,9 +200,10 @@ public class Simulator {
 					switch(tokens[cToken++])
 					{
 					case "POWER":
-						if(sim == null)
-							sim = new ChronoTrigger(cTime);
+						if(power)
+							sim.powerOff(ChronoTime.now());
 						else{
+							sim.powerOn(ChronoTime.now());
 							System.out.println(" > ChronoTrigger is off.");
 							sim = null;}
 						break;
@@ -210,7 +212,8 @@ public class Simulator {
 						state = 1;
 						break;
 					case "RESET":
-						sim = new ChronoTrigger(cTime);
+						sim.powerOff(ChronoTime.now());
+						sim.powerOn(ChronoTime.now());
 						break;
 					case "TIME":
 						if(tokens[cToken].matches(TIMEFORMAT))
@@ -268,13 +271,7 @@ public class Simulator {
 							throw new InvalidCommandException("Runner format, num");
 						break;
 					case "CLR":
-						//not a cancel command, not used ion sprint 1?
-//						if(tokens[cToken].matches(RUNNERFORMAT))
-//						{
-//							//idk what this command should do
-//						}
-//						else
-//							throw new InvalidCommandException("runner format, clr");
+						//no action yet provided
 						break;
 					case "SWAP": //not used in sprint 2
 						break;
