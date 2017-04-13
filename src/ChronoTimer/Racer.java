@@ -135,7 +135,6 @@ public class Racer {
 	 * @throws InvalidTimeException
 	 */
 	public ChronoTime getElapsedTime() throws InvalidTimeException {
-
 		if (this.startTime == null) {
 			//0 elapsed time.
 			return new ChronoTime(0,0,0,0);
@@ -169,7 +168,6 @@ public class Racer {
 	 */
 	@Override
 	public String toString() {
-
 		if (this.getNumber() < 0) {
 			//Dummy Racer
 			//Flip the number to be positive and then add astrisks

@@ -24,28 +24,56 @@ public class Card extends UIPrint {
 		//System.out.println(header + body + footer);
 		return "RACE";
 	}
+
+	public void setHeader(String string) {
+		header = string;
+		this.replaceRange(header, 0, headerSize-1);
+	}
 	
 	public void setHeader(Queue<Racer> newHeader) {
 		//don't care about times for queue, right?
 		header = "";
 		for (Racer r: newHeader)
-			header = "Racer["+r.getNumber()+"]\n" +header;
+			header = r.toString() + "\n" + header;
 		
 		this.replaceRange(header, 0, headerSize-1);
 	}
 
-	public void setBody(Queue<Racer> newBody) throws InvalidTimeException{
+	public void setBody(Queue<Racer> newBody){
 		body = "";
-		for (Racer r: newBody)
-			body = "Racer["+r.getNumber()+"] "+r.getElapsedTime()+"\n" +body;
+
+		for (Racer r : newBody) {
+			try {
+				ChronoTime elapsedTime = r.getElapsedTime();
+
+				body = r.toString() + elapsedTime + "\n" + body;
+			} catch (InvalidTimeException e) {
+				//Then the Racer will not be added.
+				//We should never reach this point anyways.
+			}
+		}
 		
 		this.replaceRange(body, headerSize+1, headerSize+bodySize);
 	}
 
-	public void setFooter(Queue<Racer> newFooter) throws InvalidTimeException{
+	public void setFooter(String string) {
+		footer = string;
+		this.replaceRange(footer, headerSize+bodySize+2, headerSize+bodySize+footerSize+1);
+	}
+
+	public void setFooter(Queue<Racer> newFooter) {
 		footer = "";
-		for (Racer r: newFooter)
-			footer = "Racer["+r.getNumber()+"] "+r.getElapsedTime()+"\n" +footer;
+
+		for (Racer r : newFooter) {
+			try {
+				ChronoTime elapsedTime = r.getElapsedTime();
+
+				footer = r.toString() + elapsedTime + "\n" + footer;
+			} catch (InvalidTimeException e) {
+				//Then the Racer will not be added.
+				//We should never reach this point anyways.
+			}
+		}
 		
 		this.replaceRange(footer, headerSize+bodySize+2, headerSize+bodySize+footerSize+1);
 	}

@@ -103,21 +103,120 @@ public class Run {
      */
 	public Card getCard()
 	{
-		if (!this.hasStarted()) {
-			//Run has not started, therefore there is not a card.
-			return null;
-		}
+		final int header;
+		final int footer;
 
 		//Format card based on event type.
 		switch (this.eventType) {
 			case IND:
+				header = 3;
+				footer = 1;
+
+				this.card = new Card(header, footer);
+
+				//Header
+				Queue<Racer> nextThreeRacers = new LinkedList<Racer>();
+
+				for (Racer racer : this.queuedRacers) {
+					if (nextThreeRacers.size() == 3) {
+						break;
+					} else {
+						nextThreeRacers.add(racer);
+					}
+				}
+				//For loop exits when there are no longer racers to add OR there are 3 racers.
+				this.card.setHeader(nextThreeRacers);
+
+				//Body
+				//Set body as the list of running racers (first and only running queue).
+				this.card.setBody(this.runningLanes.get(0));
+
+				//Footer
+				Racer lastRacer = ((LinkedList<Racer>)this.finishedRacers).getLast();
+
+				if (lastRacer != null) {
+					this.card.setFooter(lastRacer.toString());
+				}
 
 				break;
 
 			case PARIND:
+				header = 2;
+				footer = 2;
+
+				this.card = new Card(header, footer);
+
+				//Header
+				//Next pair to run (essentially next two racers).
+				Queue<Racer> nextPair = new LinkedList<Racer>();
+
+				for (Racer racer : this.queuedRacers) {
+					if (nextPair.size() == 2) {
+						break;
+					} else {
+						nextPair.add(racer);
+					}
+				}
+				//For loop exits when there are no longer racers to add OR there are 2 racers.
+				this.card.setHeader(nextPair);
+
+				//Body
+				//Nothing
+
+				//Footer
+				//Finish times of the last pair to finish (essentially last two racers).
+				LinkedList<Racer> linkedList = (LinkedList<Racer>)this.finishedRacers;
+
+				lastRacer = linkedList.getLast();
+				int secondLastIndex = linkedList.size()-2;
+				if (lastRacer != null && secondLastIndex >= 0) {
+					//Then there is a valid second last racer.
+					Racer secondLast = linkedList.get(secondLastIndex);
+
+					try {
+						this.card.setFooter("" + lastRacer.getElapsedTime() + ", " + secondLast.getElapsedTime());
+
+					} catch (InvalidTimeException e) { /*Should not reach this */ }
+				} else if (lastRacer != null) {
+					//There is only a valid last racer.
+					try {
+						this.card.setFooter("" + lastRacer.getElapsedTime());
+
+					} catch (InvalidTimeException e) { /*Should not reach this */ }
+
+				} else {
+					//There are not any racers that have finished.
+				}
+
 				break;
 
 			case GRP:
+				header = 1;
+				footer = 1;
+
+				this.card = new Card(header, footer);
+
+				//Header
+				//Running Time
+				try {
+					this.card.setHeader(this.getElapsedTime().toString());
+
+				} catch (InvalidTimeException e) { /*Should not reach this point. */ }
+
+				//Body
+				//Nothing
+
+				//Footer
+				//Last Finish Time
+				lastRacer = ((LinkedList<Racer>)this.finishedRacers).getLast();
+
+				if (lastRacer != null) {
+					try {
+						this.card.setFooter(lastRacer.getElapsedTime().toString());
+
+					} catch (InvalidTimeException e) { /*Should not reach this point. */ }
+				}
+
 				break;
 		}
 
@@ -148,7 +247,27 @@ public class Run {
 	public EventType getEventType() {
 		return this.eventType;
 	}
-	
+
+
+	/**
+	 * The elapsed time of the Run
+	 * @return the elapsed time
+	 * @throws InvalidTimeException
+	 */
+	private ChronoTime getElapsedTime() throws InvalidTimeException {
+		if (this.startTime == null) {
+			//0 elapsed time.
+			return new ChronoTime(0,0,0,0);
+
+		} else if (this.endTime == null) {
+			return ChronoTime.now().elapsedSince(this.startTime);
+
+		} else {
+			return this.endTime.elapsedSince(this.startTime);
+		}
+	}
+
+
 	/**
 	 * Creates a new lane for runners to be added to.
 	 * @return lane number corresponding to the lane just created.
