@@ -294,7 +294,6 @@ public class TestRun extends TestCase {
 		//Run has a racer, but has NOT started.
 		try {
 			run.endRun(time1);
-			
 			fail("Should not pass when run has not started.");
 		} catch (InvalidTimeException e) {
 			fail("InvalidTimeException should not be thrown.");

@@ -25,6 +25,9 @@ public class TestRacer extends TestCase {
 		 * Test Racer Numbers:
 		 * - must be greater than 0 but no more than 4 digits
 		 */
+		
+		
+		/* No longer apply with dummy racers
 		try	{
 			r3 = new Racer(-1);
 			assertTrue("Created a racer with a negative bib number",false);
@@ -37,7 +40,7 @@ public class TestRacer extends TestCase {
 			assertTrue("Created a racer with a bib number of 0",false);
 		} catch(Exception e) {
 			assertTrue(e instanceof IllegalArgumentException);
-		}
+		}*/
 		
 		try {
 			r4 = new Racer(10000);

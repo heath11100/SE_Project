@@ -1,5 +1,6 @@
 package ChronoTimer;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 
 import Exceptions.InvalidTimeException;
@@ -136,11 +137,17 @@ public class ChronoTime {
 		
 		return String.format("%02d:%02d:%02d.%02d", hours, minutes, seconds, remaining);
 	}
+	
+	public int asHundredths(){return _currentTime;}
 
 	public static ChronoTime now() throws InvalidTimeException{
 		ZonedDateTime t = ZonedDateTime.now();
 		return new ChronoTime(t.getHour(), t.getMinute(), t.getSecond(), t.getNano()/10000000);}
 	
+	//Allows to get real-time events after setting CT system time
+	public static ChronoTime now(Duration offset) throws InvalidTimeException{
+		ZonedDateTime t = ZonedDateTime.now().plus(offset);
+		return new ChronoTime(t.getHour(), t.getMinute(), t.getSecond(), t.getNano()/10000000);}
 	
 	/**
 	 * We will consider two ChronoTimes as equal if their times are equal.

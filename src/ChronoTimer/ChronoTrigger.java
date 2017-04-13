@@ -528,6 +528,7 @@ public class ChronoTrigger
 		@Override
 		public void setUp() throws InvalidTimeException{
 			ct = new ChronoTrigger();
+			ct.powerOn(t1);
 			t1 = ChronoTime.now();
 			t2 = ChronoTime.now();
 			t3 = ChronoTime.now();
@@ -537,6 +538,7 @@ public class ChronoTrigger
 		public void testConstructors(){
 			//constructor 1
 			ct = new ChronoTrigger();
+			ct.powerOn(t1);
 			assertFalse(ct.channels == null);
 			for (int i=0; i< 8; i++){
 				assertFalse(ct.channels[i] ==null);
@@ -547,6 +549,7 @@ public class ChronoTrigger
 			
 			//constructor 2
 			ct = new ChronoTrigger(t1);
+			ct.powerOn(t1);
 			assertFalse(ct.channels == null);
 			for (int i=0; i< 8; i++){
 				assertFalse(ct.channels[i] ==null);
