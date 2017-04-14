@@ -1,23 +1,27 @@
-package Tests;
+package Tests.RunTests;
 
 import junit.framework.TestCase;
 import ChronoTimer.*;
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
 
+import org.junit.Test;
+import org.junit.Before;
+import static org.junit.Assert.fail;
+
 /**
  * Tests the specific implementation for IND type runs
  * - does nots include PARIND.
  * @author austinheath
  */
-public class TestRun_IND extends TestCase {
+public class TestRun_IND {
 	private Run run;
 	
 	private int racerNumber;
 	
 	ChronoTime time1, time2, time3;
 	
-	@Override 
+	@Before
 	public void setUp() throws InvalidTimeException {
 		run = new Run();
 		
@@ -33,6 +37,7 @@ public class TestRun_IND extends TestCase {
 	/**
 	 * Tests creating a single lane with IND.
 	 */
+	@Test
 	public void testCreateFirstLane() {
 		try {
 			run.newLane();
@@ -45,6 +50,7 @@ public class TestRun_IND extends TestCase {
 	/**
 	 * Tests to ensure failure when creating multiple lanes with IND.
 	 */
+	@Test
 	public void testMultipleLanes() {
 		int laneCount = 0;
 		try {
@@ -64,6 +70,7 @@ public class TestRun_IND extends TestCase {
 	/**
 	 * Tests to ensure that upon changing eventType from PARIND to IND that all but one lane is deleted.
 	 */
+	@Test
 	public void testLaneDeletionAfterEventTypeChange() {
 		int laneCount = -1;
 		boolean isINDType = false;
