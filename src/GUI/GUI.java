@@ -41,11 +41,12 @@ public class GUI {
 
 	//Style
 	private final int splashSeconds = 8;
-	protected static Font guiFont,splashFont,bigSplashFont;
+	protected static Font guiFont,splashFont,bigSplashFont,incFont;
 	static{
 		try {guiFont = Font.createFont(Font.TRUETYPE_FONT, new File("./lib/PTS75F.ttf")).deriveFont(18f);
 			splashFont = Font.createFont(Font.TRUETYPE_FONT, new File("./lib/PTC55F.ttf")).deriveFont(50f);
-			bigSplashFont = Font.createFont(Font.TRUETYPE_FONT, new File("./lib/PTC55F.ttf")).deriveFont(75f);}
+			bigSplashFont = Font.createFont(Font.TRUETYPE_FONT, new File("./lib/PTC55F.ttf")).deriveFont(75f);
+			incFont = Font.createFont(Font.TRUETYPE_FONT, new File("./lib/Inconsolata.otf")).deriveFont(12f);}
 		catch (Exception e) {System.out.println("Unable to load custom font. Using default.");}
 	}
 	protected static Color lightBlue = new Color(204,240,255);
@@ -62,7 +63,11 @@ public class GUI {
 		doSplash();
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyTrigger());
 		displayText = new JTextArea();
+		displayText.setFont(incFont);
+		displayText.setMargin(new Insets(2,2,2,2));
 		printerText = new JTextArea();
+		printerText.setFont(incFont);
+		printerText.setMargin(new Insets(2,2,2,2));
 		handler = new Handler(displayText,printerText);
 		createTopView();
 		createBackView();

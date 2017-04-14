@@ -2,9 +2,6 @@ package GUI;
 
 import java.util.NoSuchElementException;
 import java.util.TimerTask;
-
-import javafx.scene.text.Font;
-
 import javax.swing.JTextArea;
 import javax.swing.Timer;
 
@@ -54,7 +51,6 @@ public class Handler {
 
 	public Handler(JTextArea d, JTextArea p) {
 		displayArea = d;
-		displayArea.setFont(new java.awt.Font(java.awt.Font.MONOSPACED, java.awt.Font.PLAIN, 12));
 		printArea = p;
 		printerPower = false;
 		main = new ChronoTrigger();

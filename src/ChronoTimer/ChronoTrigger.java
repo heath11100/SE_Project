@@ -1,5 +1,7 @@
 package ChronoTimer;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
@@ -12,6 +14,7 @@ public class ChronoTrigger
 {
 	private Channel[] channels;
 	private ChronoTime officialTime;
+	private Duration offset;
 	private ArrayList<Run> runs = new ArrayList<>();
 	private int curRun = -1;
 	private boolean logTimes = false;
@@ -27,9 +30,9 @@ public class ChronoTrigger
 	public ChronoTrigger()
 	{
 		//set official time
-		try {officialTime = ChronoTime.now();}
+		try {officialTime = ChronoTime.now(offset);}
 		catch (InvalidTimeException e) {history.add(e.getMessage());}
-
+		offset = Duration.ofNanos(0);
 		//create channels
 		channels = new Channel[8];
 		for(int j =0; j < 8; j++){
@@ -49,6 +52,11 @@ public class ChronoTrigger
 	{
 		//set official time
 		officialTime = t;
+
+		offset = Duration.ofNanos(0);
+		
+		
+		
 		
 		//create channels
 		channels = new Channel[8];
@@ -57,6 +65,7 @@ public class ChronoTrigger
 				channels[i].connect("EYE");}
 		for(int k = 0; k < 8; k++)
 			lanes[k] = k+1;
+		
 		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
 		flush();
 	}
@@ -70,6 +79,7 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
+			offset = Duration.between(Instant.now(), Instant.now().plusSeconds((newOfficialTime.asHundredths()/100)));
 			officialTime = newOfficialTime;
 			history.add( (logTimes? officialTime+" | " : "") +"Set time to " + newOfficialTime.toString());
 			flush();
