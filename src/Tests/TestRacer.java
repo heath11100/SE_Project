@@ -1,187 +1,289 @@
 package Tests;
 
-import ChronoTimer.*;
-import Exceptions.*;
+import ChronoTimer.ChronoTime;
+import ChronoTimer.Racer;
+import Exceptions.InvalidTimeException;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+
+import java.lang.IllegalArgumentException;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 //NB: I am assuming we have a constructor that takes a bib number
 
-public class TestRacer extends TestCase {
+public class TestRacer {
+	private Racer racer, dummyRacer;
+	private ChronoTime time1, time2, time3, zeroTime;
 
-	Racer r1,r2,r3,r4,r5;
-	ChronoTime t1,t2,t3;
+	@BeforeClass
+	public static void classPreparation() {
+		System.out.println("Prepared");
+	}
 
-	@Override
-	public void setUp(){
-		r1 = new Racer(1);
-		r2 = new Racer(2);
+	@Before
+	public void setUp() throws Exception {
+		racer = new Racer(1);
+		dummyRacer = new Racer(-1);
+		time1 = new ChronoTime(0,0,0,0);
+		time2 = new ChronoTime(1,0,0,0);
+		time3 = new ChronoTime(2,0,0,0);
+		zeroTime = new ChronoTime(0, 0, 0, 0);
 	}
-	
+
+	//MARK: Test Constructors
 	@Test
-	public void testConstructorInvalidArgs(){
-		/*
-		 * Test Racer Numbers:
-		 * - must be greater than 0 but no more than 4 digits
-		 */
-		
-		
-		/* No longer apply with dummy racers
-		try	{
-			r3 = new Racer(-1);
-			assertTrue("Created a racer with a negative bib number",false);
-		} catch(Exception e) {
-			assertTrue(e instanceof IllegalArgumentException);
-		}
-		
-		try	{
-			r3 = new Racer(0);
-			assertTrue("Created a racer with a bib number of 0",false);
-		} catch(Exception e) {
-			assertTrue(e instanceof IllegalArgumentException);
-		}*/
-		
-		try {
-			r4 = new Racer(10000);
-			assertTrue("Error was not thrown for a number greater than 4 digits",false);
-		} catch (Exception e) {
-			assertTrue(e instanceof IllegalArgumentException);
-		}
-		
-		try {
-			r4 = new Racer(9999);
-			assertTrue("Racer successfully created with largest 4-digit number", true);
-		} catch (Exception e) {
-			assertTrue("Racer could not be created with largest 4-digit number",false);
-		}
-		
-		assertEquals(r1.getNumber(), 1);
-		assertEquals(r1.getStatus(), Racer.Status.QUEUED);
-		assertEquals(r2.getNumber(), 2);
-		assertEquals(r2.getStatus(), Racer.Status.QUEUED);
+	public void testConstructorNormalRacer() {
+		//Racer should have number 1.
+		assertEquals(1, racer.getNumber());
+		//Status should default to QUEUED.
+		assertEquals(Racer.Status.QUEUED, racer.getStatus());
 	}
-	
+
 	@Test
-	public void testStartAndFinish() throws InvalidTimeException{
-		t1 = new ChronoTime(0,0,0,0);
-		t2 = new ChronoTime(1,0,0,0);
-		r1.start(t1);
-		assertEquals(r1.getStartTime(), t1);
-		assertEquals(r1.getStatus(), Racer.Status.RACING);
-		r1.finish(t2);
-		assertEquals(r1.getEndTime(), t2);
-		assertEquals(r1.getStatus(), Racer.Status.FINISHED);
+	public void testConstructorDummyRacer() {
+		//Racer should have number -1.
+		assertEquals(-1, dummyRacer.getNumber());
+
+		//Status should default to QUEUED.
+		assertEquals(Racer.Status.QUEUED, dummyRacer.getStatus());
 	}
-	
+
 	@Test
-	public void testInvalidStartAndFinishInvalidArgs() throws InvalidTimeException{
-		//allow equal start and stop times?
-		t1 = new ChronoTime(0,0,0,0);
-		t2 = new ChronoTime(0,0,0,0);
-		r1.start(t1);
-		
-		try {
-			r1.finish(t2);
-			assertTrue("Failed to throw exception when throw exception when end time is equal to start time.", false);
-		} catch (Exception e) {
-			assertTrue(e instanceof InvalidTimeException);
-		}		
-		
-		// allow stop times that are before start times?
-		// could be legitimate, but we need to decide
-		t3 = new ChronoTime(1,0,0,0);
-		r2.start(t3);
-		try {
-			r2.finish(t1);
-			assertTrue("Failed to throw exception when throw exception when end time is less than start time.", false);
-		} catch (Exception e) {
-			assertTrue(e instanceof InvalidTimeException);
-		}	
+	public void testConstructorRacerMaximum() {
+		racer = new Racer(9999);
+
+		//Racer should have number 9999
+		assertEquals(9999, racer.getNumber());
+
+		//Status should default to QUEUED.
+		assertEquals(Racer.Status.QUEUED, racer.getStatus());
 	}
-	
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testConstructorNumber0() {
+		new Racer(0);
+	}
+
 	@Test
-	public void testDNF() throws InvalidTimeException{
-		t1 = new ChronoTime(0,0,0,0);
-		r1.start(t1);
-		r1.didNotFinish();
-		assertEquals(r1.getStartTime(), t1);
-		assertEquals(r1.getStatus(), Racer.Status.DNF);
+	public void testConstructorDummyRacerMaximum() {
+		dummyRacer = new Racer(-9999);
+
+		//Racer should have number -9999
+		assertEquals(-9999, dummyRacer.getNumber());
+
+		//Status should default to QUEUED.
+		assertEquals(Racer.Status.QUEUED, dummyRacer.getStatus());
 	}
-	
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testConstructorInvalidNumberNegative() {
+		new Racer(-10_000);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testConstructorInvalidNumberPositive() {
+		new Racer(10_000);
+	}
+
+
+	//Test Start
 	@Test
-	public void testCancel() throws InvalidTimeException{
-		t1 = new ChronoTime(0,0,0,0);
-		r1.start(t1);
-		r1.cancel();
-		assertEquals(r1.getStartTime(), null);
-		assertEquals(r1.getStatus(), Racer.Status.QUEUED);
+	public void testSuccessfulStart() {
+		assertEquals(null, racer.getStartTime());
+		assertEquals(Racer.Status.QUEUED, racer.getStatus());
+
+		racer.start(time1);
+
+		assertEquals(time1, racer.getStartTime());
+		assertEquals(Racer.Status.RACING, racer.getStatus());
 	}
-	
+
+	@Test(expected = IllegalStateException.class)
+	public void testDoubleStart() {
+		//Starting a racer after the racer has already started.
+
+		racer.start(time1);
+		racer.start(time2);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testStartAfterFinish() {
+		//Start a racer after the racer has finished.
+		racer.start(time1);
+		try {
+			racer.finish(time2);
+		} catch (InvalidTimeException e) {
+			fail("Finishing should not fail in this instance.");
+		}
+		racer.start(time1);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testStartAfterDNF() {
+		//Start a racer after the racer has DNFd
+		racer.start(time1);
+		racer.didNotFinish();
+		racer.start(time1);
+	}
+
 	@Test
-	public void testInvalidOrder() throws InvalidTimeException {
-		t1 = new ChronoTime(0,0,0,0);
-		t2 = new ChronoTime(1,0,0,0);
-		
-		//finish, DNF or cancel without starting
-		try {
-			r1.finish(t1);
-			assertTrue("Racer finishing before starting should throw exception.", false);
-		} catch (Exception e) {
-			
-			assertTrue(e instanceof InvalidTimeException);
-		}
-		
-		try {
-			r1.didNotFinish();
-			assertTrue("Racer DNF before starting should throw exception.", false);
-		} catch (Exception e) {
-			assertTrue(e instanceof IllegalStateException);
-		}
-		
-		try {
-			r1.cancel();
-			assertTrue("Racer canceling before starting should throw exception.", false);
-		} catch (Exception e) {
-			assertTrue(e instanceof IllegalStateException);
-		}
-		
-		r1.start(t1);
-		
-		//start twice?
-		try {
-			r1.start(t2);
-			assertTrue("Racer starting twice should throw exception.", false);
-		} catch (Exception e) {
-			assertTrue(e instanceof IllegalStateException);
-		}
-		
-		r1.cancel();
-		
-		try {
-			r1.cancel();
-			assertTrue("Racer cancel twice should throw exception.", false);
-		} catch (Exception e) {
-			assertTrue(e instanceof IllegalStateException);
-		}
-		
-		r1.start(t1);
-		r1.finish(t2);
-		//cancel after finish?
-		try {
-			r1.cancel();
-			assertTrue("Racer cancel after finish should throw exception.", false);
-		} catch (Exception e) {
-			assertTrue(e instanceof IllegalStateException);
-		}
-		
-		//DNF after finish?
-		try {
-			r1.didNotFinish();
-			assertTrue("Racer DNF after finish should throw exception.", false);
-		} catch (Exception e) {
-			assertTrue(e instanceof IllegalStateException);
-		}
+	public void testStartAfterCancel() {
+		//Start the racer, cancel them, and start them again.
+		racer.start(time1);
+		racer.cancel();
+		racer.start(time2);
 	}
-	
+
+
+	//MARK: Finish
+	@Test
+	public void testSuccessfulFinish() {
+		//The racer starts and finishes.
+		racer.start(time1);
+		try {
+			racer.finish(time2);
+		} catch (InvalidTimeException e) {
+			fail("Finish should not fail in this instance.");
+		}
+
+		assertEquals(time1, racer.getStartTime());
+		assertEquals(time2, racer.getEndTime());
+		assertEquals(Racer.Status.FINISHED, racer.getStatus());
+	}
+
+	@Test(expected = InvalidTimeException.class)
+	public void testFinishTimeBeforeStartTime() throws InvalidTimeException {
+		//Racer start time is "after" the finish time
+		racer.start(time2);
+		racer.finish(time1);
+	}
+
+	@Test(expected = InvalidTimeException.class)
+	public void testFinishTimeEqualsStartTime() throws InvalidTimeException {
+		//Racer start time is "equal" the finish time
+		racer.start(time1);
+		racer.finish(time1);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testFinishQueued() throws InvalidTimeException {
+		//Finish a racer that is QUEUED (not racing)
+		racer.finish(time1);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testFinishFinishedRacer() throws InvalidTimeException {
+		//Finish a racer and then finish them again.
+		racer.start(time1);
+		racer.finish(time2);
+		racer.finish(time3);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testFinishDNFRacer() throws InvalidTimeException {
+		//Start racer, DNF them, and then finish them.
+		racer.start(time1);
+		racer.didNotFinish();
+		racer.finish(time2);
+	}
+
+	//MARK: DNF
+	@Test
+	public void testSuccessfulDNF() {
+		//The racer starts and DNF.
+		racer.start(time1);
+		racer.didNotFinish();
+
+		assertEquals(time1, racer.getStartTime());
+		assertEquals(null, racer.getEndTime());
+		assertEquals(Racer.Status.DNF, racer.getStatus());
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testDNFQueued() throws InvalidTimeException {
+		//DNF a racer that is QUEUED (not racing)
+		racer.didNotFinish();
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testDNFdnfedRacer() throws InvalidTimeException {
+		//start a racer and then dnf them twice.
+		racer.start(time1);
+		racer.didNotFinish();
+		racer.didNotFinish();
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testDNFFinish() throws InvalidTimeException {
+		//Start racer, DNF them, and then finish them.
+		racer.start(time1);
+		racer.finish(time2);
+		racer.didNotFinish();
+	}
+
+
+	//MARK: Cancel
+	@Test
+	public void testSuccessfulCancel() {
+		//Start racer and then cancel them.
+		racer.start(time1);
+		racer.cancel();
+
+		assertEquals(null, racer.getStartTime());
+		assertEquals(null, racer.getEndTime());
+		assertEquals(Racer.Status.QUEUED, racer.getStatus());
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testCancelQueued() {
+		racer.cancel();
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testCancelFinish() {
+		racer.start(time1);
+
+		try {
+			racer.finish(time2);
+		} catch (InvalidTimeException e) {
+			fail("finish should not fail in this instance.");
+		}
+
+		racer.cancel();
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testCancelDNF() {
+		racer.start(time1);
+		racer.didNotFinish();
+		racer.cancel();
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testCancelCancel() {
+		racer.start(time1);
+		racer.cancel();
+		racer.cancel();
+	}
+
+
+	//MARK: Get Elapsed Time
+	@Test
+	public void getTimeBeforeStart() throws InvalidTimeException {
+		assertEquals(zeroTime, racer.getElapsedTime());
+	}
+
+	@Test
+	public void getTimeAfterEnd() throws InvalidTimeException {
+		ChronoTime elapsed = time2.elapsedSince(time1);
+
+		racer.start(time1);
+		racer.finish(time2);
+
+		assertEquals(elapsed, racer.getElapsedTime());
+	}
 }

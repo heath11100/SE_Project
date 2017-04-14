@@ -69,6 +69,16 @@ public class TestRun extends TestCase {
 			fail("Should not fail for PARIND type.");
 		}
 	}
+
+	public void testEventTypeGRP() {
+		try {
+			run.setEventType("GRP");
+
+			assertEquals(run.getEventType(), Run.EventType.GRP);
+		} catch (RaceException e) {
+			fail("Should not fail for GRP type.");
+		}
+	}
 	
 	public void testInvalidType() {
 		try {

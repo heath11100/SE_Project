@@ -23,23 +23,67 @@ public class Racer {
 	 * The current status of the Racer.
 	 */
 	private Status status;
-	
-	public boolean equals(Object other) {
-		if (other instanceof Racer) {
-			return this.number == ((Racer)other).number;
+
+	/**
+	 * Returns the Racer's number.
+	 * @return the number of the Racer.
+	 */
+	public int getNumber() {
+		return this.number;
+	}
+
+	/**
+	 * Returns the Racer's status
+	 * @return the current status of the Racer
+	 */
+	public Racer.Status getStatus() {
+		return this.status;
+	}
+
+	/**
+	 * Returns the Racer's start time.
+	 * @return the startTime of the Racer, null if there is not a start time (racer has not started)
+	 */
+	public ChronoTime getStartTime() {
+		return this.startTime;
+	}
+
+	/**
+	 * Returns the Racer's end time.
+	 * @return the endTime of the Racer, null if there is not an end time (i.e., racer still racing or racer DNF, etc.)
+	 */
+	public ChronoTime getEndTime() {
+		return this.endTime;
+	}
+
+	/**
+	 * Returns the total amount of time the racer was racing.
+	 * @return the elapsed time
+	 * @throws InvalidTimeException
+	 */
+	public ChronoTime getElapsedTime() throws InvalidTimeException {
+		if (this.startTime == null) {
+			//0 elapsed time.
+			return new ChronoTime(0,0,0,0);
+
+		} else if (this.endTime == null) {
+			return ChronoTime.now().elapsedSince(this.startTime);
+
+		} else {
+			return this.endTime.elapsedSince(this.startTime);
 		}
-		return false;
 	}
 	
 	/**
 	 * Creates a Racer with a given number.
 	 * Number must be 1 or greater.
-	 * @throws IllegalArgumentException when a number less than or equal to 0 is supplied.
+	 * @throws IllegalArgumentException when a number less than -9999 or a number greater than 9999
 	 * @param number the identification number corresponding to the racer.
 	 */
 	public Racer(int number) throws IllegalArgumentException {
-	if (number > 9999) {
-			throw new IllegalArgumentException("Racer cannot have a number greater than 4 digits");
+	if (number > 9999 || number < -9999 || number == 0) {
+			throw new IllegalArgumentException("Racer cannot have a number greater than 4 digits, or 0");
+
 		} else {
 			this.number = number;
 			this.status = Status.QUEUED;
@@ -71,7 +115,7 @@ public class Racer {
 	 */
 	public void finish(ChronoTime endTime) throws InvalidTimeException, IllegalStateException {
 		if (this.status != Status.RACING) {
-			throw new InvalidTimeException("Cannot finish because the racer is not racing! Current status is " + this.status);
+			throw new IllegalStateException("Cannot finish because the racer is not racing! Current status is " + this.status);
 		} else if (endTime.isBefore(this.startTime) || endTime.equals(this.startTime)) {
 			throw new InvalidTimeException("Start time is before end time which is an invalid state.");
 		} else {
@@ -112,57 +156,15 @@ public class Racer {
 			throw new IllegalStateException("Cannot cancel racer because their status is not RACING. Current status is " + this.status);
 		}
 	}
-	
-	/**
-	 * Returns the Racer's start time.
-	 * @return the startTime of the Racer, null if there is not a start time (racer has not started)
-	 */
-	public ChronoTime getStartTime() {
-		return this.startTime;
-	}
-	
-	/**
-	 * Returns the Racer's end time.
-	 * @return the endTime of the Racer, null if there is not an end time (i.e., racer still racing or racer DNF, etc.)
-	 */
-	public ChronoTime getEndTime() {
-		return this.endTime;
-	}
-	
-	/**
-	 * Returns the total amount of time the racer was racing.
-	 * @return the elapsed time
-	 * @throws InvalidTimeException
-	 */
-	public ChronoTime getElapsedTime() throws InvalidTimeException {
-		if (this.startTime == null) {
-			//0 elapsed time.
-			return new ChronoTime(0,0,0,0);
 
-		} else if (this.endTime == null) {
-			return ChronoTime.now().elapsedSince(this.startTime);
-
-		} else {
-			return this.endTime.elapsedSince(this.startTime);
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof Racer) {
+			return this.number == ((Racer)other).number;
 		}
+		return false;
 	}
-	
-	/**
-	 * Returns the Racer's number.
-	 * @return the number of the Racer.
-	 */
-	public int getNumber() {
-		return this.number;
-	}
-	
-	/**
-	 * Returns the Racer's status
-	 * @return the current status of the Racer
-	 */
-	public Racer.Status getStatus() {
-		return this.status;
-	}
-	
+
 	/**
 	 * Returns the racer and their respective number
 	 */
@@ -170,13 +172,12 @@ public class Racer {
 	public String toString() {
 		if (this.getNumber() < 0) {
 			//Dummy Racer
-			//Flip the number to be positive and then add astrisks
+			//Flip the number to be positive and then add asterisks
 			return "Racer[**" + this.getNumber()*(-1) + "**]";
 		} else {
 			return "Racer[" + this.getNumber() + "]";
 		}
 	}
-	
 	
 	public enum Status {
 		//When the Racer is created, but has not yet started
