@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 
 /**
  * The Printer class.
- * @author Casey Van Groll
+ * @author Casey Van Grolls
  */
 public class Printer 
 {

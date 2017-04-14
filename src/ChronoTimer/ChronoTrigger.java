@@ -15,7 +15,7 @@ import junit.framework.TestCase;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-//hellollss
+//hellollsss
 public class ChronoTrigger 
 {
 	private Channel[] channels;
