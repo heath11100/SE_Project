@@ -1,4 +1,4 @@
-package Tests;
+package Tests.RunTests;
 
 import ChronoTimer.*;
 import Exceptions.*;
@@ -304,11 +304,13 @@ public class TestRun extends TestCase {
 		//Run has a racer, but has NOT started.
 		try {
 			run.endRun(time1);
-			fail("Should not pass when run has not started.");
+			assertTrue(run.hasStarted());
+			assertTrue(run.hasEnded());
+
 		} catch (InvalidTimeException e) {
 			fail("InvalidTimeException should not be thrown.");
 		} catch (RaceException e) {
-			assertTrue("Should fail because run has not started.",true);
+			fail("Should not throw error because endTime and startTime are now the same.");
 		}
 	}
 	

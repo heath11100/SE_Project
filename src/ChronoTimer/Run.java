@@ -1,5 +1,6 @@
 package ChronoTimer;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -278,7 +279,7 @@ public class Run {
 	 */
 	public int newLane() throws RaceException {
 		//Verify event type & lane count.
-		if (this.canAddLaneFor(this.getEventType())) {
+		if (!this.canAddLaneFor(this.getEventType())) {
 			throw new RaceException("Cannot create another lane for run type " + this.getEventType());
 		} else if (this.hasStarted()) {
 			throw new RaceException("Cannot create new lane after run started");
@@ -305,10 +306,10 @@ public class Run {
 	private boolean canAddLaneFor(EventType eventType) {
 		switch (eventType) {
 			case IND:
-				return this.runningLanes.size() >= 1;
+				return this.runningLanes.size() == 0;
 
 			case PARIND:
-				return this.runningLanes.size() >= 1 && this.runningLanes.size() <= 8;
+				return this.runningLanes.size() >= 0 && this.runningLanes.size() <= 7;
 
 			case GRP:
 				return false;
@@ -472,20 +473,22 @@ public class Run {
 		if (racerNumber < 1 || racerNumber > 9999) {
 			throw new RaceException("Number must be 1 to 9999");
 
-		} else if (this.eventType == EventType.GRP) {
-			throw new RaceException("Cannot queue racer during GRP event");
-
 		} else if (!this.canQueueRacer(racerNumber)) {
 			throw new RaceException("Racer already exists with number: " + racerNumber);
 			
 		} else if (this.hasEnded()) { 
 			throw new RaceException("Run has already ended");
 			
-		} else if (this.hasStarted() && this.eventType == EventType.GRP) {
-			//Then we should mark the next racer.
-			this.markNextRacer(racerNumber);
+		} else if (this.eventType == EventType.GRP) {
+			if (this.hasStarted()) {
+				//Then we should attempt to mark the next racer.
+				this.markNextRacer(racerNumber);
+			} else {
+				throw new RaceException("Cannot queue a racer for event type GRP.");
+			}
 
 		} else {
+			//Cannot queue a racer.
 			Racer racer = new Racer(racerNumber);
 			this.queuedRacers.add(racer);
 
