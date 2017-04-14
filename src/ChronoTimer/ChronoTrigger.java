@@ -1,5 +1,6 @@
 package ChronoTimer;
 
+import java.io.PrintStream;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -35,6 +36,7 @@ public class ChronoTrigger
 	public ChronoTrigger()
 	{
 		//set official time
+		power = false;
 		try {officialTime = ChronoTime.now();}
 		catch (InvalidTimeException e) {history.add(e.getMessage());}
 		offset = Duration.ofNanos(0);
@@ -57,7 +59,7 @@ public class ChronoTrigger
 	{
 		//set official time
 		officialTime = t;
-
+		power = false;
 		offset = Duration.ofNanos(0);
 		
 		
@@ -75,6 +77,10 @@ public class ChronoTrigger
 		flush();
 	}
 	
+	public void setPrinter(Printer s)
+	{
+		printer = s;
+	}
 	/**
 	 * Sets the officialTime of the race
 	 * @param commandTime
@@ -445,18 +451,8 @@ public class ChronoTrigger
 		}
 	}
 	
-	public void printRun(ChronoTime commandTime, int runNum, Printer curPrint)
-	{
-		if(power)
-		{
-			officialTime = commandTime;
-			
-			if (!runs.isEmpty())
-				curPrint.print(runs.get(runNum).getLog());
-			else
-				history.add("runNum " + runNum+ " was invalid");
-		}
-	}
+	
+	
 	/**
 	 * Exports run to .txt, default set to curRun
 	 * @param commandTime
@@ -485,6 +481,19 @@ public class ChronoTrigger
 			
 			if (!runs.isEmpty() && runNum < curRun)
 				printer.export(runNum, runs.get(runNum));
+			else
+				history.add("runNum " + runNum+ " was invalid");
+		}
+	}
+	
+	public void exportRun(ChronoTime commandTime, int runNum, Printer curPrint)
+	{
+		if(power)
+		{
+			officialTime = commandTime;
+			
+			if (!runs.isEmpty())
+				curPrint.print(runs.get(runNum).getLog());
 			else
 				history.add("runNum " + runNum+ " was invalid");
 		}
