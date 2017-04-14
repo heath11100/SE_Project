@@ -64,8 +64,10 @@ public class GUI {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyTrigger());
 		displayText = new JTextArea();
 		displayText.setFont(incFont);
+		displayText.setMargin(new Insets(2,2,2,2));
 		printerText = new JTextArea();
 		printerText.setFont(incFont);
+		printerText.setMargin(new Insets(2,2,2,2));
 		handler = new Handler(displayText,printerText);
 		createTopView();
 		createBackView();
