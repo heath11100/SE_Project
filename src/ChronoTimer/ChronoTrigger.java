@@ -2,6 +2,8 @@ package ChronoTimer;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
@@ -9,7 +11,10 @@ import java.util.Set;
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
 import junit.framework.TestCase;
-//hello
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+//hellollss
 public class ChronoTrigger 
 {
 	private Channel[] channels;
@@ -30,7 +35,7 @@ public class ChronoTrigger
 	public ChronoTrigger()
 	{
 		//set official time
-		try {officialTime = ChronoTime.now(offset);}
+		try {officialTime = ChronoTime.now();}
 		catch (InvalidTimeException e) {history.add(e.getMessage());}
 		offset = Duration.ofNanos(0);
 		//create channels
@@ -79,7 +84,14 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			offset = Duration.between(Instant.now(), Instant.now().plusSeconds((newOfficialTime.asHundredths()/100)));
+			Instant instant = Instant.now();
+			ZoneId zoneId = ZoneId.of( "America/Montreal" );
+			ZonedDateTime now = ZonedDateTime.ofInstant( instant , zoneId );
+			LocalDate tomorrow = now.toLocalDate().plusDays(1);
+			LocalDateTime startTomorrow = tomorrow.atStartOfDay();
+			Duration duration = Duration.between( now , startTomorrow );
+			
+			offset = duration;
 			officialTime = newOfficialTime;
 			history.add( (logTimes? officialTime+" | " : "") +"Set time to " + newOfficialTime.toString());
 			flush();
