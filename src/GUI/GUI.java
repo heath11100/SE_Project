@@ -40,7 +40,7 @@ public class GUI {
 	private JTextArea displayText,printerText;
 
 	//Style
-	private final int splashSeconds = 8;
+	private final int splashSeconds = 0;
 	protected static Font guiFont,splashFont,bigSplashFont,incFont;
 	static{
 		try {guiFont = Font.createFont(Font.TRUETYPE_FONT, new File("./lib/PTS75F.ttf")).deriveFont(18f);

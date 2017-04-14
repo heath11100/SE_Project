@@ -123,7 +123,6 @@ public class Run {
 
 				if (nextThreeRacers.size() == 0) {
 					header = 1;
-
 				} else {
 					header = nextThreeRacers.size();
 				}
@@ -154,6 +153,8 @@ public class Run {
 				//Set body as the list of running racers (first and only running queue).
 				if (this.runningLanes.size() > 0) {
 					this.card.setBody(this.runningLanes.get(0));
+				} else {
+					System.out.print("NO RUNNING RACERS??");
 				}
 
 				this.card.setFooter(lastRacerString);
@@ -596,9 +597,13 @@ public class Run {
 		} else if (this.hasEnded()) {
 			throw new RaceException("Race has already ended");
 
-		} else if ((this.eventType == EventType.IND || this.eventType == EventType.PARIND)
-				&& this.isValidLane(lane)) {
+		} else if (this.eventType == EventType.IND || (this.eventType == EventType.PARIND
+				&& this.isValidLane(lane))) {
 			//EventType is IND OR PARIND, lane is valid
+
+			if (this.eventType == EventType.IND && this.runningLanes.size() == 0) {
+				this.newLane();
+			}
 
 			Racer nextRacer = queuedRacers.poll();
 
