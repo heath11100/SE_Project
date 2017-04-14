@@ -35,10 +35,13 @@ public class NumPad extends JPanel{
 		numbers = new JButton[10];
 		for (int i=0;i<10;i++){
 			numbers[i] = new JButton(""+i);
+			GUI.stylize(numbers[i]);
 			numbers[i].addActionListener(new Listener(handler, "NUM "+i));}
 		star = new JButton("*");
+		GUI.stylize(star);
 		star.addActionListener(new Listener(handler, "STAR"));
 		pound = new JButton("#");
+		GUI.stylize(pound);
 		pound.addActionListener(new Listener(handler, "POUND"));
 	}
 }
