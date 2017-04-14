@@ -129,8 +129,8 @@ public class Handler {
 				case print:
 				case export:
 				case timeh:
-				
 					curNum = "";
+					extraInput = false;
 					GUIState = guis.fcn;
 					break;
 				case timem:
@@ -166,6 +166,7 @@ public class Handler {
 						else
 							disp = new Card(0, 0);
 						curNum = "";
+						extraInput = false;
 					}
 					break;
 				case event:
@@ -180,11 +181,10 @@ public class Handler {
 					if(curNum != "")
 						main.printRun(ChronoTime.now(), Integer.parseInt(curNum));
 					else
-					{
 						main.printRun(ChronoTime.now());
-						curNum = "";
-					}
+					curNum = "";
 					GUIState = guis.wait;
+					extraInput = false;
 					if(race)
 						disp = main.getCard();
 					else
@@ -196,7 +196,9 @@ public class Handler {
 						main.exportRun(ChronoTime.now(), Integer.parseInt(curNum));
 					else
 						main.exportRun(ChronoTime.now());
+					curNum = "";
 					GUIState = guis.wait;
+					extraInput = false;
 					if(race)
 						disp = main.getCard();
 					else
@@ -221,10 +223,19 @@ public class Handler {
 					if(curNum != "")
 					{
 						GUIState = guis.wait;
-						main.setTime(ChronoTime.now(), new ChronoTime(hour, min, Integer.parseInt(curNum), 0));
+						try{
+							main.setTime(ChronoTime.now(), new ChronoTime(hour, min, Integer.parseInt(curNum), 0));	
+						}
+						catch (InvalidTimeException t)
+						{
+							System.out.println("time exception in setting time");
+						}
+						
 						hour = min = 0;
 						curNum = "";
 						disp = new Card(0, 0);
+						extraInput = false;
+						
 					}
 				default:
 					// do nothing
@@ -259,6 +270,7 @@ public class Handler {
 				case timem:
 				case times:
 					// stop function protocol
+					extraInput = false;
 					curNum = "";
 					GUIState = guis.wait;
 					if(race)
@@ -297,6 +309,8 @@ public class Handler {
 					hour = 0;
 					min = 0;
 					disp = new Card(0,0);
+					printerPower = false;
+					extraInput = false;
 				}
 				break;
 			case "PRINTER POWER":
@@ -312,6 +326,11 @@ public class Handler {
 				switch (GUIState) 
 				{
 				case num:
+				case print:
+				case export:
+				case timeh:
+				case timem:
+				case times:
 					curNum = "";
 					break;
 				case fcn:
@@ -675,8 +694,9 @@ public class Handler {
 
 			displayArea.setText(disp.getText());
 			displayArea.append("\n");
-			if(hour != 0) displayArea.append(" " + hour + ":");
-			if(min != 0) displayArea.append(" " + min + ":");
+			if(extraInput) displayArea.append("\n>");
+			if(hour != 0) displayArea.append("" + hour + ": ");
+			if(min != 0) displayArea.append("" + min + ": ");
 			displayArea.append(curNum);
 			
 			return true;
@@ -703,6 +723,7 @@ public class Handler {
 			{
 			case "NUM":
 				GUIState = guis.num;
+				extraInput = true;
 				return true;
 			case "CLEAR":
 				GUIState = guis.wait;
@@ -732,6 +753,7 @@ public class Handler {
 			case "PRINT":
 				if(printerPower)
 				{
+					extraInput = true;
 					GUIState = guis.print;
 					return true;
 				}
@@ -743,6 +765,7 @@ public class Handler {
 				return false;
 			case "EXPORT":
 				GUIState = guis.export;
+				extraInput = true;
 				return true;
 			case "RESET":
 				GUIState = guis.start;
@@ -765,6 +788,7 @@ public class Handler {
 				race = true;
 				return false;
 			case "TIME":
+				extraInput = true;
 				GUIState = guis.timeh;
 				return true;
 			default:
