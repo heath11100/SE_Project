@@ -23,7 +23,11 @@ public class Menu extends UIPrint {
 			"RESET"
 		};
 	
-	final String RACEOFF = "NEWRUN";
+	final String RACEOFF[] =  
+		{
+				"NEWRUN",
+				"TIME"
+		};
 	
 
 	int position;
@@ -37,7 +41,8 @@ public class Menu extends UIPrint {
 			for(String s: RACEON)
 				curList.add(s);
 		else
-			curList.add(RACEOFF);
+			for(String s: RACEOFF)
+				curList.add(s);
 		for(String s: ALWAYSFUNCTION)
 			curList.add(s);
 		position = 0;
