@@ -166,7 +166,7 @@ public class Handler {
 						else
 							disp = new Card(0, 0);
 						curNum = "";
-						extraInput = false;
+						extraInput = false; 
 					}
 					break;
 				case event:
