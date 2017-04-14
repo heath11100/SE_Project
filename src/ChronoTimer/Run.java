@@ -481,10 +481,14 @@ public class Run {
 		} else if (this.hasEnded()) { 
 			throw new RaceException("Run has already ended");
 			
+		} else if (this.hasStarted() && this.eventType == EventType.GRP) {
+			//Then we should mark the next racer.
+			this.markNextRacer(racerNumber);
+
 		} else {
 			Racer racer = new Racer(racerNumber);
 			this.queuedRacers.add(racer);
-						
+
 			this.log.add("Queued "+racer);
 		}
 	}
