@@ -110,11 +110,6 @@ public class Run {
 		//Format card based on event type.
 		switch (this.eventType) {
 			case IND:
-				header = 3;
-				footer = 1;
-
-				this.card = new Card(header, footer);
-
 				//Header
 				Queue<Racer> nextThreeRacers = new LinkedList<Racer>();
 
@@ -125,19 +120,43 @@ public class Run {
 						nextThreeRacers.add(racer);
 					}
 				}
+
+				if (nextThreeRacers.size() == 0) {
+					header = 1;
+
+				} else {
+					header = nextThreeRacers.size();
+				}
+
+				//Footer
+				Racer lastRacer = null;
+
+				if (this.finishedRacers.size() > 0) {
+					lastRacer = ((LinkedList<Racer>)this.finishedRacers).getLast();
+				}
+
+				String lastRacerString = "NO RACER FINISHED";
+
+				if (lastRacer != null) {
+					lastRacerString = lastRacer.toString();
+				}
+
+				this.card = new Card(header, 1);
+
 				//For loop exits when there are no longer racers to add OR there are 3 racers.
-				this.card.setHeader(nextThreeRacers);
+				if (nextThreeRacers.size() == 0) {
+					this.card.setHeader("NO RACERS QUEUED");
+				} else {
+					this.card.setHeader(nextThreeRacers);
+				}
 
 				//Body
 				//Set body as the list of running racers (first and only running queue).
-				this.card.setBody(this.runningLanes.get(0));
-
-				//Footer
-				Racer lastRacer = ((LinkedList<Racer>)this.finishedRacers).getLast();
-
-				if (lastRacer != null) {
-					this.card.setFooter(lastRacer.toString());
+				if (this.runningLanes.size() > 0) {
+					this.card.setBody(this.runningLanes.get(0));
 				}
+
+				this.card.setFooter(lastRacerString);
 
 				break;
 
@@ -209,13 +228,20 @@ public class Run {
 
 				//Footer
 				//Last Finish Time
-				lastRacer = ((LinkedList<Racer>)this.finishedRacers).getLast();
+				lastRacer = null;
+
+				if (this.finishedRacers.size() > 0) {
+					lastRacer = ((LinkedList<Racer>)this.finishedRacers).getLast();
+				}
 
 				if (lastRacer != null) {
 					try {
 						this.card.setFooter(lastRacer.getElapsedTime().toString());
 
 					} catch (InvalidTimeException e) { /*Should not reach this point. */ }
+				} else {
+					//There is no last racer.
+					this.card.setFooter("NO RACER FINISHED");
 				}
 
 				break;

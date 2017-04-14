@@ -20,14 +20,16 @@ public class Card extends UIPrint {
 	@Override
 	public String writeTo()
 	{
-		this.setText(header + body + footer);
+		refresh();
+		//this.setText(header + body + footer);
 		//System.out.println(header + body + footer);
 		return "RACE";
 	}
 
 	public void setHeader(String string) {
 		header = string;
-		this.replaceRange(header, 0, headerSize-1);
+		refresh();
+		//this.replaceRange(header, 0, headerSize-1);
 	}
 	
 	public void setHeader(Queue<Racer> newHeader) {
@@ -35,8 +37,8 @@ public class Card extends UIPrint {
 		header = "";
 		for (Racer r: newHeader)
 			header = r.toString() + "\n" + header;
-		
-		this.replaceRange(header, 0, headerSize-1);
+		refresh();
+		//this.replaceRange(header, 0, headerSize-1);
 	}
 
 	public void setBody(Queue<Racer> newBody){
@@ -52,13 +54,14 @@ public class Card extends UIPrint {
 				//We should never reach this point anyways.
 			}
 		}
-		
-		this.replaceRange(body, headerSize+1, headerSize+bodySize);
+		refresh();
+		//this.replaceRange(body, headerSize+1, headerSize+bodySize);
 	}
 
 	public void setFooter(String string) {
 		footer = string;
-		this.replaceRange(footer, headerSize+bodySize+2, headerSize+bodySize+footerSize+1);
+		refresh();
+		//this.replaceRange(footer, headerSize+bodySize+2, headerSize+bodySize+footerSize+1);
 	}
 
 	public void setFooter(Queue<Racer> newFooter) {
@@ -74,8 +77,15 @@ public class Card extends UIPrint {
 				//We should never reach this point anyways.
 			}
 		}
-		
-		this.replaceRange(footer, headerSize+bodySize+2, headerSize+bodySize+footerSize+1);
+
+		refresh();
+		//this.replaceRange(footer, headerSize+bodySize+2, headerSize+bodySize+footerSize+1);
+	}
+
+	private void refresh() {
+		this.setText(header);
+		this.append("\n\n" + body);
+		this.append("\n\n" + footer);
 	}
 
 	@Override
