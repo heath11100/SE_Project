@@ -1,33 +1,36 @@
 package ChronoTimer;
-import java.io.PrintStream;
+
 import java.io.PrintWriter;
+
+import javax.swing.JTextArea;
+
 import com.google.gson.Gson;
 
 
 /**
  * The Printer class.
- * @author Casey Van Groll
+ * @author Casey Van Grolls
  */
 public class Printer 
 {
-	private PrintStream output;
+	private JTextArea output;
 	
-	/** Initializes a Printer with System.out PrintStream. */
-	public Printer(){output = System.out;}
+	/** Initializes a Printer with System.out JTextArea. */
+	public Printer(){output =null;}
 	
-	/** Initializes a Printer with the specified PrintStream. 
-	 * @param stream the specified PrintStream */
-	public Printer(PrintStream stream){output = stream;}
+	/** Initializes a Printer with the specified JTextArea. 
+	 * @param stream the specified JTextArea */
+	public Printer(JTextArea stream){output = stream;}
 	
-	/** Changes the PrintStream to a specified stream
-	 * @param stream the new PrintStream */
-	public void changeStream(PrintStream stream){output = stream;}
+	/** Changes the JTextArea to a specified stream
+	 * @param stream the new JTextArea */
+	public void changeStream(JTextArea stream){output = stream;}
 	
 	/** Flushes the parameter log's pending data to the output. */
-	public void flush(Log l){output.print(l.flush());}
+	public void flush(Log l){output.append(l.flush());}
 	
 	/** Prints the entire parameter log to the output. */
-	public void print(Log l){ output.print(l.readAll()); }
+	public void print(Log l){ output.append(l.readAll()); }
 	
 	/** Exports the parameter run to a file. */
 	public void export(int runNumber, Run r){

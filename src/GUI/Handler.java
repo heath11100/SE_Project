@@ -316,6 +316,10 @@ public class Handler {
 					break;
 				default:
 					printerPower = !printerPower;	
+					if(printerPower)
+						printArea.setText("peinter On");
+					else
+						printArea.setText("");
 				}
 				break;
 			case "STAR":

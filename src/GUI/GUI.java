@@ -68,7 +68,7 @@ public class GUI {
 		printerText = new JTextArea();
 		printerText.setFont(incFont);
 		printerText.setMargin(new Insets(2,2,2,2));
-		handler = new Handler(displayText,printerText);
+		handler = new Handler(displayText,printerText); 
 		createTopView();
 		createBackView();
 		frame.setVisible(true);
