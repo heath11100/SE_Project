@@ -1,15 +1,19 @@
 package GUI;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.KeyEvent;
+import java.awt.font.*;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
 
 public class ChannelPad extends JPanel{
 	private static final long serialVersionUID = 1L;
@@ -22,6 +26,7 @@ public class ChannelPad extends JPanel{
 	
 	protected ChannelPad(Handler handler){
 		this.handler=handler;
+		setBackground(GUI.mediumBlue);
 		setLayout(new GridBagLayout());
 		createLeftPanel();
 		createRightPanel();
@@ -34,12 +39,15 @@ public class ChannelPad extends JPanel{
 	
 	private void createLeftPanel(){
 		sub1 = new JPanel();
+		sub1.setBackground(GUI.mediumBlue);
 		//sub1.setBackground(new Color(0,0,200));
 		sub1.setLayout(new GridLayout(6,1));
 		
 		JLabel[] labels = new JLabel[6];
 		for (int i=0;i<6;i++){
 			labels[i] = new JLabel();
+			labels[i].setForeground(Color.WHITE);
+			labels[i].setFont(GUI.guiFont);
 			labels[i].setHorizontalAlignment(JLabel.RIGHT);}
 		
 		labels[0].setText(" ");					sub1.add(labels[0]);
@@ -59,7 +67,7 @@ public class ChannelPad extends JPanel{
 	
 	private void createRightPanel(){
 		sub2 = new JPanel();
-		//sub2.setBackground(new Color(200,0,0));
+		sub2.setBackground(GUI.mediumBlue);
 		sub2.setLayout(new GridLayout(6,4));
 		
 		JLabel[] labels = new JLabel[8];
@@ -68,10 +76,17 @@ public class ChannelPad extends JPanel{
 		
 		for (int i=0;i<8;i++){
 			labels[i] = new JLabel(""+(i+1));
+			labels[i].setForeground(Color.WHITE);
+			labels[i].setOpaque(true);
+			labels[i].setBackground(GUI.darkBlue);
+			labels[i].setFont(GUI.guiFont);
 			labels[i].setHorizontalAlignment(JLabel.CENTER);
 			trigger[i] = new JButton();
+			GUI.stylize(trigger[i]);
+			trigger[i].setBackground(GUI.lightBlue);
 			trigger[i].addActionListener(new Listener(handler,"TRIGGER "+(i+1)));
 			toggle[i] = new JCheckBox();
+			toggle[i].setBackground(GUI.mediumBlue);
 			toggle[i].addActionListener(new Listener(handler,"TOGGLE "+(i+1)));
 			toggle[i].setHorizontalAlignment(JCheckBox.CENTER);
 		}
