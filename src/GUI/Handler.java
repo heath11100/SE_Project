@@ -28,6 +28,8 @@ public class Handler {
 	boolean printerPower;
 	UIPrint disp;
 	Timer updater;
+	int hour = 0, min = 0;
+	boolean extraInput = false;
 	
 	final int TIMERDELAY = 100;
 	final int STARTDELAY = 1000;
@@ -43,7 +45,11 @@ public class Handler {
 		num, // choosing a number for entry
 		event, // choosing an event type
 		print,	//selecting a race to print
-		export	//selecting a race to export
+		export,	//selecting a race to export
+		timeh,	//selecting time in hours
+		timem,	//minutes
+		times	//seconds
+		
 	}
 
 	public Handler(JTextArea d, JTextArea p) {
@@ -122,8 +128,18 @@ public class Handler {
 				case num:
 				case print:
 				case export:
+				case timeh:
+				
 					curNum = "";
 					GUIState = guis.fcn;
+					break;
+				case timem:
+					curNum = "";
+					GUIState = guis.timeh;
+					break;
+				case times:
+					curNum = "";
+					GUIState = guis.timem;
 					break;
 				default:
 
@@ -145,7 +161,10 @@ public class Handler {
 					{
 						main.addRacer(ChronoTime.now(), Integer.parseInt(curNum));
 						GUIState = guis.wait;
-						disp = main.getCard();
+						if(race)
+							disp = main.getCard();
+						else
+							disp = new Card(0, 0);
 						curNum = "";
 					}
 					break;
@@ -161,7 +180,10 @@ public class Handler {
 					if(curNum != "")
 						main.printRun(ChronoTime.now(), Integer.parseInt(curNum));
 					else
+					{
 						main.printRun(ChronoTime.now());
+						curNum = "";
+					}
 					GUIState = guis.wait;
 					if(race)
 						disp = main.getCard();
@@ -181,6 +203,29 @@ public class Handler {
 						disp = new Card(0, 0);
 					break;
 					//later
+				case timeh:
+					if(curNum != "")
+					{
+						GUIState = guis.timem;
+						hour = Integer.parseInt(curNum);
+						curNum = "";
+					}
+				case timem:
+					if(curNum != "")
+					{
+						GUIState = guis.times;
+						min = Integer.parseInt(curNum);
+						curNum = "";
+					}
+				case times:
+					if(curNum != "")
+					{
+						GUIState = guis.wait;
+						main.setTime(ChronoTime.now(), new ChronoTime(hour, min, Integer.parseInt(curNum), 0));
+						hour = min = 0;
+						curNum = "";
+						disp = new Card(0, 0);
+					}
 				default:
 					// do nothing
 				}
@@ -210,10 +255,16 @@ public class Handler {
 				case event:
 				case print:
 				case export:
+				case timeh:
+				case timem:
+				case times:
 					// stop function protocol
 					curNum = "";
 					GUIState = guis.wait;
-					disp = main.getCard();
+					if(race)
+						disp = main.getCard();
+					else
+						disp = new Card(0, 0);
 					break;
 				default:
 
@@ -241,10 +292,21 @@ public class Handler {
 				default:
 					main.powerOff(ChronoTime.now());
 					GUIState = guis.off;
+					curNum = "";
+					race = false;
+					hour = 0;
+					min = 0;
+					disp = new Card(0,0);
 				}
 				break;
 			case "PRINTER POWER":
-				printerPower = !printerPower;
+				switch (GUIState) 
+				{
+				case off:
+					break;
+				default:
+					printerPower = !printerPower;	
+				}
 				break;
 			case "STAR":
 				switch (GUIState) 
@@ -415,6 +477,12 @@ public class Handler {
 					if (curNum.length() < 4)
 						curNum += "1";
 					break;
+				case timeh:
+				case timem:
+				case times:
+					if (curNum.length() < 2)
+						curNum += "1";
+					break;
 				default:
 					// do nothing
 				}
@@ -428,7 +496,12 @@ public class Handler {
 					if (curNum.length() < 4)
 						curNum += "2";
 					break;
-				case event:
+				case timeh:
+				case timem:
+				case times:
+					if (curNum.length() < 2)
+						curNum += "2";
+					break;
 
 				default:
 					// do nothing
@@ -443,6 +516,12 @@ public class Handler {
 					if (curNum.length() < 4)
 						curNum += "3";
 					break;
+				case timeh:
+				case timem:
+				case times:
+					if (curNum.length() < 2)
+						curNum += "3";
+					break;
 				default:
 					// do nothing
 				}
@@ -454,6 +533,12 @@ public class Handler {
 				case print:
 				case num:
 					if (curNum.length() < 4)
+						curNum += "4";
+					break;
+				case timeh:
+				case timem:
+				case times:
+					if (curNum.length() < 2)
 						curNum += "4";
 					break;
 				default:
@@ -470,6 +555,12 @@ public class Handler {
 					if (curNum.length() < 4)
 						curNum += "5";
 					break;
+				case timeh:
+				case timem:
+				case times:
+					if (curNum.length() < 2)
+						curNum += "5";
+					break;
 				default:
 					// do nothing
 				}
@@ -482,6 +573,12 @@ public class Handler {
 				case print:
 				case num:
 					if (curNum.length() < 4)
+						curNum += "6";
+					break;
+				case timeh:
+				case timem:
+				case times:
+					if (curNum.length() < 2)
 						curNum += "6";
 					break;
 				default:
@@ -498,6 +595,12 @@ public class Handler {
 					if (curNum.length() < 4)
 						curNum += "7";
 					break;
+				case timeh:
+				case timem:
+				case times:
+					if (curNum.length() < 2)
+						curNum += "7";
+					break;
 				default:
 					// do nothing
 				}
@@ -512,6 +615,12 @@ public class Handler {
 					if (curNum.length() < 4)
 						curNum += "8";
 					break;
+				case timeh:
+				case timem:
+				case times:
+					if (curNum.length() < 2)
+						curNum += "8";
+					break;
 				default:
 					// do nothing
 				}
@@ -524,6 +633,12 @@ public class Handler {
 				case print:
 				case num:
 					if (curNum.length() < 4)
+						curNum += "9";
+					break;
+				case timeh:
+				case timem:
+				case times:
+					if (curNum.length() < 2)
 						curNum += "9";
 					break;
 				default:
@@ -543,6 +658,12 @@ public class Handler {
 																	// racer
 						curNum += "0";
 					break;
+				case timeh:
+				case timem:
+				case times:
+					if (curNum.length() < 2 && curNum.length() > 0)
+						curNum += "0";
+					break;
 				default:
 					// do nothing
 				}
@@ -553,7 +674,10 @@ public class Handler {
 			}
 
 			displayArea.setText(disp.getText());
-			displayArea.append("\n" + curNum);
+			displayArea.append("\n");
+			if(hour != 0) displayArea.append(" " + hour + ":");
+			if(min != 0) displayArea.append(" " + min + ":");
+			displayArea.append(curNum);
 			
 			return true;
 		} catch (InvalidTimeException e) 
@@ -640,6 +764,9 @@ public class Handler {
 				disp = main.getCard();
 				race = true;
 				return false;
+			case "TIME":
+				GUIState = guis.timeh;
+				return true;
 			default:
 				return false;
 			}
