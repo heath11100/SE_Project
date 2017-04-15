@@ -47,7 +47,6 @@ public class Menu extends UIPrint {
 			curList.add(s);
 		position = 0;
 		this.setText("");
-		this.setRows(20);
 	}
 	
 	//TODO make this more efficient, try not to rebuild the string every time

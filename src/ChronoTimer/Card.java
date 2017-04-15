@@ -14,7 +14,8 @@ public class Card extends UIPrint {
 		bodySize = TOTAL_LINES-h-f-2;
 		body="";
 		this.setText("");
-		this.setRows(20);
+		//this.setRows(20);
+		//comment this cus no longer needed?
 	}
 	
 	@Override
