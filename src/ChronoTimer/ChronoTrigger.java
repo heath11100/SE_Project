@@ -557,7 +557,7 @@ public class ChronoTrigger
 	}
 	/**
 	 * exports to server
-	 * @param commandTime
+	 * @param commandTimes
 	 */
 	public void exportToServer(ChronoTime commandTime)
 	{
