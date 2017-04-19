@@ -2,6 +2,7 @@ package GUI;
 
 import java.util.NoSuchElementException;
 import java.util.TimerTask;
+
 import javax.swing.JTextArea;
 import javax.swing.Timer;
 
@@ -25,11 +26,13 @@ public class Handler {
 	boolean printerPower;
 	UIPrint disp;
 	Timer updater;
+	Timer postToServerTimer;
 	int hour = 0, min = 0;
 	boolean extraInput = false;
 	
 	final int TIMERDELAY = 100;
 	final int STARTDELAY = 1000;
+	final int SERVERDELAY = 10000;
 	
 
 	public enum guis {
@@ -60,8 +63,9 @@ public class Handler {
 		curNum = "";
 		race = false;
 		updater = new Timer(TIMERDELAY, new Listener(this, "UPDATE"));
-		updater.setInitialDelay(100);
 		updater.start();
+		postToServerTimer = new Timer(SERVERDELAY, new Listener(this, "SERVER"));
+		postToServerTimer.start();
 		disp = new Card(0,0);
 	}
 
@@ -73,6 +77,10 @@ public class Handler {
 		{
 			switch (command) 
 			{
+			case "SERVER":
+				if(race)
+					main.exportToServer(ChronoTime.now());
+			break;
 			case "UPDATE":
 				disp.writeTo();
 				break;
