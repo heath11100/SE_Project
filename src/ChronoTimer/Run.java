@@ -347,6 +347,24 @@ public class Run {
 	}
 	
 	/**
+	 * Returns an ArrayList of all racers.
+	 * @return the number of the removed lane.
+	 * @throws RaceException when there is not a lane to remove
+	 * @throws IllegalStateException when the lists are not the same size (this would be an internal error)
+	 */
+	protected ArrayList<Racer> getAllRacers(){
+		ArrayList<Racer> allRacers = new ArrayList<>();
+		for (Racer r: queuedRacers)
+			allRacers.add(r);
+		for (Queue<Racer> q: runningLanes)
+			for (Racer r: q)
+				allRacers.add(r);
+		for (Racer r: finishedRacers)
+			allRacers.add(r);
+		return allRacers;
+	}
+	
+	/**
 	 * Removes the last lane from the list.
 	 * @return the number of the removed lane.
 	 * @throws RaceException when there is not a lane to remove
