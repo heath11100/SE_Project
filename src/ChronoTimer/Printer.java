@@ -17,7 +17,7 @@ public class Printer
 	
 	
 	/** Initializes a Printer with System.out PrintStream. */
-	public Printer(){output =null;}
+	public Printer(){output = System.out;}
 	
 	/** Initializes a Printer with the specified PrintStream. 
 	 * @param stream the specified PrintStream */
