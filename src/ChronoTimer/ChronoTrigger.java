@@ -567,7 +567,7 @@ public class ChronoTrigger
 			if(!runs.isEmpty())
 			{
 				ArrayList<Racer> temp = (runs.get(curRun)).getAllRacers();
-				ArrayList<NamedRacer> racers;
+				ArrayList<NamedRacer> racers = new ArrayList<NamedRacer>();
 				for(Racer r : temp)
 				{
 					racers.add(new NamedRacer(r, "",""));
