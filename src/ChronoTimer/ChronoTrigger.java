@@ -564,6 +564,7 @@ public class ChronoTrigger
 		if(power)
 		{
 			officialTime = commandTime;
+			post("CLEAR");
 			if(!runs.isEmpty())
 			{
 				ArrayList<Racer> temp = (runs.get(curRun)).getAllRacers();
@@ -574,7 +575,7 @@ public class ChronoTrigger
 				}
 				for(int i = 0; i < racers.size(); i++)
 				{
-					this.post("ADD " + (new Gson().toJson(racers.get(i))));
+					post("ADD " + (new Gson().toJson(racers.get(i))));
 				}
 			}
 		}
