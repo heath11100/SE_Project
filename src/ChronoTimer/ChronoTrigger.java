@@ -1,6 +1,12 @@
 package ChronoTimer;
 
+
+
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -9,12 +15,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
 import junit.framework.TestCase;
+
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+
+import com.google.gson.Gson;
 //hellollsss
 public class ChronoTrigger 
 {
@@ -97,7 +107,6 @@ public class ChronoTrigger
 			LocalDate tomorrow = now.toLocalDate().plusDays(1);
 			LocalDateTime startTomorrow = tomorrow.atStartOfDay();
 			Duration duration = Duration.between( now , startTomorrow );
-			
 			offset = duration;
 			officialTime = newOfficialTime;
 			history.add( (logTimes? officialTime+" | " : "") +"Set time to " + newOfficialTime.toString());
@@ -497,6 +506,77 @@ public class ChronoTrigger
 				curPrint.print(runs.get(runNum).getLog());
 			else
 				history.add("runNum " + runNum+ " was invalid");
+		}
+	}
+	/**
+	 * posts to server
+	 */
+	private static void post(Object o){
+
+		if(!(o instanceof String) && !(o instanceof NamedRacer))
+		{System.out.println("Cannot POST object of type "+o.getClass());return;}
+
+		try{
+			// Client will connect to this location
+			URL site = new URL("http://localhost:8000/sendresults");
+			HttpURLConnection conn = (HttpURLConnection) site.openConnection();
+
+			// create a POST request
+			conn.setRequestMethod("POST");
+			conn.setDoOutput(true);
+			conn.setDoInput(true);
+			DataOutputStream out = new DataOutputStream(conn.getOutputStream());
+
+			// write String (Command) or Employee prepended with "ADD"
+			if (o instanceof String)
+				out.writeBytes((String) o);
+			else{
+				// write Employee JSON string to output buffer for message
+				NamedRacer e = (NamedRacer) o;
+				out.writeBytes("ADD " + new Gson().toJson(e));}
+
+			out.flush();
+			out.close();
+			System.out.print("Sent POST to server // ");
+
+			InputStreamReader inputStr = new InputStreamReader(conn.getInputStream());
+
+			// string to hold the result of reading in the response
+			StringBuilder sb = new StringBuilder();
+
+			// read the characters from the request byte by byte and build up
+			// the Response
+			int nextChar;
+			while ((nextChar = inputStr.read()) > -1) {
+				sb = sb.append((char) nextChar);
+			}
+			System.out.println("Return String: " + sb);
+		}
+
+		catch (Exception e) {e.printStackTrace();}
+	}
+	/**
+	 * exports to server
+	 * @param commandTime
+	 */
+	public void exportToServer(ChronoTime commandTime)
+	{
+		if(power)
+		{
+			officialTime = commandTime;
+			if(!runs.isEmpty())
+			{
+				ArrayList<Racer> temp = (runs.get(curRun)).getAllRacers();
+				ArrayList<NamedRacer> racers;
+				for(Racer r : temp)
+				{
+					racers.add(new NamedRacer(r, "",""));
+				}
+				for(int i = 0; i < racers.size(); i++)
+				{
+					this.post("ADD " + (new Gson().toJson(racers.get(i))));
+				}
+			}
 		}
 	}
 	/**
