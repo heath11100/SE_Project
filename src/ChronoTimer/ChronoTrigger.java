@@ -26,6 +26,7 @@ public class ChronoTrigger
 	private boolean logTimes = false;
 	private Log history = new Log();
 	private Printer printer = new Printer();
+	private Printer runprinter = new Printer();
 	private String eventType;
 	private int[] lanes = new int[8];
 	private boolean power;
@@ -79,7 +80,7 @@ public class ChronoTrigger
 	
 	public void setPrinter(Printer s)
 	{
-		printer = s;
+		runprinter = s;
 	}
 	/**
 	 * Sets the officialTime of the race
@@ -424,11 +425,11 @@ public class ChronoTrigger
 			officialTime = commandTime;
 			
 			if (!runs.isEmpty())
-				printer.print(runs.get(curRun).getLog());
+				runprinter.print(runs.get(curRun).getLog());
 			else {
 				Log log = new Log();
 				log.add("No run to print.");
-				printer.print(log);
+				runprinter.print(log);
 			}
 		}
 	}
@@ -445,7 +446,7 @@ public class ChronoTrigger
 			officialTime = commandTime;
 			
 			if (!runs.isEmpty())
-				printer.print(runs.get(runNum).getLog());
+				runprinter.print(runs.get(runNum).getLog());
 			else
 				history.add("runNum " + runNum+ " was invalid");
 		}
@@ -480,7 +481,7 @@ public class ChronoTrigger
 			officialTime = commandTime;
 			
 			if (!runs.isEmpty() && runNum < curRun)
-				printer.export(runNum, runs.get(runNum));
+				runprinter.export(runNum, runs.get(runNum));
 			else
 				history.add("runNum " + runNum+ " was invalid");
 		}
