@@ -54,6 +54,7 @@ public class Handler {
 		printArea = p;
 		printerPower = false;
 		main = new ChronoTrigger();
+		main.setPrinter(new Printer(new PrinterStream(printArea)));
 		//need to set the default printer as well here
 		GUIState = guis.off;
 		curNum = "";
