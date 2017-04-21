@@ -1,20 +1,10 @@
 package ChronoTimer;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
 import Exceptions.*;
-
-/*
-Questions:
-	1) How will I give information to be displayed by the ChronoTrigger?
-	2) When printing Racers, how do I distinguish between a dummy racer and an actual racer?
-
-Notes:
-	- Should the racer compute the "elapsed time" from two absolute times?
- */
 
 public class Run {
 	private ChronoTime startTime;
@@ -167,7 +157,14 @@ public class Run {
 		}
 
 		if (lastRacer != null) {
-			this.card.setFooter(lastRacer.toString());
+		    try {
+                this.card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTime());
+
+            } catch (InvalidTimeException e) {
+		        //We should never reach this point.
+		        this.card.setFooter(lastRacer.toString() + " INVALID_TIME");
+            }
+
 		} else {
 			this.card.setFooter("NO RACER FINISHED");
 		}
@@ -267,7 +264,6 @@ public class Run {
 			//We should never reach this point
 
 			this.card.setHeader("INVALID RACE TIME");
-
 		}
 
 		//Body
@@ -692,7 +688,6 @@ public class Run {
 		}  else if (this.eventType == EventType.GRP) {
 			if (this.hasStarted()) {
 				throw new RaceException("Run has already started");
-
 			} else {
 				//Then we set the start time of the run to be atTime.
 				this.startTime = atTime;
@@ -763,8 +758,11 @@ public class Run {
 			//Create racer with negative bib number because they are place holder.
 			Racer newRacer = new Racer(racerNumber);
 
-			newRacer.start(this.startTime);
-			newRacer.finish(atTime);
+			ChronoTime emptyTime = new ChronoTime(0,0,0,0);
+            ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
+
+			newRacer.start(emptyTime);
+			newRacer.finish(elapsedTime);
 
 			this.finishedRacers.add(newRacer);
 		}
