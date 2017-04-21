@@ -1,7 +1,6 @@
 package ChronoTimer;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.time.ZonedDateTime;
 
 import Exceptions.InvalidTimeException;
@@ -77,6 +76,13 @@ public class ChronoTime {
 	public ChronoTime(int hours, int minutes, int seconds, int hundredths) throws InvalidTimeException {
 		this((minutes+hours*60)+":"+seconds+"."+hundredths);
 	}
+	
+	
+	
+	//Allows to get real-time events after setting CT system time
+	public ChronoTime withOffset(int offset) throws InvalidTimeException{
+		int newTime = (_currentTime + offset)%MAX_TIME;
+		return new ChronoTime(0,0,0,newTime);}
 
 	/**
 	 * Calculates how much time has elapsed since the parameter time.
