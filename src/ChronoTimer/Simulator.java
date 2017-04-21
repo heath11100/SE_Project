@@ -116,7 +116,7 @@ public class Simulator {
 			System.out.println(message);
 	}
 	
-	public static void main(String args[])
+	public static void main(String args[]) throws InvalidTimeException
 	{
 		Scanner input;
 		boolean fread_m = false;	//tells the simulator whether to keep track of its own time or use the provided file times
