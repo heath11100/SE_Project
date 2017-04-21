@@ -101,12 +101,8 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			Instant instant = Instant.now();
-			ZoneId zoneId = ZoneId.of( "America/Montreal" );
-			ZonedDateTime now = ZonedDateTime.ofInstant( instant , zoneId );
-			LocalDate tomorrow = now.toLocalDate().plusDays(1);
-			LocalDateTime startTomorrow = tomorrow.atStartOfDay();
-			Duration duration = Duration.between( now , startTomorrow );
+			int difference = newOfficialTime.asHundredths()-commandTime.asHundredths();
+			Duration duration = Duration.ofMillis(difference*10);
 			offset = duration;
 			officialTime = newOfficialTime;
 			history.add( (logTimes? officialTime+" | " : "") +"Set time to " + newOfficialTime.toString());
