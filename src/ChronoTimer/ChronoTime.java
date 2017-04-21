@@ -2,7 +2,6 @@ package ChronoTimer;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-
 import Exceptions.InvalidTimeException;
 
 /**
@@ -82,6 +81,7 @@ public class ChronoTime {
 	//Allows to get real-time events after setting CT system time
 	public ChronoTime withOffset(int offset) throws InvalidTimeException{
 		int newTime = (_currentTime + offset)%MAX_TIME;
+		if (newTime < 0) newTime = MAX_TIME-newTime;
 		return new ChronoTime(0,0,0,newTime);}
 
 	/**
