@@ -34,6 +34,7 @@ public class Handler {
 	final int STARTDELAY = 1000;
 	final int SERVERDELAY = 10000;
 	
+	boolean SERVERENABLED;
 
 	public enum guis {
 		off, // synonymous with the cts.off state
@@ -59,6 +60,7 @@ public class Handler {
 		main = new ChronoTrigger();
 		main.setPrinter(new Printer(new PrinterStream(printArea)));
 		//need to set the default printer as well here
+		SERVERENABLED = false;
 		GUIState = guis.off;
 		curNum = "";
 		race = false;
@@ -78,11 +80,13 @@ public class Handler {
 			switch (command) 
 			{
 			case "SERVER":
-				if(race)
+				if(race && SERVERENABLED)
 					main.exportToServer(ChronoTime.now());
 			break;
 			case "UPDATE":
 				disp.writeTo();
+				if(race && GUIState == guis.wait)
+					disp = main.getCard();
 				break;
 
 			/**
@@ -183,6 +187,7 @@ public class Handler {
 						disp = new Card(0, 0);
 					break;
 				case print:
+					printArea.setText("");
 					if(curNum != "")
 						main.printRun(ChronoTime.now(), Integer.parseInt(curNum));
 					else
@@ -315,6 +320,7 @@ public class Handler {
 					min = 0;
 					disp = new Card(0,0);
 					printerPower = false;
+					printArea.setText("");
 					extraInput = false;
 				}
 				break;
@@ -326,7 +332,7 @@ public class Handler {
 				default:
 					printerPower = !printerPower;	
 					if(printerPower)
-						printArea.setText("peinter On");
+						printArea.setText("printer On");
 					else
 						printArea.setText("");
 				}
@@ -751,7 +757,7 @@ public class Handler {
 				return false;
 			case "ENDRUN":
 				GUIState = guis.wait;
-				disp = main.getCard();
+				disp = new Card(0, 0);
 				race = false;
 				main.finRun(ChronoTime.now());
 				return false;
@@ -800,6 +806,22 @@ public class Handler {
 				extraInput = true;
 				GUIState = guis.timeh;
 				return true;
+			case "ENABLESERVER":
+				GUIState = guis.wait;
+				SERVERENABLED = true;
+				if(race)
+					disp = main.getCard();
+				else
+					disp = new Card(0, 0);
+				return false;
+			case "DISABLESERVER":
+				GUIState = guis.wait;
+				SERVERENABLED = true;
+				if(race)
+					disp = main.getCard();
+				else
+					disp = new Card(0, 0);
+				return false;
 			default:
 				return false;
 			}

@@ -20,6 +20,8 @@ public class Menu extends UIPrint {
 			"EVENT",
 			"PRINT",
 			"EXPORT",
+			"ENABLESERVER",
+			"DISABLESERVER",
 			"RESET"
 		};
 	
