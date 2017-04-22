@@ -80,8 +80,8 @@ public class ChronoTime {
 	
 	//Allows to get real-time events after setting CT system time
 	public ChronoTime withOffset(int offset) throws InvalidTimeException{
-		int newTime = (_currentTime + offset)%MAX_TIME;
-		if (newTime < 0) newTime = MAX_TIME-newTime;
+		int newTime = (_currentTime + offset)%(MAX_TIME+1);
+		if (newTime < 0) newTime = MAX_TIME+1+newTime;
 		return new ChronoTime(0,0,0,newTime);}
 
 	/**

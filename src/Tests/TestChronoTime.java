@@ -141,6 +141,18 @@ public class TestChronoTime extends TestCase{
 			assertTrue(inRange(t0,t6,offset6,delta));
 		}
 		
+		public void testWithOffset() throws InvalidTimeException{
+			t1 = new ChronoTime("00:00:00");
+			t2 = new ChronoTime("23:59:59.99");
+			
+			assertEquals(t1.withOffset(1), new ChronoTime("00:00:00.01"));
+			assertEquals(t1.withOffset(-1), new ChronoTime("23:59:59.99"));//test negative wrap
+			assertEquals(t1.withOffset(8640000), t1);//test positive wrap
+			assertEquals(t2.withOffset(1), t1);//test positive wrap
+			assertEquals(t2.withOffset(-8640000), t2);//test negative wrap
+		}
+		
+		
 		private boolean inRange(ChronoTime original, ChronoTime offset, Duration dur, int delta) throws InvalidTimeException{
 			return Math.abs(original.elapsedSince(offset).asHundredths() - Math.abs(dur.toMillis()/10)) < delta ||
 					Math.abs(offset.elapsedSince(original).asHundredths() - Math.abs(dur.toMillis()/10)) < delta;}
