@@ -116,15 +116,10 @@ public class TestChronoTime extends TestCase{
 			Duration offset4 = Duration.ofMinutes(-100);//	-1 hour, 40 min
 			Duration offset5 = Duration.ofHours(10);//		10 hour
 			Duration offset6 = Duration.ofHours(-10);//	   -10 hour
-			//System.out.println("now:    " + ChronoTime.now());
-			//System.out.println("+16m40s " + ChronoTime.now(offset1));
-			//System.out.println("-16m40s " + ChronoTime.now(offset2));
-			//System.out.println("+1h40m  " + ChronoTime.now(offset3));
-			//System.out.println("-1h40m  " +ChronoTime.now(offset4));
-			//System.out.println("+10h    " +ChronoTime.now(offset5));
-			//System.out.println("-10h    " +ChronoTime.now(offset6));
 			
-			int delta = 10; //accurate to within 10 hundredths of a second (to allow calculation time)
+			//accurate to within 10 hundredths of a second (to allow calculation time)
+			int delta = 10;
+			
 			ChronoTime t0 = ChronoTime.now();
 			t1 = ChronoTime.now(offset1);
 			t2 = ChronoTime.now(offset2);

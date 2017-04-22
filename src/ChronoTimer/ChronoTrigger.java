@@ -58,8 +58,6 @@ public class ChronoTrigger
 			channels[j].connect("EYE");}
 		for(int k = 0; k < 8; k++)
 			lanes[k] = k+1;
-		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
-		flush();
 	}
 	/**
 	 * Constructor with time parameter
@@ -83,9 +81,6 @@ public class ChronoTrigger
 				channels[i].connect("EYE");}
 		for(int k = 0; k < 8; k++)
 			lanes[k] = k+1;
-		
-		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
-		flush();
 	}
 	
 	public void setPrinter(Printer s)
@@ -192,6 +187,8 @@ public class ChronoTrigger
 	{
 		power = true;
 		officialTime = commandTime;
+		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
+		flush();
 	}
 	/**
 	 * turn power off
@@ -200,6 +197,8 @@ public class ChronoTrigger
 	{
 		power = false;
 		officialTime = commandTime;
+		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is off.");
+		flush();
 	}
 	/**
 	 * This will set the type of the current race to String type.

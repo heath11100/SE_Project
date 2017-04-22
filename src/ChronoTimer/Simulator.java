@@ -203,9 +203,7 @@ public class Simulator {
 						if(power)
 							sim.powerOff(ChronoTime.now());
 						else{
-							sim.powerOn(ChronoTime.now());
-							System.out.println(" > ChronoTrigger is off.");
-							sim = null;}
+							sim.powerOn(ChronoTime.now());}
 						break;
 					case "EXIT":
 						System.out.println("Exiting simulator.");
@@ -301,7 +299,7 @@ public class Simulator {
 				{
 					report("Innapropriate number of tokens.");
 				}
-				catch (NullPointerException ex){report("Have not turned power on ye");}
+				catch (NullPointerException ex){report("Have not turned power on yet");}
 				catch (InvalidTimeException ex) {report("Error: incorrect time format.");}
 				catch (InvalidCommandException ex) {
 					report("error: " + ex.getMessage());
