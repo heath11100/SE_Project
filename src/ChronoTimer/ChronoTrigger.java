@@ -198,7 +198,7 @@ public class ChronoTrigger
 		power = false;
 		officialTime = commandTime;
 		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is off.");
-		flush();
+		printer.flush(history);
 	}
 	/**
 	 * This will set the type of the current race to String type.

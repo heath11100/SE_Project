@@ -200,10 +200,8 @@ public class Simulator {
 					switch(tokens[cToken++])
 					{
 					case "POWER":
-						if(power)
-							sim.powerOff(ChronoTime.now());
-						else{
-							sim.powerOn(ChronoTime.now());}
+						if(power){sim.powerOff(ChronoTime.now());power=false;}
+						else{sim.powerOn(ChronoTime.now());power=true;}
 						break;
 					case "EXIT":
 						System.out.println("Exiting simulator.");
