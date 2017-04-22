@@ -122,7 +122,7 @@ public class ChronoTime {
 		//calculate seconds and subtract from remaining
 		int seconds = remaining / 100;
 		remaining%=100;
-		return minutes+":"+seconds+"."+remaining;
+		return String.format("%d:%02d.%02d",minutes,seconds,remaining);
 	}
 
 	/**

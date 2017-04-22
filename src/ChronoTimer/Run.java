@@ -739,7 +739,7 @@ public class Run {
 				ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
 				nextRacer.finish(elapsedTime);
 
-				String racerLogString = "" + atTime +" "+nextRacer+" finished";
+				String racerLogString = "" + atTime +" "+nextRacer+" finished with time "+nextRacer.getElapsedTime().getTimeStamp();
 
 				//Log which lane the racer ended in for PARIND only
 				if (this.eventType == EventType.PARIND) {
