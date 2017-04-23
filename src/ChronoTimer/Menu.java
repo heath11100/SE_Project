@@ -9,7 +9,7 @@ public class Menu extends UIPrint {
 	final String RACEON[] = 
 		{
 			"NUM",
-			"CLEAR",
+			//"CLEAR",
 			"CANCEL",
 			"DNF",
 			"ENDRUN"

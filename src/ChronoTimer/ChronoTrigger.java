@@ -474,7 +474,7 @@ public class ChronoTrigger
 			}
 			
 			if (!runs.isEmpty()){
-				try {(runs.get(curRun)).didNotFinishNextRacer(curRun);}
+				try {(runs.get(curRun)).didNotFinishNextRacer(1);}
 				catch(RaceException e) {history.add(e.getMessage());}
 				catch(NoSuchElementException e){history.add(e.getMessage());}
 				catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
@@ -499,7 +499,7 @@ public class ChronoTrigger
 			}
 			
 			if (!runs.isEmpty()){
-				try {runs.get(curRun).cancelNextRacer(curRun);}
+				try {runs.get(curRun).cancelNextRacer(1);}
 				catch(RaceException e) {history.add(e.getMessage());}
 				catch(NoSuchElementException e){history.add(e.getMessage());}
 				catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
