@@ -830,12 +830,12 @@ public class Run {
 	 */
 	public void cancelNextRacer(int lane) throws RaceException {
 		
-		if (!this.isValidLane(lane)) {
-			throw new RaceException("Invalid lane: " + lane);
-			
-		} else if (this.hasEnded()) {
+		if (this.hasEnded()) {
 			throw new RaceException("Race has ended");
 			
+		} else if (!this.isValidLane(lane)) {
+			throw new RaceException("Invalid lane: " + lane);
+
 		} else if (this.eventType == EventType.GRP) {
 			throw new RaceException("Cannot cancel next racer for GRP run");
 
@@ -867,12 +867,12 @@ public class Run {
 	 * OR when eventType is GRP
 	 */
 	public void didNotFinishNextRacer(int lane) throws RaceException {
-		if (!this.isValidLane(lane)) {
-			throw new RaceException("Invalid lane: " + lane);
-			
-		} else if (this.hasEnded()) {
+		 if (this.hasEnded()) {
 			throw new RaceException("Race has ended");
 			
+		} else if (!this.isValidLane(lane)) {
+			throw new RaceException("Invalid lane: " + lane);
+
 		} else if (this.eventType == EventType.GRP) {
 			throw new RaceException("Cannot DNF next racer for GRP type");
 
