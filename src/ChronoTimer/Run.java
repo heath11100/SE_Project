@@ -49,7 +49,12 @@ public class Run {
 	 * @return true if lane number is valid, false otherwise.
 	 */
 	private boolean isValidLane(int laneNumber) {
-		return (laneNumber >= 1 && laneNumber <= MAX_LANES) && (laneNumber <= this.runningLanes.size());
+		switch (this.eventType) {
+			case IND:
+				return laneNumber == 1;
+			default:
+				return (laneNumber >= 1 && laneNumber <= MAX_LANES) && (laneNumber <= this.runningLanes.size());
+		}
 	}
 	
 	/**
