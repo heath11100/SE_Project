@@ -23,16 +23,16 @@ public class TestChronoTime extends TestCase{
 		t6 = new ChronoTime("1439:59.99");
 		
 		assertEquals("toString is wrong", t1.toString(), "00:00:00.00");
-		assertEquals("getTimeStamp is wrong", t1.getTimeStamp(), "0:0.0");
+		assertEquals("getTimeStamp is wrong", t1.getTimeStamp(), "0:00.00");
 		assertEquals("toString is wrong", t2.toString(), "01:01:01.00");
-		assertEquals("getTimeStamp is wrong", t2.getTimeStamp(), "61:1.0");
+		assertEquals("getTimeStamp is wrong", t2.getTimeStamp(), "61:01.00");
 		assertEquals("toString is wrong", t3.toString(), "23:59:59.00");
-		assertEquals("getTimeStamp is wrong", t3.getTimeStamp(), "1439:59.0");
+		assertEquals("getTimeStamp is wrong", t3.getTimeStamp(), "1439:59.00");
 		
 		assertEquals("toString is wrong", t4.toString(), "00:00:00.00");
-		assertEquals("getTimeStamp is wrong", t4.getTimeStamp(), "0:0.0");
+		assertEquals("getTimeStamp is wrong", t4.getTimeStamp(), "0:00.00");
 		assertEquals("toString is wrong", t5.toString(), "00:01:01.01");
-		assertEquals("getTimeStamp is wrong", t5.getTimeStamp(), "1:1.1");
+		assertEquals("getTimeStamp is wrong", t5.getTimeStamp(), "1:01.01");
 		assertEquals("toString is wrong", t6.toString(), "23:59:59.99");
 		assertEquals("getTimeStamp is wrong", t6.getTimeStamp(), "1439:59.99");
 	}

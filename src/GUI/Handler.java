@@ -20,12 +20,12 @@ public class Handler {
 	JTextArea displayArea, printArea;
 	ChronoTrigger main;
 
-	guis GUIState;
+	GUIState inputState;
 	String curNum;
-	boolean race;
+	boolean raceState;
 	boolean printerPower;
-	UIPrint disp;
-	Timer updater;
+	UIPrint currentScreen;
+	Timer selfUpdater;
 	Timer postToServerTimer;
 	int hour = 0, min = 0;
 	boolean extraInput = false;
@@ -36,7 +36,7 @@ public class Handler {
 	
 	boolean SERVERENABLED;
 
-	public enum guis {
+	public enum GUIState {
 		off, // synonymous with the cts.off state
 		start, // extra, unused right now? for when we are powering up the
 				// machine, similar to the off state.
@@ -61,14 +61,14 @@ public class Handler {
 		main.setPrinter(new Printer(new PrinterStream(printArea)));
 		//need to set the default printer as well here
 		SERVERENABLED = false;
-		GUIState = guis.off;
+		inputState = GUIState.off;
 		curNum = "";
-		race = false;
-		updater = new Timer(TIMERDELAY, new Listener(this, "UPDATE"));
-		updater.start();
+		raceState = false;
+		selfUpdater = new Timer(TIMERDELAY, new Listener(this, "UPDATE"));
+		selfUpdater.start();
 		postToServerTimer = new Timer(SERVERDELAY, new Listener(this, "SERVER"));
 		postToServerTimer.start();
-		disp = new Card(0,0);
+		currentScreen = new Card(0,0);
 	}
 
 	protected boolean issue(String command) 
@@ -80,13 +80,13 @@ public class Handler {
 			switch (command) 
 			{
 			case "SERVER":
-				if(race && SERVERENABLED)
+				if(raceState && SERVERENABLED)
 					main.exportToServer(ChronoTime.now());
 			break;
 			case "UPDATE":
-				disp.writeTo();
-				if(race && GUIState == guis.wait)
-					disp = main.getCard();
+				currentScreen.writeTo();
+				if(raceState && inputState == GUIState.wait)
+					currentScreen = main.getCard();
 				break;
 
 			/**
@@ -95,26 +95,26 @@ public class Handler {
 			 * the user to move up choosing a function
 			 */
 			case "UP":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case fcn:
 				case event:
 				case wait:
 					// should allow user to navigate the scroll view for this
 					// run
-					disp.up();
+					currentScreen.up();
 					break;
 				default:
 
 				}
 				break;
 			case "DOWN":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case fcn:
 				case event:
 				case wait:
-					disp.down();
+					currentScreen.down();
 					break;
 				default:
 
@@ -125,30 +125,30 @@ public class Handler {
 			 * exit out of a menu, 'go back'
 			 */
 			case "LEFT":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case fcn:
 					// maneuver back in menu
-					GUIState = guis.wait;
-					disp = main.getCard();
+					inputState = GUIState.wait;
+					currentScreen = main.getCard();
 					break;
 				case event:
-					disp = new Menu(race);
+					currentScreen = new Menu(raceState);
 				case num:
 				case print:
 				case export:
 				case timeh:
 					curNum = "";
 					extraInput = false;
-					GUIState = guis.fcn;
+					inputState = GUIState.fcn;
 					break;
 				case timem:
 					curNum = "";
-					GUIState = guis.timeh;
+					inputState = GUIState.timeh;
 					break;
 				case times:
 					curNum = "";
-					GUIState = guis.timem;
+					inputState = GUIState.timem;
 					break;
 				default:
 
@@ -160,31 +160,31 @@ public class Handler {
 			 */
 			case "RIGHT":
 			case "POUND":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case fcn:
-					enterCommand(disp.writeTo());//this will put me in the correct state
+					enterCommand(currentScreen.writeTo());//this will put me in the correct state
 					break;
 				case num:
 					if(curNum != "")
 					{
 						main.addRacer(ChronoTime.now(), Integer.parseInt(curNum));
-						GUIState = guis.wait;
-						if(race)
-							disp = main.getCard();
+						inputState = GUIState.wait;
+						if(raceState)
+							currentScreen = main.getCard();
 						else
-							disp = new Card(0, 0);
+							currentScreen = new Card(0, 0);
 						curNum = "";
 						extraInput = false; 
 					}
 					break;
 				case event:
-					main.setType(ChronoTime.now(), disp.writeTo());
-					GUIState = guis.wait;
-					if(race)
-						disp = main.getCard();
+					main.setType(ChronoTime.now(), currentScreen.writeTo());
+					inputState = GUIState.wait;
+					if(raceState)
+						currentScreen = main.getCard();
 					else
-						disp = new Card(0, 0);
+						currentScreen = new Card(0, 0);
 					break;
 				case print:
 					printArea.setText("");
@@ -193,12 +193,12 @@ public class Handler {
 					else
 						main.printRun(ChronoTime.now());
 					curNum = "";
-					GUIState = guis.wait;
+					inputState = GUIState.wait;
 					extraInput = false;
-					if(race)
-						disp = main.getCard();
+					if(raceState)
+						currentScreen = main.getCard();
 					else
-						disp = new Card(0, 0);
+						currentScreen = new Card(0, 0);
 					break;
 					//later
 				case export:
@@ -207,32 +207,32 @@ public class Handler {
 					else
 						main.exportRun(ChronoTime.now());
 					curNum = "";
-					GUIState = guis.wait;
+					inputState = GUIState.wait;
 					extraInput = false;
-					if(race)
-						disp = main.getCard();
+					if(raceState)
+						currentScreen = main.getCard();
 					else
-						disp = new Card(0, 0);
+						currentScreen = new Card(0, 0);
 					break;
 					//later
 				case timeh:
 					if(curNum != "")
 					{
-						GUIState = guis.timem;
+						inputState = GUIState.timem;
 						hour = Integer.parseInt(curNum);
 						curNum = "";
 					}
 				case timem:
 					if(curNum != "")
 					{
-						GUIState = guis.times;
+						inputState = GUIState.times;
 						min = Integer.parseInt(curNum);
 						curNum = "";
 					}
 				case times:
 					if(curNum != "")
 					{
-						GUIState = guis.wait;
+						inputState = GUIState.wait;
 						try{
 							main.setTime(ChronoTime.now(), new ChronoTime(hour, min, Integer.parseInt(curNum), 0));	
 						}
@@ -243,7 +243,7 @@ public class Handler {
 						
 						hour = min = 0;
 						curNum = "";
-						disp = new Card(0, 0);
+						currentScreen = new Card(0, 0);
 						extraInput = false;
 						
 					}
@@ -264,12 +264,12 @@ public class Handler {
 			 * starts up list, if list is already started, will cancel it?
 			 */
 			case "FUNCTION":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case wait:
 					// start function protocol
-					disp = new Menu(race);
-					GUIState = guis.fcn;
+					currentScreen = new Menu(raceState);
+					inputState = GUIState.fcn;
 					break;
 				case num:
 				case fcn: 
@@ -282,11 +282,11 @@ public class Handler {
 					// stop function protocol
 					extraInput = false;
 					curNum = "";
-					GUIState = guis.wait;
-					if(race)
-						disp = main.getCard();
+					inputState = GUIState.wait;
+					if(raceState)
+						currentScreen = main.getCard();
 					else
-						disp = new Card(0, 0);
+						currentScreen = new Card(0, 0);
 					break;
 				default:
 
@@ -294,38 +294,38 @@ public class Handler {
 
 				break;
 			case "POWER":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case off:
 					main.powerOn(ChronoTime.now());
-					disp = new SplashScreen();
-					GUIState = guis.start;
+					currentScreen = new SplashScreen();
+					inputState = GUIState.start;
 					
 					new java.util.Timer().schedule(new TimerTask() {
 						
 						@Override
 						public void run() {
-							disp = new Card(0, 0);
-							GUIState = guis.wait;
+							currentScreen = new Card(0, 0);
+							inputState = GUIState.wait;
 						}
 					}, STARTDELAY);
 					
 					break;
 				default:
 					main.powerOff(ChronoTime.now());
-					GUIState = guis.off;
+					inputState = GUIState.off;
 					curNum = "";
-					race = false;
+					raceState = false;
 					hour = 0;
 					min = 0;
-					disp = new Card(0,0);
+					currentScreen = new Card(0,0);
 					printerPower = false;
 					printArea.setText("");
 					extraInput = false;
 				}
 				break;
 			case "PRINTER POWER":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case off:
 					break;
@@ -338,7 +338,7 @@ public class Handler {
 				}
 				break;
 			case "STAR":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case num:
 				case print:
@@ -349,8 +349,8 @@ public class Handler {
 					curNum = "";
 					break;
 				case fcn:
-					GUIState = guis.wait;
-					disp = main.getCard();
+					inputState = GUIState.wait;
+					currentScreen = main.getCard();
 					break;
 				default:
 					// do nothing
@@ -503,7 +503,7 @@ public class Handler {
 				main.toggle(ChronoTime.now(), 8);
 				break;
 			case "NUM 1":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case export:
 				case print:
@@ -522,7 +522,7 @@ public class Handler {
 				}
 				break;
 			case "NUM 2":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case export:
 				case print:
@@ -542,7 +542,7 @@ public class Handler {
 				}
 				break;
 			case "NUM 3":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case export:
 				case print:
@@ -561,7 +561,7 @@ public class Handler {
 				}
 				break;
 			case "NUM 4":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case export:
 				case print:
@@ -581,7 +581,7 @@ public class Handler {
 
 				break;
 			case "NUM 5":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case export:
 				case print:
@@ -601,7 +601,7 @@ public class Handler {
 
 				break;
 			case "NUM 6":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case export:
 				case print:
@@ -621,7 +621,7 @@ public class Handler {
 
 				break;
 			case "NUM 7":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case export:
 				case print:
@@ -641,7 +641,7 @@ public class Handler {
 
 				break;
 			case "NUM 8":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case export:
 				case print:
@@ -661,7 +661,7 @@ public class Handler {
 
 				break;
 			case "NUM 9":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case export:
 				case print:
@@ -681,7 +681,7 @@ public class Handler {
 
 				break;
 			case "NUM 0":
-				switch (GUIState) 
+				switch (inputState) 
 				{
 				case export:
 				case print:
@@ -707,7 +707,7 @@ public class Handler {
 				throw new NoSuchElementException("could not parse command");
 			}
 
-			displayArea.setText(disp.getText());
+			displayArea.setText(currentScreen.getText());
 			displayArea.append("\n");
 			if(extraInput) displayArea.append("\n>");
 			if(hour != 0) displayArea.append("" + hour + ": ");
@@ -737,97 +737,97 @@ public class Handler {
 			switch (command)
 			{
 			case "NUM":
-				GUIState = guis.num;
+				inputState = GUIState.num;
 				extraInput = true;
 				return true;
 			case "CLEAR":
-				GUIState = guis.wait;
-				disp = main.getCard();
+				inputState = GUIState.wait;
+				currentScreen = main.getCard();
 				//clear does nothing?
 				return false;
 			case "CANCEL":
-				GUIState = guis.wait;
-				disp = main.getCard();
+				inputState = GUIState.wait;
+				currentScreen = main.getCard();
 				main.cancel(ChronoTime.now());
 				return false;
 			case "DNF":
-				GUIState = guis.wait;
-				disp = main.getCard();
+				inputState = GUIState.wait;
+				currentScreen = main.getCard();
 				main.dnf(ChronoTime.now());
 				return false;
 			case "ENDRUN":
-				GUIState = guis.wait;
-				disp = new Card(0, 0);
-				race = false;
+				inputState = GUIState.wait;
+				currentScreen = new Card(0, 0);
+				raceState = false;
 				main.finRun(ChronoTime.now());
 				return false;
 			case "EVENT":
-				GUIState = guis.event;
-				disp = new EventMenu();
+				inputState = GUIState.event;
+				currentScreen = new EventMenu();
 				return true;
 			case "PRINT":
 				if(printerPower)
 				{
 					extraInput = true;
-					GUIState = guis.print;
+					inputState = GUIState.print;
 					return true;
 				}
-				GUIState = guis.wait;
-				if(race)
-					disp = main.getCard();
+				inputState = GUIState.wait;
+				if(raceState)
+					currentScreen = main.getCard();
 				else
-					disp = new Card(0, 0);
+					currentScreen = new Card(0, 0);
 				return false;
 			case "EXPORT":
-				GUIState = guis.export;
+				inputState = GUIState.export;
 				extraInput = true;
 				return true;
 			case "RESET":
-				GUIState = guis.start;
-				disp = new SplashScreen();
+				inputState = GUIState.start;
+				currentScreen = new SplashScreen();
 				main.powerOff(ChronoTime.now());
 				main.powerOn(ChronoTime.now());
 				new java.util.Timer().schedule(new TimerTask() {
 					
 					@Override
 					public void run() {
-						disp = new Card(0, 0);
-						GUIState = guis.wait;
+						currentScreen = new Card(0, 0);
+						inputState = GUIState.wait;
 					}
 				}, STARTDELAY);
 				return false;
 			case "NEWRUN":
-				GUIState = guis.wait;
+				inputState = GUIState.wait;
 				main.newRun(ChronoTime.now());
-				disp = main.getCard();
-				race = true;
+				currentScreen = main.getCard();
+				raceState = true;
 				return false;
 			case "TIME":
 				extraInput = true;
-				GUIState = guis.timeh;
+				inputState = GUIState.timeh;
 				return true;
 			case "ENABLESERVER":
-				GUIState = guis.wait;
+				inputState = GUIState.wait;
 				SERVERENABLED = true;
-				if(race)
-					disp = main.getCard();
+				if(raceState)
+					currentScreen = main.getCard();
 				else
-					disp = new Card(0, 0);
+					currentScreen = new Card(0, 0);
 				return false;
 			case "DISABLESERVER":
-				GUIState = guis.wait;
+				inputState = GUIState.wait;
 				SERVERENABLED = true;
-				if(race)
-					disp = main.getCard();
+				if(raceState)
+					currentScreen = main.getCard();
 				else
-					disp = new Card(0, 0);
+					currentScreen = new Card(0, 0);
 				return false;
 			default:
 				return false;
 			}
 		} catch (InvalidTimeException e) 
 		{
-			System.out.println("casey why?");
+			System.out.println("Misrepresented time... Crashing");
 			return false;
 		}
 	}

@@ -33,7 +33,7 @@ public class ChronoTrigger
 {
 	private Channel[] channels;
 	private ChronoTime officialTime;
-	private Duration offset;
+	private int offset;
 	private ArrayList<Run> runs = new ArrayList<>();
 	private int curRun = -1;
 	private boolean logTimes = false;
@@ -54,7 +54,7 @@ public class ChronoTrigger
 		power = false;
 		try {officialTime = ChronoTime.now();}
 		catch (InvalidTimeException e) {history.add(e.getMessage());}
-		offset = Duration.ofNanos(0);
+		offset = 0;
 		//create channels
 		channels = new Channel[8];
 		for(int j =0; j < 8; j++){
@@ -62,9 +62,6 @@ public class ChronoTrigger
 			channels[j].connect("EYE");}
 		for(int k = 0; k < 8; k++)
 			lanes[k] = k+1;
-		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
-		flush();
-		
 		
 		String tk1 = "";
 		File fil = new File("./src/ChronoTimer/racerNames");
@@ -94,7 +91,7 @@ public class ChronoTrigger
 		//set official time
 		officialTime = t;
 		power = false;
-		offset = Duration.ofNanos(0);
+		offset = 0;
 		
 		
 		
@@ -124,10 +121,6 @@ public class ChronoTrigger
 			i++;
 		}
 		inFile.close();
-		
-		
-		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
-		flush();
 	}
 	
 	public void setPrinter(Printer s)
@@ -143,15 +136,8 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			int difference = newOfficialTime.asHundredths()-commandTime.asHundredths();
-			Duration duration = Duration.ofMillis(difference*10);
-			offset = duration;
-			try {
-				officialTime = newOfficialTime.now(offset);
-			} catch (InvalidTimeException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			offset = newOfficialTime.asHundredths()-commandTime.asHundredths();
+			officialTime = newOfficialTime;
 			history.add( (logTimes? officialTime+" | " : "") +"Set time to " + newOfficialTime.toString());
 			flush();
 		}
@@ -163,7 +149,7 @@ public class ChronoTrigger
 	public ChronoTime getTime(){
 		if(power)
 		{try {
-			return officialTime.now(offset);
+			return officialTime.withOffset(offset);
 		} catch (InvalidTimeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -179,7 +165,7 @@ public class ChronoTrigger
 		if(power)
 		{
 		try {
-			officialTime = commandTime.now(offset);
+			officialTime = commandTime.withOffset(offset);
 		} catch (InvalidTimeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -206,7 +192,7 @@ public class ChronoTrigger
 		if(power)
 		{
 		try {
-			officialTime = commandTime.now(offset);
+			officialTime = commandTime.withOffset(offset);
 		} catch (InvalidTimeException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -236,7 +222,7 @@ public class ChronoTrigger
 		if(power)
 		{
 		try {
-			officialTime = commandTime.now(offset);
+			officialTime = commandTime.withOffset(offset);
 		} catch (InvalidTimeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -258,7 +244,9 @@ public class ChronoTrigger
 	{
 		power = true;
 		try {
-			officialTime = commandTime.now(offset);
+			officialTime = commandTime.withOffset(offset);
+			history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
+			flush();
 		} catch (InvalidTimeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -271,7 +259,9 @@ public class ChronoTrigger
 	{
 		power = false;
 		try {
-			officialTime = commandTime.now(offset);
+			officialTime = commandTime.withOffset(offset);
+			history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is off.");
+			printer.flush(history);
 		} catch (InvalidTimeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -288,7 +278,7 @@ public class ChronoTrigger
 		if(power)
 		{
 			try {
-				officialTime = commandTime.now(offset);
+				officialTime = commandTime.withOffset(offset);
 			} catch (InvalidTimeException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -324,7 +314,7 @@ public class ChronoTrigger
 		if(power)
 		{
 			try {
-				officialTime = commandTime.now(offset);
+				officialTime = commandTime.withOffset(offset);
 			} catch (InvalidTimeException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -358,7 +348,7 @@ public class ChronoTrigger
 		if(power)
 		{
 			try {
-				officialTime = commandTime.now(offset);
+				officialTime = commandTime.withOffset(offset);
 			} catch (InvalidTimeException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -386,7 +376,7 @@ public class ChronoTrigger
 		if(power)
 		{
 			try {
-				officialTime = commandTime.now(offset);
+				officialTime = commandTime.withOffset(offset);
 			} catch (InvalidTimeException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -448,7 +438,7 @@ public class ChronoTrigger
 		if(power)
 		{
 			try {
-				officialTime = commandTime.now(offset);
+				officialTime = commandTime.withOffset(offset);
 			} catch (InvalidTimeException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -473,7 +463,7 @@ public class ChronoTrigger
 		if(power)
 		{
 			try {
-				officialTime = commandTime.now(offset);
+				officialTime = commandTime.withOffset(offset);
 			} catch (InvalidTimeException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -498,7 +488,7 @@ public class ChronoTrigger
 		if(power)
 		{
 			try {
-				officialTime = commandTime.now(offset);
+				officialTime = commandTime.withOffset(offset);
 			} catch (InvalidTimeException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -520,7 +510,7 @@ public class ChronoTrigger
 		if(power)
 		{
 			try {
-				officialTime = commandTime.now(offset);
+				officialTime = commandTime.withOffset(offset);
 			} catch (InvalidTimeException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -544,7 +534,7 @@ public class ChronoTrigger
 		if(power)
 		{
 			try {
-				officialTime = commandTime.now(offset);
+				officialTime = commandTime.withOffset(offset);
 			} catch (InvalidTimeException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -570,7 +560,7 @@ public class ChronoTrigger
 		if(power)
 		{
 			try {
-				officialTime = commandTime.now(offset);
+				officialTime = commandTime.withOffset(offset);
 			} catch (InvalidTimeException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -594,7 +584,7 @@ public class ChronoTrigger
 		if(power)
 		{
 			try {
-				officialTime = commandTime.now(offset);
+				officialTime = commandTime.withOffset(offset);
 			} catch (InvalidTimeException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -615,7 +605,7 @@ public class ChronoTrigger
 		if(power)
 		{
 			try {
-				officialTime = commandTime.now(offset);
+				officialTime = commandTime.withOffset(offset);
 			} catch (InvalidTimeException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -633,7 +623,7 @@ public class ChronoTrigger
 		if(power)
 		{
 			try {
-				officialTime = commandTime.now(offset);
+				officialTime = commandTime.withOffset(offset);
 			} catch (InvalidTimeException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -701,7 +691,7 @@ public class ChronoTrigger
 		if(power)
 		{
 			try {
-				officialTime = commandTime.now(offset);
+				officialTime = commandTime.withOffset(offset);
 			} catch (InvalidTimeException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -787,12 +777,12 @@ public class ChronoTrigger
 		
 		@Override
 		public void setUp() throws InvalidTimeException{
-			ct = new ChronoTrigger();
-			ct.powerOn(t1);
 			t1 = ChronoTime.now();
 			t2 = ChronoTime.now();
 			t3 = ChronoTime.now();
 			t4 = ChronoTime.now();
+			ct = new ChronoTrigger();
+			ct.powerOn(t1);
 		}
 		
 		public void testConstructors(){
@@ -817,15 +807,6 @@ public class ChronoTrigger
 			assertFalse(ct.history == null);
 			assertFalse(ct.printer == null);
 			assertEquals(t1, ct.officialTime);
-		}
-		
-		public void testSetGetTime(){
-			ct.setTime(t1, t2);
-			assertEquals(ct.getTime(),t2);
-			ct.setTime(t1, t1);
-			assertEquals(ct.getTime(),t1);
-			ct.setTime(t4, t3);
-			assertEquals(ct.getTime(),t3);
 		}
 		
 		public void testChannel(){

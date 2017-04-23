@@ -37,7 +37,7 @@ public class GUI {
 	private ChannelPad channelPad;
 
 	// Displays
-	private JTextArea displayText,printerText;
+	private JTextArea displayText,printerText; 
 
 	//Style
 	private final int splashSeconds = 0;

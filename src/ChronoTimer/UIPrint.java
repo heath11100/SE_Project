@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import javax.swing.JTextArea;
 
-import GUI.Handler.guis;
+import GUI.Handler.GUIState;
 
 public abstract class UIPrint{
 	private String textArea;
