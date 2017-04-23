@@ -251,6 +251,31 @@ public class ChronoTrigger
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//create channels
+		channels = new Channel[8];
+		for(int j =0; j < 8; j++){
+			channels[j] = new Channel();
+			channels[j].connect("EYE");}
+		for(int k = 0; k < 8; k++)
+			lanes[k] = k+1;
+		
+		String tk1 = "";
+		File fil = new File("./src/ChronoTimer/racerNames");
+		Scanner inFile = null;
+		try {
+			inFile = new Scanner(fil);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int i = 0;
+		while(inFile.hasNext())
+		{
+			tk1 =  inFile.next();
+			temps[i] = (tk1);
+			i++;
+		}
+		inFile.close();
 	}
 	/**
 	 * turn power off
@@ -266,6 +291,10 @@ public class ChronoTrigger
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		channels = null;
+		runs = new ArrayList<Run>();
+		offset = 0;
+		curRun = -1;
 	}
 	/**
 	 * This will set the type of the current race to String type.
