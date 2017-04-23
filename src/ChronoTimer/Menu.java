@@ -2,7 +2,7 @@ package ChronoTimer;
 
 import java.util.ArrayList;
 
-import GUI.Handler.guis;
+import GUI.Handler.GUIState;
 
 public class Menu extends UIPrint {
 
