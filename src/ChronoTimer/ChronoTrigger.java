@@ -640,7 +640,7 @@ public class ChronoTrigger
 				e.printStackTrace();
 			}
 			
-			if (!runs.isEmpty() && runNum < curRun)
+			if (!runs.isEmpty() && runNum <= curRun)
 				runprinter.export(runNum, runs.get(runNum));
 			else
 				history.add("runNum " + runNum+ " was invalid");
