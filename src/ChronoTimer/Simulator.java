@@ -226,8 +226,13 @@ public class Simulator {
 								throw new InvalidCommandException("Channel format, tog");
 							break;
 						case "CONN":
-							sim.connectSensor(cTime, Integer.parseInt(tokens[cToken++]), tokens[cToken++]);
-							//not used in sprint 1
+							if (tokens[cToken].matches(CHANNELFORMAT))
+								if(tokens[cToken + 1].matches(SENSORFORMAT))
+									sim.connectSensor(cTime, Integer.parseInt(tokens[cToken++]), tokens[cToken++]);
+								else
+									throw new InvalidCommandException("Channel format, conn");
+							else
+								throw new InvalidCommandException("Channel format, conn");
 							break;
 						case "DISC": //not used in sprint 1
 							sim.disSensor(cTime, Integer.parseInt(tokens[cToken++]));
