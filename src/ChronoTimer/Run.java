@@ -679,8 +679,8 @@ public class Run {
 		} else if (this.hasEnded()) {
 			throw new RaceException("Race has already ended");
 
-		} else if (this.eventType == EventType.IND || (this.eventType == EventType.PARIND
-				&& this.isValidLane(lane))) {
+		} else if ((this.eventType == EventType.IND || this.eventType == EventType.PARIND)
+				&& this.isValidLane(lane)) {
 			//EventType is IND OR PARIND, lane is valid
 
 			if (this.eventType == EventType.IND && this.runningLanes.size() == 0) {
