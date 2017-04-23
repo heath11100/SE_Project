@@ -62,9 +62,6 @@ public class ChronoTrigger
 			channels[j].connect("EYE");}
 		for(int k = 0; k < 8; k++)
 			lanes[k] = k+1;
-		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
-		flush();
-		
 		
 		String tk1 = "";
 		File fil = new File("./src/ChronoTimer/racerNames");
@@ -124,10 +121,6 @@ public class ChronoTrigger
 			i++;
 		}
 		inFile.close();
-		
-		
-		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
-		flush();
 	}
 	
 	public void setPrinter(Printer s)
@@ -252,6 +245,8 @@ public class ChronoTrigger
 		power = true;
 		try {
 			officialTime = commandTime.withOffset(offset);
+			history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
+			flush();
 		} catch (InvalidTimeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -263,10 +258,10 @@ public class ChronoTrigger
 	public void powerOff(ChronoTime commandTime)
 	{
 		power = false;
-		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is off.");
-		printer.flush(history);
 		try {
 			officialTime = commandTime.withOffset(offset);
+			history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is off.");
+			printer.flush(history);
 		} catch (InvalidTimeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
