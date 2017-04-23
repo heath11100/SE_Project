@@ -740,7 +740,8 @@ public class ChronoTrigger
 				}
 				for(int i = 0; i < racers.size(); i++)
 				{
-					post("ADD " + (new Gson().toJson(racers.get(i))));
+					try{post("ADD " + (new Gson().toJson(racers.get(i))));}
+					catch (Exception e){}//muffle if server isn't running
 				}
 				
 			}
