@@ -263,6 +263,8 @@ public class ChronoTrigger
 	public void powerOff(ChronoTime commandTime)
 	{
 		power = false;
+		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is off.");
+		printer.flush(history);
 		try {
 			officialTime = commandTime.withOffset(offset);
 		} catch (InvalidTimeException e) {
