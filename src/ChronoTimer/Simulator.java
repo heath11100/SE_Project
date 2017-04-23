@@ -185,127 +185,129 @@ public class Simulator {
 				warning("Improper token matching in file read, did you forget a timestamp?");
 			else if(tokens.length < 1)
 				warning("Not enough tokens.");
-			else
-			{
-				
-				try
-				{
+			else {
+
+				try {
 					//Set simulator time variable
-					if(fread_m)
+					if (fread_m)
 						cTime = new ChronoTime(tokens[cToken++]);
 					else
 						cTime = ChronoTime.now();
-					
+
 					//Branch based on command
-					switch(tokens[cToken++])
-					{
-					case "POWER":
-						if(power){sim.powerOff(ChronoTime.now());power=false;}
-						else{sim.powerOn(ChronoTime.now());power=true;}
-						break;
-					case "EXIT":
-						System.out.println("Exiting simulator.");
-						state = 1;
-						break;
-					case "RESET":
-						sim.powerOff(ChronoTime.now());
-						sim.powerOn(ChronoTime.now());
-						break;
-					case "TIME":
-						if(tokens[cToken].matches(TIMEFORMAT))
-							sim.setTime(cTime, new ChronoTime(tokens[cToken++]));
-						else
-							throw new InvalidCommandException("TimeFormat, time");
-						break;
-					case "TOG":
-						if(tokens[cToken].matches(CHANNELFORMAT))
-							sim.toggle(cTime, Integer.parseInt(tokens[cToken++]));
-						else
-							throw new InvalidCommandException("Channel format, tog");
-						break;
-					case "CONN": //not used in sprint 1
-						break;
-					case "DISC": //not used in sprint 1
-						break;
-					case "EVENT": ;
-						if(tokens[cToken].matches(EVENTFORMAT))
-							sim.setType(cTime, tokens[cToken++]);//fix this
-						else
-							throw new InvalidCommandException("Event format, event");
-						break;
-					case "NEWRUN": 
-						sim.newRun(cTime);
-						break;
-					case "ENDRUN": 
-						sim.finRun(cTime);
-						break;
-					case "PRINT":
-						if(cToken == tokens.length)
-							sim.printRun(cTime);
-						else
-							if(tokens[cToken].matches(RACEFORMAT))
+					switch (tokens[cToken++]) {
+						case "POWER":
+							if (power) {
+								sim.powerOff(ChronoTime.now());
+								power = false;
+							} else {
+								sim.powerOn(ChronoTime.now());
+								power = true;
+							}
+							break;
+						case "EXIT":
+							System.out.println("Exiting simulator.");
+							state = 1;
+							break;
+						case "RESET":
+							sim.powerOff(ChronoTime.now());
+							sim.powerOn(ChronoTime.now());
+							break;
+						case "TIME":
+							if (tokens[cToken].matches(TIMEFORMAT))
+								sim.setTime(cTime, new ChronoTime(tokens[cToken++]));
+							else
+								throw new InvalidCommandException("TimeFormat, time");
+							break;
+						case "TOG":
+							if (tokens[cToken].matches(CHANNELFORMAT))
+								sim.toggle(cTime, Integer.parseInt(tokens[cToken++]));
+							else
+								throw new InvalidCommandException("Channel format, tog");
+							break;
+						case "CONN":
+							sim.connectSensor(cTime, Integer.parseInt(tokens[cToken++]), tokens[cToken++]);
+							//not used in sprint 1
+							break;
+						case "DISC": //not used in sprint 1
+							sim.disSensor(cTime, Integer.parseInt(tokens[cToken++]));
+							break;
+						case "EVENT":
+							;
+							if (tokens[cToken].matches(EVENTFORMAT))
+								sim.setType(cTime, tokens[cToken++]);//fix this
+							else
+								throw new InvalidCommandException("Event format, event");
+							break;
+						case "NEWRUN":
+							sim.newRun(cTime);
+							break;
+						case "ENDRUN":
+							sim.finRun(cTime);
+							break;
+						case "PRINT":
+							if (cToken == tokens.length)
+								sim.printRun(cTime);
+							else if (tokens[cToken].matches(RACEFORMAT))
 								sim.printRun(cTime, Integer.parseInt(tokens[cToken++]));
 							else
 								throw new InvalidCommandException("Race format, print");
-						
-						//must overload this to take no args OR race number
-						break;
-					case "EXPORT":
-						if(cToken == tokens.length)
-							sim.exportRun(cTime);
-						else
-							if(tokens[cToken].matches(RACEFORMAT))
+
+							//must overload this to take no args OR race number
+							break;
+						case "EXPORT":
+							if (cToken == tokens.length)
+								sim.exportRun(cTime);
+							else if (tokens[cToken].matches(RACEFORMAT))
 								sim.exportRun(cTime, Integer.parseInt(tokens[cToken++]));
 							else
 								throw new InvalidCommandException("Race format, export");
-						//must overload this to take no args OR race number
-						break;
-					case "NUM":
-						if(tokens[cToken].matches(RUNNERFORMAT))
-							sim.addRacer(cTime, Integer.parseInt(tokens[cToken++]));
-						else
-							throw new InvalidCommandException("Runner format, num");
-						break;
-					case "CLR":
-						//no action yet provided
-						break;
-					case "SWAP": //not used in sprint 2
-						break;
-					case "CANCEL":
-						sim.cancel(cTime);
-						break;
-					case "DNF": 
-						sim.dnf(cTime);
-						break;
-					case "TRIG":
-						if(tokens[cToken].matches(CHANNELFORMAT))
-							sim.triggerSensor(cTime, Integer.parseInt(tokens[cToken++]));
-						else
-							throw new InvalidCommandException("Channel format, trig");
-						break;
-					case "START":
-						sim.triggerSensor(cTime, 1);
-						break;
-					case "FINISH":
-						sim.triggerSensor(cTime, 2);
-						break;
-					default:
-						report("Could not parse command.");
+							//must overload this to take no args OR race number
+							break;
+						case "NUM":
+							if (tokens[cToken].matches(RUNNERFORMAT))
+								sim.addRacer(cTime, Integer.parseInt(tokens[cToken++]));
+							else
+								throw new InvalidCommandException("Runner format, num");
+							break;
+						case "CLR":
+							//no action yet provided
+							break;
+						case "SWAP": //not used in sprint 2
+							break;
+						case "CANCEL":
+							sim.cancel(cTime);
+							break;
+						case "DNF":
+							sim.dnf(cTime);
+							break;
+						case "TRIG":
+							if (tokens[cToken].matches(CHANNELFORMAT))
+								sim.triggerSensor(cTime, Integer.parseInt(tokens[cToken++]));
+							else
+								throw new InvalidCommandException("Channel format, trig");
+							break;
+						case "START":
+							sim.triggerSensor(cTime, 1);
+							break;
+						case "FINISH":
+							sim.triggerSensor(cTime, 2);
+							break;
+						default:
+							report("Could not parse command.");
 					}
-				}
-				catch (ArrayIndexOutOfBoundsException ex)
-				{
+				} catch (ArrayIndexOutOfBoundsException ex) {
 					report("Innapropriate number of tokens.");
-				}
-				catch (NullPointerException ex){report("Have not turned power on yet");}
-				catch (InvalidTimeException ex) {report("Error: incorrect time format.");}
-				catch (InvalidCommandException ex) {
+				} catch (NullPointerException ex) {
+					report("Have not turned power on yet");
+				} catch (InvalidTimeException ex) {
+					report("Error: incorrect time format.");
+				} catch (InvalidCommandException ex) {
 					report("error: " + ex.getMessage());
 				}
-				if(cToken != tokens.length)
+				if (cToken != tokens.length)
 					report("Error: too many words in command.");
 			}
-			
 		}
 		//after loop
 		input.close();
