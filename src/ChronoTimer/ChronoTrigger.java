@@ -3,6 +3,8 @@ package ChronoTimer;
 
 
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
@@ -14,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
+import java.util.Scanner;
 import java.util.Set;
 
 import Exceptions.InvalidTimeException;
@@ -25,7 +28,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import com.google.gson.Gson;
-//hellollsss
+//hellollssss
 public class ChronoTrigger 
 {
 	private Channel[] channels;
@@ -40,6 +43,7 @@ public class ChronoTrigger
 	private String eventType;
 	private int[] lanes = new int[8];
 	private boolean power;
+	private String[] temps = new String[20];
 	/**
 	 * Default Constructor
 	 * 
@@ -58,6 +62,27 @@ public class ChronoTrigger
 			channels[j].connect("EYE");}
 		for(int k = 0; k < 8; k++)
 			lanes[k] = k+1;
+		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
+		flush();
+		
+		
+		String tk1 = "";
+		File fil = new File("./src/ChronoTimer/racerNames");
+		Scanner inFile = null;
+		try {
+			inFile = new Scanner(fil);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int i = 0;
+		while(inFile.hasNext())
+		{
+			tk1 =  inFile.next();
+			temps[i] = (tk1);
+			i++;
+		}
+		inFile.close();
 	}
 	/**
 	 * Constructor with time parameter
@@ -81,6 +106,28 @@ public class ChronoTrigger
 				channels[i].connect("EYE");}
 		for(int k = 0; k < 8; k++)
 			lanes[k] = k+1;
+		
+		String tk1 = "";
+		File fil = new File("./src/ChronoTimer/racerNames");
+		Scanner inFile = null;
+		try {
+			inFile = new Scanner(fil);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int i = 0;
+		while(inFile.hasNext())
+		{
+			tk1 =  inFile.next();
+			temps[i] = (tk1);
+			i++;
+		}
+		inFile.close();
+		
+		
+		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
+		flush();
 	}
 	
 	public void setPrinter(Printer s)
@@ -99,7 +146,12 @@ public class ChronoTrigger
 			int difference = newOfficialTime.asHundredths()-commandTime.asHundredths();
 			Duration duration = Duration.ofMillis(difference*10);
 			offset = duration;
-			officialTime = newOfficialTime;
+			try {
+				officialTime = newOfficialTime.now(offset);
+			} catch (InvalidTimeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			history.add( (logTimes? officialTime+" | " : "") +"Set time to " + newOfficialTime.toString());
 			flush();
 		}
@@ -110,10 +162,14 @@ public class ChronoTrigger
 	 */
 	public ChronoTime getTime(){
 		if(power)
-		{return officialTime;}
-		else
-			return null;}
-	
+		{try {
+			return officialTime.now(offset);
+		} catch (InvalidTimeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}}
+		return null;
+	}
 	/**
 	 * Toggles channel giveny by parameter int c. Adds only if channel
 	 * exists
@@ -122,7 +178,12 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-		officialTime = commandTime;
+		try {
+			officialTime = commandTime.now(offset);
+		} catch (InvalidTimeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		//if valid channel..
 		if(c>=0 && c< 8){
@@ -144,7 +205,12 @@ public class ChronoTrigger
 	{	
 		if(power)
 		{
-		officialTime = commandTime;
+		try {
+			officialTime = commandTime.now(offset);
+		} catch (InvalidTimeException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		//if valid channel..
 		if(c>=0 && c< 8){
@@ -169,7 +235,12 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-		officialTime = commandTime;
+		try {
+			officialTime = commandTime.now(offset);
+		} catch (InvalidTimeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		//if valid channel..
 		if(c>=0 && c< 8){
@@ -186,9 +257,12 @@ public class ChronoTrigger
 	public void powerOn(ChronoTime commandTime)
 	{
 		power = true;
-		officialTime = commandTime;
-		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
-		flush();
+		try {
+			officialTime = commandTime.now(offset);
+		} catch (InvalidTimeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	/**
 	 * turn power off
@@ -196,9 +270,12 @@ public class ChronoTrigger
 	public void powerOff(ChronoTime commandTime)
 	{
 		power = false;
-		officialTime = commandTime;
-		history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is off.");
-		printer.flush(history);
+		try {
+			officialTime = commandTime.now(offset);
+		} catch (InvalidTimeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	/**
 	 * This will set the type of the current race to String type.
@@ -210,7 +287,12 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			officialTime = commandTime;
+			try {
+				officialTime = commandTime.now(offset);
+			} catch (InvalidTimeException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 			if (runs.isEmpty())	//need to check here if valid type - share checkValid(runType) method with Run?
 				eventType = type;
@@ -241,7 +323,12 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			officialTime = commandTime;
+			try {
+				officialTime = commandTime.now(offset);
+			} catch (InvalidTimeException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 			if(runs.isEmpty() || runs.get(curRun).hasEnded()){
 				runs.add(new Run());
@@ -270,7 +357,12 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			officialTime = commandTime;
+			try {
+				officialTime = commandTime.now(offset);
+			} catch (InvalidTimeException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 			if (runs.isEmpty())
 				history.add("Cannot add racer before race is created.");
@@ -293,7 +385,12 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			officialTime = commandTime;
+			try {
+				officialTime = commandTime.now(offset);
+			} catch (InvalidTimeException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 			//if valid channel..
 			if(c>=0 && c< 8){
@@ -350,7 +447,12 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			officialTime = commandTime;
+			try {
+				officialTime = commandTime.now(offset);
+			} catch (InvalidTimeException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 			if (!runs.isEmpty()){
 				try {(runs.get(curRun)).didNotFinishNextRacer(curRun);}
@@ -370,7 +472,12 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			officialTime = commandTime;
+			try {
+				officialTime = commandTime.now(offset);
+			} catch (InvalidTimeException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 			if (!runs.isEmpty()){
 				try {runs.get(curRun).cancelNextRacer(curRun);}
@@ -390,7 +497,12 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			officialTime = commandTime;
+			try {
+				officialTime = commandTime.now(offset);
+			} catch (InvalidTimeException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 			if (!runs.isEmpty()){
 				
@@ -407,7 +519,12 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			officialTime = commandTime;
+			try {
+				officialTime = commandTime.now(offset);
+			} catch (InvalidTimeException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 			if (!runs.isEmpty()){
 				try {runs.get(curRun).endRun(this.officialTime);}//endRace method in run
@@ -426,7 +543,12 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			officialTime = commandTime;
+			try {
+				officialTime = commandTime.now(offset);
+			} catch (InvalidTimeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			if (!runs.isEmpty())
 				runprinter.print(runs.get(curRun).getLog());
@@ -447,7 +569,12 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			officialTime = commandTime;
+			try {
+				officialTime = commandTime.now(offset);
+			} catch (InvalidTimeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			if (!runs.isEmpty())
 				runprinter.print(runs.get(runNum).getLog());
@@ -466,7 +593,12 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			officialTime = commandTime;
+			try {
+				officialTime = commandTime.now(offset);
+			} catch (InvalidTimeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			if (!runs.isEmpty())
 				printer.export(curRun, runs.get(curRun));
@@ -482,7 +614,12 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			officialTime = commandTime;
+			try {
+				officialTime = commandTime.now(offset);
+			} catch (InvalidTimeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			if (!runs.isEmpty() && runNum < curRun)
 				runprinter.export(runNum, runs.get(runNum));
@@ -495,7 +632,12 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			officialTime = commandTime;
+			try {
+				officialTime = commandTime.now(offset);
+			} catch (InvalidTimeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			if (!runs.isEmpty())
 				curPrint.print(runs.get(runNum).getLog());
@@ -558,20 +700,30 @@ public class ChronoTrigger
 	{
 		if(power)
 		{
-			officialTime = commandTime;
+			try {
+				officialTime = commandTime.now(offset);
+			} catch (InvalidTimeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			post("CLEAR");
 			if(!runs.isEmpty())
 			{
 				ArrayList<Racer> temp = (runs.get(curRun)).getAllRacers();
 				ArrayList<NamedRacer> racers = new ArrayList<NamedRacer>();
+				int k =0;
 				for(Racer r : temp)
 				{
-					racers.add(new NamedRacer(r, "",""));
+					String fname = temps[k];
+					String lname = temps[k+1];
+					racers.add(new NamedRacer(r, fname, lname));
+					k = k+2;
 				}
 				for(int i = 0; i < racers.size(); i++)
 				{
 					post("ADD " + (new Gson().toJson(racers.get(i))));
 				}
+				
 			}
 		}
 	}
@@ -756,3 +908,4 @@ public class ChronoTrigger
 		}
 	}
 }
+
