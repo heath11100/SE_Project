@@ -540,6 +540,26 @@ public class Run {
 				break;
 			}
 		}
+
+		if (isValid) {
+			for (Queue<Racer> runningLane : this.runningLanes) {
+				for (Racer racer : runningLane) {
+					if (racer.getNumber() == racerNumber) {
+						isValid = false;
+						break;
+					}
+				}
+			}
+		}
+
+		if (isValid) {
+			for (Racer racer : this.finishedRacers) {
+				if (racer.getNumber() == racerNumber) {
+					isValid = false;
+					break;
+				}
+			}
+		}
 		
 		return isValid;
 	}
