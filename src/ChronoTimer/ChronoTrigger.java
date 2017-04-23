@@ -313,7 +313,7 @@ public class ChronoTrigger
 				e1.printStackTrace();
 			}
 			
-			if (runs.isEmpty())	//need to check here if valid type - share checkValid(runType) method with Run?
+			if (runs.isEmpty()||runs.get(curRun).hasEnded())	//need to check here if valid type - share checkValid(runType) method with Run?
 				eventType = type;
 			else{
 				try {runs.get(curRun).setEventType(type);}
