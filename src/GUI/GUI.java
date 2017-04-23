@@ -136,6 +136,9 @@ public class GUI {
 		stylize(power);
 		power.setPreferredSize(new Dimension(100, 40));
 		power.addActionListener(new Listener(handler,"POWER"));
+		power.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {power();}});
 		panels[0].add(power, c);
 	}
 
@@ -272,7 +275,7 @@ public class GUI {
 			channelPlugs[i].setOpaque(true);
 			channelPlugs[i].setFont(guiFont);
 			channelPlugs[i].setBackground(Color.WHITE);
-			channelPlugs[i].setSelectedIndex(0);
+			channelPlugs[i].setSelectedIndex(1);
 			channelPlugs[i].addActionListener(
 					new ActionListener(){
 						public void actionPerformed(ActionEvent e) {
@@ -401,6 +404,11 @@ public class GUI {
 		}
 	}
 	
+	protected void power(){
+		for (JComboBox b: channelPlugs)
+			b.setSelectedIndex(1);
+		channelPad.power();
+	}
 	
 	public static void main(String[] args) {new GUI();}
 }

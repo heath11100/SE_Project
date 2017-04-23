@@ -100,4 +100,9 @@ public class ChannelPad extends JPanel{
 		sub2.add(trigger[1]);sub2.add(trigger[3]);sub2.add(trigger[5]);sub2.add(trigger[7]);
 		sub2.add(toggle[1]);sub2.add(toggle[3]);sub2.add(toggle[5]);sub2.add(toggle[7]);
 	}
+	
+	protected void power(){
+		for (int i=0;i<8;i++)
+			toggle[i].setSelected(false);
+	}
 }
