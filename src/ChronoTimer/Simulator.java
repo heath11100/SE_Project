@@ -116,7 +116,7 @@ public class Simulator {
 			System.out.println(message);
 	}
 	
-	public static void main(String args[])
+	public static void main(String args[]) throws InvalidTimeException
 	{
 		Scanner input;
 		boolean fread_m = false;	//tells the simulator whether to keep track of its own time or use the provided file times
@@ -200,12 +200,8 @@ public class Simulator {
 					switch(tokens[cToken++])
 					{
 					case "POWER":
-						if(power)
-							sim.powerOff(ChronoTime.now());
-						else{
-							sim.powerOn(ChronoTime.now());
-							System.out.println(" > ChronoTrigger is off.");
-							sim = null;}
+						if(power){sim.powerOff(ChronoTime.now());power=false;}
+						else{sim.powerOn(ChronoTime.now());power=true;}
 						break;
 					case "EXIT":
 						System.out.println("Exiting simulator.");
@@ -301,7 +297,7 @@ public class Simulator {
 				{
 					report("Innapropriate number of tokens.");
 				}
-				catch (NullPointerException ex){report("Have not turned power on ye");}
+				catch (NullPointerException ex){report("Have not turned power on yet");}
 				catch (InvalidTimeException ex) {report("Error: incorrect time format.");}
 				catch (InvalidCommandException ex) {
 					report("error: " + ex.getMessage());
