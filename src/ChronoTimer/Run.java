@@ -162,13 +162,7 @@ public class Run {
 		}
 
 		if (lastRacer != null) {
-		    try {
-                this.card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTime());
-
-            } catch (InvalidTimeException e) {
-		        //We should never reach this point.
-		        this.card.setFooter(lastRacer.toString() + " INVALID_TIME");
-            }
+			this.card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString());
 
 		} else {
 			this.card.setFooter("NO RACER FINISHED");
@@ -222,25 +216,15 @@ public class Run {
 			Racer lastRacer = linkedList.get(size-1);
 			Racer secondLast = linkedList.get(size-2);
 
-			try {
-				this.card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTime() + ", " +
-						secondLast.toString() + " " + secondLast.getElapsedTime());
-
-			} catch (InvalidTimeException e) {
-				//We should never reach this.
-				this.card.setFooter(lastRacer.toString() + " INVALID_TIME, " + secondLast.toString() + " INVALID_TIME");
-			}
+			this.card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString()+ ", " +
+					secondLast.toString() + " " + secondLast.getElapsedTimeString());
 
 		} else if (size > 0) {
 			//Then only one racer has finished.
 			Racer lastRacer = linkedList.get(size-1);
-			try {
-				this.card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTime());
 
-			} catch (InvalidTimeException e) {
-				//We should never reach this.
-				this.card.setFooter(lastRacer.toString() + " INVALID_TIME");
-		}
+			this.card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString());
+
 		} else {
 			//Then no one has finished.
 			this.card.setFooter("NO PAIR HAS FINISHED");
@@ -282,13 +266,8 @@ public class Run {
 		if (size > 0) {
 			//Then there is a valid finish time.
 			Racer lastRacer = linkedList.get(size-1);
-			try {
-				this.card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTime());
+			this.card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString());
 
-			} catch (InvalidTimeException e) {
-				//We should never reach this point.
-				this.card.setFooter(lastRacer.toString() + " INVALID TIME");
-			}
 		} else {
 			//Then no one has finished.
 			this.card.setFooter("NO RACER FINISHED");

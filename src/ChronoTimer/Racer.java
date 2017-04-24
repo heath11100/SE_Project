@@ -1,6 +1,7 @@
 package ChronoTimer;
 
 import Exceptions.InvalidTimeException;
+import Exceptions.RaceException;
 
 public class Racer {
 	/**
@@ -71,6 +72,19 @@ public class Racer {
 
 		} else {
 			return this.endTime.elapsedSince(this.startTime);
+		}
+	}
+
+	public String getElapsedTimeString() {
+		if (this.status == Status.DNF) {
+			return "DNF";
+
+		} else {
+			try {
+				return "" + this.getElapsedTime();
+			} catch (InvalidTimeException e) {
+				return "INVALID TIME";
+			}
 		}
 	}
 	

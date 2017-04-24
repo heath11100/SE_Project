@@ -65,24 +65,6 @@ public class Card extends UIPrint {
 		//this.replaceRange(footer, headerSize+bodySize+2, headerSize+bodySize+footerSize+1);
 	}
 
-	public void setFooter(Queue<Racer> newFooter) {
-		footer = "";
-
-		for (Racer r : newFooter) {
-			try {
-				ChronoTime elapsedTime = r.getElapsedTime();
-
-				footer = r.toString() + elapsedTime + "\n" + footer;
-			} catch (InvalidTimeException e) {
-				//Then the Racer will not be added.
-				//We should never reach this point anyways.
-			}
-		}
-
-		refresh();
-		//this.replaceRange(footer, headerSize+bodySize+2, headerSize+bodySize+footerSize+1);
-	}
-
 	private void refresh() {
 		this.setText(header);
 		this.append("\n\n" + body);
