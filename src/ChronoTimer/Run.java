@@ -839,7 +839,7 @@ public class Run {
 
 		}else {
 			LinkedList<Racer> runningQueue = (LinkedList<Racer>) this.runningLanes.get(lane - 1);
-			Racer lastRacer = runningQueue.get(0);
+			Racer lastRacer = runningQueue.poll();
 			
 			if (lastRacer == null) {
 				throw new RaceException("No racer to cancel");
@@ -879,7 +879,7 @@ public class Run {
 
 		}else {
 			LinkedList<Racer> runningQueue = (LinkedList<Racer>) this.runningLanes.get(lane - 1);
-			Racer lastRacer = runningQueue.get(0);
+			Racer lastRacer = runningQueue.poll();
 			
 			if (lastRacer == null) {
 				throw new RaceException("No racer to DNF");
