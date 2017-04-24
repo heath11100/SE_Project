@@ -42,6 +42,11 @@ public class Card extends UIPrint {
 		//this.replaceRange(header, 0, headerSize-1);
 	}
 
+	public void setBody(String newBody) {
+		body = newBody;
+		refresh();
+	}
+
 	public void setBody(Queue<Racer> newBody){
 		body = "";
 

@@ -152,7 +152,23 @@ public class Run {
 		//Body
 		//Set body as the list of running racers (first and only running queue).
 		if (this.runningLanes.size() > 0) {
-			this.card.setBody(this.runningLanes.get(0));
+			String bodyString = "";
+
+			for (Racer racer : this.runningLanes.get(0)) {
+				String elapsedTimeString = "";
+
+				try {
+					ChronoTime elapsedTime = racer.getStartTime().elapsedSince(this.startTime);
+					elapsedTimeString = elapsedTime.toString();
+
+				} catch (InvalidTimeException e) {
+					elapsedTimeString = "INVALID TIME";
+				}
+
+				bodyString += racer.toString() + " " + elapsedTimeString + "\n";
+			}
+
+			this.card.setBody(bodyString);
 		}
 
 		//Footer
