@@ -839,7 +839,10 @@ public class Run {
 		} else if (this.eventType == EventType.GRP) {
 			throw new RaceException("Cannot cancel next racer for GRP run");
 
-		} else {
+		} else if (this.runningLanes.isEmpty() || this.runningLanes.get(lane-1)==null) {
+			throw new RaceException("No racer to cancel");
+
+		}else {
 			LinkedList<Racer> runningQueue = (LinkedList<Racer>) this.runningLanes.get(lane - 1);
 			Racer lastRacer = runningQueue.get(0);
 			
@@ -876,7 +879,10 @@ public class Run {
 		} else if (this.eventType == EventType.GRP) {
 			throw new RaceException("Cannot DNF next racer for GRP type");
 
-		} else {
+		} else if (this.runningLanes.isEmpty() ||this.runningLanes.get(lane-1)==null) {
+			throw new RaceException("No racer to DNF");
+
+		}else {
 			LinkedList<Racer> runningQueue = (LinkedList<Racer>) this.runningLanes.get(lane - 1);
 			Racer lastRacer = runningQueue.get(0);
 			
