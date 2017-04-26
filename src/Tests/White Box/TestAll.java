@@ -1,8 +1,9 @@
-package Tests;
-
-import Tests.RunTests.*;
 import org.junit.runners.Suite;
 import org.junit.runner.RunWith;
+
+import Tests.TestChronoTime;
+import Tests.TestChronoTrigger;
+import Tests.TestRacer;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({

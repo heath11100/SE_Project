@@ -1,5 +1,3 @@
-package Tests.RunTests;
-
 import ChronoTimer.ChronoTime;
 import ChronoTimer.Run;
 import Exceptions.InvalidTimeException;

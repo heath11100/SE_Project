@@ -1,5 +1,3 @@
-package Tests.RunTests;
-
 import ChronoTimer.*;
 import Exceptions.*;
 import junit.framework.TestCase;

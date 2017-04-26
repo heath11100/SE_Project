@@ -1,4 +1,3 @@
-package Tests;
 import java.time.Duration;
 import java.time.LocalDateTime;
 

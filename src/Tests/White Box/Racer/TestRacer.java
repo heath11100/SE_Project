@@ -1,5 +1,3 @@
-package Tests;
-
 import ChronoTimer.ChronoTime;
 import ChronoTimer.Racer;
 import Exceptions.InvalidTimeException;

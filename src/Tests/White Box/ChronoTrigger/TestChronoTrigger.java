@@ -1,5 +1,3 @@
-package Tests;
-
 import ChronoTimer.ChronoTrigger.TestCT;
 
 /**
