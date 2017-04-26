@@ -1,3 +1,5 @@
+package Tests.whiteBox.Run;
+
 import ChronoTimer.*;
 import Exceptions.*;
 import junit.framework.TestCase;

@@ -1,3 +1,5 @@
+package Tests.whiteBox.Racer;
+
 import ChronoTimer.ChronoTime;
 import ChronoTimer.Racer;
 import Exceptions.InvalidTimeException;

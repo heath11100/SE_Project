@@ -1,3 +1,5 @@
+package Tests.whiteBox.ChronoTrigger;
+
 import ChronoTimer.ChronoTrigger.TestCT;
 
 /**

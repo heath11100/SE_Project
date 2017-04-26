@@ -1,3 +1,4 @@
+package Tests.whiteBox.Run;
 
 
 import org.junit.runners.Suite;

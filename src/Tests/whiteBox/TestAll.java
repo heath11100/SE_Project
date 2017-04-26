@@ -1,9 +1,13 @@
-import org.junit.runners.Suite;
-import org.junit.runner.RunWith;
+package Tests.whiteBox;
 
-import Tests.TestChronoTime;
-import Tests.TestChronoTrigger;
-import Tests.TestRacer;
+import org.junit.runners.Suite;
+
+import Tests.whiteBox.ChronoTime.TestChronoTime;
+import Tests.whiteBox.ChronoTrigger.TestChronoTrigger;
+import Tests.whiteBox.Racer.TestRacer;
+import Tests.whiteBox.Run.TestAllRun;
+
+import org.junit.runner.RunWith;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
