@@ -1,5 +1,6 @@
 package ChronoTimer;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -358,7 +359,7 @@ public class Run {
 			throw new RaceException("Cannot have more than 8 lanes.");
 		}
 		
-		this.runningLanes.add(new LinkedList<Racer>());
+		this.runningLanes.add(new LinkedList<>());
 		
 		return this.runningLanes.size();
 	}
@@ -382,6 +383,9 @@ public class Run {
 
 			case GRP:
 				return false;
+
+			case PARGRP:
+				return this.runningLanes.size() >= 0 && this.runningLanes.size() <= 7;
 
 			default:
 				return false;
@@ -518,6 +522,16 @@ public class Run {
 				this.finishedRacers.clear();
 
 				break;
+
+			case "PARGRP":
+				this.eventType = EventType.PARGRP;
+
+				//Remove any racers queued, and also any lanes.
+				this.runningLanes.clear();
+				this.queuedRacers.clear();
+				this.finishedRacers.clear();
+
+				break;
 			
 		default:
 			throw new RaceException("Invalid event type: " + newEventType);
@@ -576,16 +590,16 @@ public class Run {
 	 * OR when the run was ended
 	 * OR when the event type is GRP
 	 */
-	public void queueRacer(int racerNumber) throws RaceException {		
+	public void queueRacer(int racerNumber) throws RaceException {
 		if (racerNumber < 1 || racerNumber > 9999) {
 			throw new RaceException("Number must be 1 to 9999");
 
 		} else if (!this.canQueueRacer(racerNumber)) {
 			throw new RaceException("Racer already exists with number: " + racerNumber);
-			
-		} else if (this.hasEnded()) { 
+
+		} else if (this.hasEnded()) {
 			throw new RaceException("Run has already ended");
-			
+
 		} else if (this.eventType == EventType.GRP) {
 			if (this.hasStarted()) {
 				//Then we should attempt to mark the next racer.
@@ -594,20 +608,32 @@ public class Run {
 				throw new RaceException("Cannot queue a racer for event type GRP.");
 			}
 
+		} else if (this.eventType == EventType.PARGRP) {
+			if (this.queuedRacers.size() < 8) {
+				//Then there is at least one spot for the racer.
+				Racer racer = new Racer(racerNumber);
+				this.queuedRacers.add(racer);
+
+				//Can throw error, should never tho.
+				this.newLane();
+
+				//Log that the racer was added.
+				this.log.add("Added " + racer.toString() + " to lane " + this.queuedRacers.size());
+			}
+
 		} else {
-			//Cannot queue a racer.
 			Racer racer = new Racer(racerNumber);
 			this.queuedRacers.add(racer);
 
 			this.log.add("Queued "+racer);
 		}
 	}
-	
+
 	/**
 	 * Removes a racer, identified with racerNumber, from the queue of racers yet to begin the run.
 	 * @param racerNumber is used to identify the racer, racer must exist, number must be in bounds [1,9999]
 	 * @param lane is the lane corresponding to the racer's lane
-	 * @throws RaceException when a queued racer does not exist with racerNumber 
+	 * @throws RaceException when a queued racer does not exist with racerNumber
 	 * or when the racerNumber is not within bounds [1,9999]
 	 * OR when the lane is invalid
 	 * OR when eventType is GRP
@@ -616,13 +642,12 @@ public class Run {
 		if (racerNumber < MIN_BIB_NUMBER || racerNumber > MAX_BIB_NUMBER) {
 			throw new RaceException("Number must be within bounds [1,9999]");
 
-
 		} else if (this.eventType == EventType.GRP) {
 			throw new RaceException("Cannot remove a racer from GRP run.");
 
 		} else if (!this.isValidLane(lane)) {
 			throw new RaceException("Invalid lane: " + lane);
-			
+
 		} else {
 			Racer racer = null;
 			for (Racer r : this.queuedRacers) {
@@ -631,13 +656,17 @@ public class Run {
 					break;
 				}
 			}
-			
+
 			if (racer == null) {
 				throw new RaceException("No racer to remove");
-				
 			} else {
-				queuedRacers.remove(racer);
-				
+				this.queuedRacers.remove(racer);
+
+				if (this.eventType == EventType.PARGRP) {
+					//Remove a lane as well
+					this.removeLane();
+				}
+
 				this.log.add("Removed "+racer);
 			}
 		}
@@ -666,7 +695,6 @@ public class Run {
 		} else {
 			tempStartTime = this.startTime;
 		}
-
 
 		if (atTime == null) {
 			throw new InvalidTimeException("Invalid time to start: NULL");
@@ -806,7 +834,7 @@ public class Run {
 		}
 
 		Racer dummyRacer = ((LinkedList<Racer>)this.finishedRacers).get(this.nextRacerToMarkIndex);
-		Racer newRacer = new Racer(dummyRacer.getNumber());
+		Racer newRacer = new Racer(racerNumber);
 
 		newRacer.start(dummyRacer.getStartTime());
 		try {
@@ -901,6 +929,7 @@ public class Run {
 	public enum EventType {
 		IND,
 		PARIND,
-		GRP
+		GRP,
+		PARGRP
 	}
 }
