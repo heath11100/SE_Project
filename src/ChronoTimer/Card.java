@@ -4,18 +4,13 @@ import java.util.Queue;
 import Exceptions.InvalidTimeException;
 
 public class Card extends UIPrint {
-	private final int TOTAL_LINES=20;
-	private int headerSize, bodySize, footerSize;
 	private String header, body, footer;
 	
-	public Card(int h, int f){
-		headerSize=h;header = "";
-		footerSize=f;footer = "";
-		bodySize = TOTAL_LINES-h-f-2;
+	public Card(){
+		header = "";
+		footer = "";
 		body="";
 		this.setText("");
-		//this.setRows(20);
-		//comment this cus no longer needed?
 	}
 	
 	@Override

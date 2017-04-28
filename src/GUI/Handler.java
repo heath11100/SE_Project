@@ -68,7 +68,7 @@ public class Handler {
 		selfUpdater.start();
 		postToServerTimer = new Timer(SERVERDELAY, new Listener(this, "SERVER"));
 		postToServerTimer.start();
-		currentScreen = new Card(0,0);
+		currentScreen = new Card();
 	}
 
 	protected boolean issue(String command) 
@@ -84,9 +84,10 @@ public class Handler {
 					main.exportToServer(ChronoTime.now());
 			break;
 			case "UPDATE":
-				currentScreen.writeTo();
 				if(raceState && inputState == GUIState.wait)
-					currentScreen = main.getCard();
+					currentScreen = main.getCard(ChronoTime.now());
+
+				currentScreen.writeTo();
 				break;
 
 			/**
@@ -130,7 +131,7 @@ public class Handler {
 				case fcn:
 					// maneuver back in menu
 					inputState = GUIState.wait;
-					currentScreen = main.getCard();
+					currentScreen = main.getCard(ChronoTime.now());
 					break;
 				case event:
 					currentScreen = new Menu(raceState);
@@ -171,9 +172,9 @@ public class Handler {
 						main.addRacer(ChronoTime.now(), Integer.parseInt(curNum));
 						inputState = GUIState.wait;
 						if(raceState)
-							currentScreen = main.getCard();
+							currentScreen = main.getCard(ChronoTime.now());
 						else
-							currentScreen = new Card(0, 0);
+							currentScreen = new Card();
 						curNum = "";
 						extraInput = false; 
 					}
@@ -182,9 +183,9 @@ public class Handler {
 					main.setType(ChronoTime.now(), currentScreen.writeTo());
 					inputState = GUIState.wait;
 					if(raceState)
-						currentScreen = main.getCard();
+						currentScreen = main.getCard(ChronoTime.now());
 					else
-						currentScreen = new Card(0, 0);
+						currentScreen = new Card();
 					break;
 				case print:
 					printArea.setText("");
@@ -196,9 +197,9 @@ public class Handler {
 					inputState = GUIState.wait;
 					extraInput = false;
 					if(raceState)
-						currentScreen = main.getCard();
+						currentScreen = main.getCard(ChronoTime.now());
 					else
-						currentScreen = new Card(0, 0);
+						currentScreen = new Card();
 					break;
 					//later
 				case export:
@@ -210,9 +211,9 @@ public class Handler {
 					inputState = GUIState.wait;
 					extraInput = false;
 					if(raceState)
-						currentScreen = main.getCard();
+						currentScreen = main.getCard(ChronoTime.now());
 					else
-						currentScreen = new Card(0, 0);
+						currentScreen = new Card();
 					break;
 					//later
 				case timeh:
@@ -243,7 +244,7 @@ public class Handler {
 						
 						hour = min = 0;
 						curNum = "";
-						currentScreen = new Card(0, 0);
+						currentScreen = new Card();
 						extraInput = false;
 						
 					}
@@ -284,9 +285,9 @@ public class Handler {
 					curNum = "";
 					inputState = GUIState.wait;
 					if(raceState)
-						currentScreen = main.getCard();
+						currentScreen = main.getCard(ChronoTime.now());
 					else
-						currentScreen = new Card(0, 0);
+						currentScreen = new Card();
 					break;
 				default:
 
@@ -305,7 +306,7 @@ public class Handler {
 						
 						@Override
 						public void run() {
-							currentScreen = new Card(0, 0);
+							currentScreen = new Card();
 							inputState = GUIState.wait;
 						}
 					}, STARTDELAY);
@@ -318,7 +319,7 @@ public class Handler {
 					raceState = false;
 					hour = 0;
 					min = 0;
-					currentScreen = new Card(0,0);
+					currentScreen = new Card();
 					printerPower = false;
 					printArea.setText("");
 					extraInput = false;
@@ -350,7 +351,7 @@ public class Handler {
 					break;
 				case fcn:
 					inputState = GUIState.wait;
-					currentScreen = main.getCard();
+					currentScreen = main.getCard(ChronoTime.now());
 					break;
 				default:
 					// do nothing
@@ -742,22 +743,22 @@ public class Handler {
 				return true;
 			case "CLEAR":
 				inputState = GUIState.wait;
-				currentScreen = main.getCard();
+				currentScreen = main.getCard(ChronoTime.now());
 				//clear does nothing?
 				return false;
 			case "CANCEL":
 				inputState = GUIState.wait;
-				currentScreen = main.getCard();
+				currentScreen = main.getCard(ChronoTime.now());
 				main.cancel(ChronoTime.now());
 				return false;
 			case "DNF":
 				inputState = GUIState.wait;
-				currentScreen = main.getCard();
+				currentScreen = main.getCard(ChronoTime.now());
 				main.dnf(ChronoTime.now());
 				return false;
 			case "ENDRUN":
 				inputState = GUIState.wait;
-				currentScreen = new Card(0, 0);
+				currentScreen = new Card();
 				raceState = false;
 				main.finRun(ChronoTime.now());
 				return false;
@@ -774,9 +775,9 @@ public class Handler {
 				}
 				inputState = GUIState.wait;
 				if(raceState)
-					currentScreen = main.getCard();
+					currentScreen = main.getCard(ChronoTime.now());
 				else
-					currentScreen = new Card(0, 0);
+					currentScreen = new Card();
 				return false;
 			case "EXPORT":
 				inputState = GUIState.export;
@@ -791,7 +792,7 @@ public class Handler {
 					
 					@Override
 					public void run() {
-						currentScreen = new Card(0, 0);
+						currentScreen = new Card();
 						inputState = GUIState.wait;
 					}
 				}, STARTDELAY);
@@ -799,7 +800,7 @@ public class Handler {
 			case "NEWRUN":
 				inputState = GUIState.wait;
 				main.newRun(ChronoTime.now());
-				currentScreen = main.getCard();
+				currentScreen = main.getCard(ChronoTime.now());
 				raceState = true;
 				return false;
 			case "TIME":
@@ -810,17 +811,17 @@ public class Handler {
 				inputState = GUIState.wait;
 				SERVERENABLED = true;
 				if(raceState)
-					currentScreen = main.getCard();
+					currentScreen = main.getCard(ChronoTime.now());
 				else
-					currentScreen = new Card(0, 0);
+					currentScreen = new Card();
 				return false;
 			case "DISABLESERVER":
 				inputState = GUIState.wait;
 				SERVERENABLED = true;
 				if(raceState)
-					currentScreen = main.getCard();
+					currentScreen = main.getCard(ChronoTime.now());
 				else
-					currentScreen = new Card(0, 0);
+					currentScreen = new Card();
 				return false;
 			default:
 				return false;

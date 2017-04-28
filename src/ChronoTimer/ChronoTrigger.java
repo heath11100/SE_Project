@@ -83,9 +83,8 @@ public class ChronoTrigger
 	}
 	/**
 	 * Constructor with time parameter
-	 * @param startTime
+	 * @param t
 	 */
-
 	public ChronoTrigger(ChronoTime t)
 	{
 		//set official time
@@ -130,7 +129,7 @@ public class ChronoTrigger
 	/**
 	 * Sets the officialTime of the race
 	 * @param commandTime
-	 * @param newOfficialTimessaaa
+	 * @param newOfficialTime
 	 */
 	public void setTime(ChronoTime commandTime, ChronoTime newOfficialTime)
 	{
@@ -713,7 +712,7 @@ public class ChronoTrigger
 	}
 	/**
 	 * exports to server
-	 * @param commandTimes
+	 * @param commandTime
 	 */
 	public void exportToServer(ChronoTime commandTime)
 	{
@@ -766,9 +765,15 @@ public class ChronoTrigger
 	 * Returns the Card of the current race
 	 * @return card of current run
 	 */
-	public Card getCard()
+	public Card getCard(ChronoTime currentTime)
 	{
-		return runs.get(curRun).getCard();
+		try {
+			officialTime = currentTime.withOffset(offset);
+		} catch (InvalidTimeException e1) {
+			e1.printStackTrace();
+		}
+
+		return runs.get(curRun).getCard(officialTime);
 	}
 	/**
 	 * The Channel class.

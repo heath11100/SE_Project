@@ -18,7 +18,7 @@ public class Run {
 	private int nextRacerToMarkIndex = 0;
 	
 	private Log log;
-	private Card card = new Card(3,10);
+	private Card card = new Card();
 
 	private final int MIN_BIB_NUMBER = 1;
 	private final int MAX_BIB_NUMBER = 9999;
@@ -97,12 +97,12 @@ public class Run {
 	 *
 	 * @return a card with the information relevant to the current event type.
      */
-	public Card getCard()
-	{
+	public Card getCard(ChronoTime currentTime) {
 		//Format card based on event type.
 		switch (this.eventType) {
 			case IND:
-				setINDcard();
+
+				setINDcard(currentTime);
 				break;
 
 			case PARIND:
@@ -128,8 +128,8 @@ public class Run {
 	 * 	Footer:
 	 * 	- Last Racer to finish
 	 */
-	private void setINDcard() {
-		this.card = new Card(3,1);
+	private void setINDcard(ChronoTime currentTime) {
+		this.card = new Card();
 		//Header
 		Queue<Racer> nextThreeRacers = new LinkedList<Racer>();
 		//Puts the next three racers into the nextThreeQueue
@@ -158,7 +158,10 @@ public class Run {
 				String elapsedTimeString = "";
 
 				try {
-					ChronoTime elapsedTime = racer.getStartTime().elapsedSince(this.startTime);
+					//Calculate the current elapsed time
+					//This puts the current time (that is passed in) relative to the run start time.
+					ChronoTime currentElapsedTime = currentTime.elapsedSince(this.startTime);
+					ChronoTime elapsedTime = currentElapsedTime.elapsedSince(racer.getStartTime());
 					elapsedTimeString = elapsedTime.toString();
 
 				} catch (InvalidTimeException e) {
@@ -197,7 +200,7 @@ public class Run {
 	 * 	- Finish times of the last pair to finish
 	 */
 	private void setPARINDcard() {
-		this.card = new Card(2, 2);
+		this.card = new Card();
 
 		//Header
 		//Next pair to run (essentially next two racers).
@@ -259,7 +262,7 @@ public class Run {
 	 * 	- Last finish time
 	 */
 	private void setGRPcard() {
-		this.card = new Card(1,1);
+		this.card = new Card();
 		//Header
 		//Running Time
 		try {
