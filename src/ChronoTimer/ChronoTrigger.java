@@ -732,8 +732,16 @@ public class ChronoTrigger
 				int k =0;
 				for(Racer r : temp)
 				{
-					String fname = temps[k];
-					String lname = temps[k+1];
+					String fname, lname;
+					try{
+					fname = temps[k];
+					lname = temps[k+1];
+					}
+					catch(NullPointerException e)
+					{
+						fname = "undefined";
+						lname = "un";
+					}
 					racers.add(new NamedRacer(r, fname, lname));
 					k = k+2;
 				}
