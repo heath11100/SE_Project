@@ -1009,7 +1009,7 @@ public class Run {
 	/**
 	 * Swaps the next two racers to finish.
 	 */
-	public void swap() {
+	public void swap() throws RaceException {
 		//TODO:
 	}
 	
