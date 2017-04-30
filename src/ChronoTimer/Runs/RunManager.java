@@ -31,7 +31,7 @@ public interface RunManager {
 
     /**
      * Queues a racer with a given racerNumber.
-     * @precondition the run has not already started, and racer does not already exist with racerNumber,
+     * @precondition the run has not already started,
      * racerNumber is valid (in bounds [1,9999])
      *
      * @param racerNumber corresponding to a racer's bib number, number must be in bounds [1,9999]
@@ -47,9 +47,7 @@ public interface RunManager {
      * Note: this will not remove a racer if they are running or have finished.
      * @param racerNumber corresponding to a racer's bib number, number must be in bounds [1,9999]
      * @return true if the racer was de-queued successfully, false otherwise.
-     * @throws RaceException with any of the following conditions:
-     * 1) racerNumber is not within bounds [1,9999]
-     * 2) Racer already exists with racerNumber
+     * @throws RaceException when racer with racerNumber does not exist in the queue.
      */
     boolean deQueueRacer(int racerNumber) throws RaceException;
 
@@ -70,7 +68,7 @@ public interface RunManager {
      *
      * @param relativeTime corresponds to the end time, relative to the start of the run.
      * @param lane corresponds to the lane to start the next racer from. Note: this may be ignored for some eventTypes.
-     * @return true if the next racer, or batch of racers, were startes successfully, false otherwise.
+     * @return true if the next racer, or batch of racers, were finished successfully, false otherwise.
      * @throws RaceException see specific eventType implementations for conditions where this exception is thrown.
      */
     boolean finishNext(ChronoTime relativeTime, int lane) throws RaceException;
@@ -92,5 +90,5 @@ public interface RunManager {
      * @return true if a racer is successfully marked as a DNF, false otherwise.
      * @throws RaceException when eventType is GRP
      */
-    boolean didNotFinishNextRacer(int lane);
+    boolean didNotFinishNextRacer(int lane) throws RaceException;
 }
