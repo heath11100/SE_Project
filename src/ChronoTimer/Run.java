@@ -397,7 +397,7 @@ public class Run {
 	 * @throws RaceException when there is not a lane to remove
 	 * @throws IllegalStateException when the lists are not the same size (this would be an internal error)
 	 */
-	protected ArrayList<Racer> getAllRacers(){
+	public ArrayList<Racer> getAllRacers(){
 		ArrayList<Racer> allRacers = new ArrayList<>();
 		for (Racer r: queuedRacers)
 			allRacers.add(r);
