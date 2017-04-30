@@ -14,6 +14,8 @@ import java.util.ArrayList;
  * 1) If I get a call for StartNextRacer, should I throw an error or just handle it myself?
  */
 public interface RunManager {
+    int MAX_RACERS = 9_999;
+
     /**
      * Returns a list of all racers within a run.
      * - This does NOT return the racers in any particular order.

@@ -6,6 +6,12 @@ import java.util.Queue;
 
 import Exceptions.*;
 
+/**
+ * PARGRP:
+ * - DNF, DNF any racer that has not finished.
+ * - Cancel, Cancel all racers.
+ */
+
 public class Run {
 	private ChronoTime startTime;
 	private ChronoTime endTime;
@@ -486,7 +492,6 @@ public class Run {
 
 		} else if (this.hasEnded()) {
 			throw new RaceException("Cannot change event type once run ended");
-
 		}
 		
 		switch (newEventType) {
@@ -867,7 +872,6 @@ public class Run {
 						racer.finish(elapsedTime);
 					}
 				}
-
 			}
 
 		}
@@ -982,7 +986,6 @@ public class Run {
 						racer.didNotFinish();
 					}
 				}
-
 			}
 
 		 } else {
@@ -1001,6 +1004,13 @@ public class Run {
 				this.log.add(lastRacer+" did not finish");
 			}
 		}
+	}
+
+	/**
+	 * Swaps the next two racers to finish.
+	 */
+	public void swap() {
+		//TODO:
 	}
 	
 	public enum EventType {

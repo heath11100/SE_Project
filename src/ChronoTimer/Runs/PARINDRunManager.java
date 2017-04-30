@@ -5,7 +5,6 @@ import ChronoTimer.Racer;
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Queue;
 import java.util.LinkedList;
