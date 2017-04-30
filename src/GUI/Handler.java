@@ -275,11 +275,7 @@ public class Handler {
 			extraInput = false;
 			curNum = "";
 			hour = min = 0;
-			inputState = GUIState.wait;
-			if(raceState)
-				currentScreen = main.getCard(ChronoTime.now());
-			else
-				currentScreen = new Card();
+			retWait();
 			break;
 		default:
 
@@ -321,11 +317,7 @@ public class Handler {
 		{
 		case fcn:
 			// maneuver back in menu
-			inputState = GUIState.wait;
-			if(raceState)
-				currentScreen = main.getCard(ChronoTime.now());
-			else
-				currentScreen = new Card();
+			retWait();
 			break;
 		case event:
 			currentScreen = new Menu(raceState);
@@ -363,22 +355,14 @@ public class Handler {
 			if(curNum != "")
 			{
 				main.addRacer(ChronoTime.now(), Integer.parseInt(curNum));
-				inputState = GUIState.wait;
-				if(raceState)
-					currentScreen = main.getCard(ChronoTime.now());
-				else
-					currentScreen = new Card();
+				retWait();
 				curNum = "";
 				extraInput = false; 
 			}
 			break;
 		case event:
 			main.setType(ChronoTime.now(), currentScreen.writeTo());
-			inputState = GUIState.wait;
-			if(raceState)
-				currentScreen = main.getCard(ChronoTime.now());
-			else
-				currentScreen = new Card();
+			retWait();
 			break;
 		case print:
 			//printArea.setText("");
@@ -387,12 +371,8 @@ public class Handler {
 			else
 				main.printRun(ChronoTime.now());
 			curNum = "";
-			inputState = GUIState.wait;
 			extraInput = false;
-			if(raceState)
-				currentScreen = main.getCard(ChronoTime.now());
-			else
-				currentScreen = new Card();
+			retWait();
 			break;
 			//later
 		case export:
@@ -401,12 +381,8 @@ public class Handler {
 			else
 				main.exportRun(ChronoTime.now());
 			curNum = "";
-			inputState = GUIState.wait;
 			extraInput = false;
-			if(raceState)
-				currentScreen = main.getCard(ChronoTime.now());
-			else
-				currentScreen = new Card();
+			retWait();
 			break;
 			//later
 		case timeh:
@@ -467,29 +443,14 @@ public class Handler {
 		}
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	private void retWait() throws InvalidTimeException
+	{
+		inputState = GUIState.wait;
+		if(raceState)
+			currentScreen = main.getCard(ChronoTime.now());
+		else
+			currentScreen = new Card();
+	}
 	
 	
 	
@@ -540,11 +501,7 @@ public class Handler {
 					inputState = GUIState.print;
 					return true;
 				}
-				inputState = GUIState.wait;
-				if(raceState)
-					currentScreen = main.getCard(ChronoTime.now());
-				else
-					currentScreen = new Card();
+				retWait();
 				return false;
 			case "EXPORT":
 				inputState = GUIState.export;
@@ -565,20 +522,12 @@ public class Handler {
 				inputState = GUIState.timeh;
 				return true;
 			case "ENABLESERVER":
-				inputState = GUIState.wait;
 				SERVERENABLED = true;
-				if(raceState)
-					currentScreen = main.getCard(ChronoTime.now());
-				else
-					currentScreen = new Card();
+				retWait();
 				return false;
 			case "DISABLESERVER":
-				inputState = GUIState.wait;
 				SERVERENABLED = true;
-				if(raceState)
-					currentScreen = main.getCard(ChronoTime.now());
-				else
-					currentScreen = new Card();
+				retWait();
 				return false;
 			default:
 				return false;
