@@ -381,7 +381,7 @@ public class Handler {
 				currentScreen = new Card();
 			break;
 		case print:
-			printArea.setText("");
+			//printArea.setText("");
 			if(curNum != "")
 				main.printRun(ChronoTime.now(), Integer.parseInt(curNum));
 			else
