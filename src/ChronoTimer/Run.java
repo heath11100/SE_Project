@@ -1,6 +1,5 @@
 package ChronoTimer;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -547,7 +546,7 @@ public class Run {
 	 * @param racerNumber corresponding to the racer's number
 	 * @return true if the racer can be queued, false otherwise.
 	 */
-	private boolean canQueueRacer(int racerNumber) {
+	private boolean doesRacerExist(int racerNumber) {
 		//Only valid if there is not a racer with that number.
 		boolean isValid = true;
 				
@@ -594,7 +593,7 @@ public class Run {
 		if (racerNumber < 1 || racerNumber > 9999) {
 			throw new RaceException("Number must be 1 to 9999");
 
-		} else if (!this.canQueueRacer(racerNumber)) {
+		} else if (!this.doesRacerExist(racerNumber)) {
 			throw new RaceException("Racer already exists with number: " + racerNumber);
 
 		} else if (this.hasEnded()) {
@@ -744,6 +743,34 @@ public class Run {
 				this.startTime = atTime;
 				this.log.add("Started group run at " + atTime);
 			}
+		} else if (this.eventType == EventType.PARGRP) {
+			if (lane < 1 || lane > 8) {
+				throw new RaceException("Invalid lane number: " + lane);
+
+			} else if (this.hasStarted()) {
+				throw new RaceException("Run has already started");
+
+			} else {
+				int runIndex = 0;
+
+				for (Racer racer : this.queuedRacers) {
+					//Ensure that we are not getting a running lane that does not exist.
+					if (runIndex < this.runningLanes.size()) {
+						this.runningLanes.get(runIndex).add(racer);
+						ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
+						racer.start(elapsedTime);
+					} else {
+						throw new RaceException("INTERNAL INCONSISTENCY: Not enough run lanes.");
+					}
+				}
+
+				//At this point: all runners have been added to the running queue.
+				//Remove all racers from the queue.
+				this.queuedRacers.clear();
+
+				this.startTime = atTime;
+				this.log.add("Started run at " + atTime);
+			}
 		}
 	}
 	
@@ -816,6 +843,33 @@ public class Run {
 			newRacer.finish(elapsedTime);
 
 			this.finishedRacers.add(newRacer);
+
+		}  else if (this.eventType == EventType.PARGRP) {
+
+			//Test if lane is valid [1,8]
+			if (lane < 1 || lane > 8) {
+				throw new RaceException("Invalid lane number: " + lane);
+
+			} else if (!this.hasStarted()) {
+				//Run has NOT started, cannot finish the lane.
+				throw new RaceException("Lane (" + lane + ") cannot finish before the run starts");
+
+			} else {
+
+				if (lane <= this.runningLanes.size()) {
+					//Then there are enough lanes to grab it.
+					LinkedList<Racer> runningLane = (LinkedList<Racer>)this.runningLanes.get(lane-1);
+
+					Racer racer = runningLane.pollFirst();
+
+					if (racer != null) {
+						ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
+						racer.finish(elapsedTime);
+					}
+				}
+
+			}
+
 		}
 	}
 
@@ -826,7 +880,9 @@ public class Run {
 	 * OR eventType is not GRP
      */
 	public void markNextRacer(int racerNumber) throws RaceException {
-		if (this.eventType == EventType.IND || this.eventType == EventType.PARIND) {
+		if (this.eventType == EventType.IND ||
+				this.eventType == EventType.PARIND ||
+				this.eventType == EventType.PARGRP) {
 			throw new RaceException("Cannot mark next racer with event " + this.eventType);
 
 		} else if (this.nextRacerToMarkIndex >= this.finishedRacers.size()) {
@@ -905,10 +961,31 @@ public class Run {
 		} else if (this.eventType == EventType.GRP) {
 			throw new RaceException("Cannot DNF next racer for GRP type");
 
-		} else if (this.runningLanes.isEmpty() ||this.runningLanes.get(lane-1)==null) {
+		} else if (this.runningLanes.isEmpty() || lane <= this.runningLanes.size()) {
 			throw new RaceException("No racer to DNF");
 
-		}else {
+		}  else if (this.eventType == EventType.PARGRP) {
+
+		 	if (lane < 1 || lane > 8) {
+		 		throw new RaceException("Lane is not within bounds [1,8]");
+
+			} else {
+		 		final int adjustedLane = lane-1;
+
+		 		if (adjustedLane < this.runningLanes.size()) {
+		 			//Then the lane exists, attempt to pull the first racer (as there should only be one per lane).
+					LinkedList<Racer> runningLane = (LinkedList<Racer>)this.runningLanes.get(adjustedLane);
+
+					if (!runningLane.isEmpty()) {
+						//Then there is a racer.
+						Racer racer = runningLane.get(0);
+						racer.didNotFinish();
+					}
+				}
+
+			}
+
+		 } else {
 			LinkedList<Racer> runningQueue = (LinkedList<Racer>) this.runningLanes.get(lane - 1);
 			Racer lastRacer = runningQueue.poll();
 			
