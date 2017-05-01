@@ -118,12 +118,12 @@ public class GRPRunManager implements RunManager {
 
             this.finishedRacers.add(newRacer);
 
+            return true;
         } catch (InvalidTimeException e) {
             //INVALID TIME!
             //Don't do anything.
+            return false;
         }
-
-        return true;
     }
 
     /**
