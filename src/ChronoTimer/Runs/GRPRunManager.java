@@ -1,5 +1,6 @@
 package ChronoTimer.Runs;
 
+import ChronoTimer.Card;
 import ChronoTimer.ChronoTime;
 import ChronoTimer.Racer;
 import Exceptions.InvalidTimeException;
@@ -20,6 +21,49 @@ public class GRPRunManager implements RunManager {
         this.finishedRacers = new LinkedList<>();
 
         this.nextRacerIndex = 0;
+    }
+
+    /**
+     * Returns a card that will be displayed by the system.
+     *
+     * @return a valid card.
+     */
+    @Override
+    public Card getCard(ChronoTime elapsedTime) {
+        Card card = new Card();
+        //Header
+        //Running Time
+        card.setHeader("Race Time: " + elapsedTime.toString());
+
+        //Body
+        //Nothing
+
+        //Footer
+        //Last Finish Time
+        LinkedList<Racer> linkedList = (LinkedList<Racer>)this.finishedRacers;
+        final int size = linkedList.size();
+
+        if (size > 0) {
+            //Then there is a valid finish time.
+            Racer lastRacer = linkedList.get(size-1);
+            card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString());
+
+        } else {
+            //Then no one has finished.
+            card.setFooter("NO RACER FINISHED");
+        }
+
+        return card;
+    }
+
+    /**
+     * This will move DNF any currently running racers.
+     */
+    @Override
+    public void endRun() {
+        //Nothing can be done
+        // There is not a list of "running" racers, so we cannot DNF anyone.
+        //Anyone yet to finish just won't be able to finish.
     }
 
     /**
@@ -47,6 +91,7 @@ public class GRPRunManager implements RunManager {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -59,7 +104,7 @@ public class GRPRunManager implements RunManager {
      * racerNumber is valid (in bounds [1,9999])
      */
     @Override
-    public boolean queueRacer(int racerNumber) throws RaceException {
+    public void queueRacer(int racerNumber) throws RaceException {
         throw new RaceException("Cannot queue racer for GRP event");
     }
 
@@ -72,7 +117,7 @@ public class GRPRunManager implements RunManager {
      * @throws RaceException every-time because of GRP type.
      */
     @Override
-    public boolean deQueueRacer(int racerNumber) throws RaceException {
+    public void deQueueRacer(int racerNumber) throws RaceException {
         throw new RaceException("Cannot de-queue a racer for GRP event");
     }
 
@@ -85,10 +130,9 @@ public class GRPRunManager implements RunManager {
      * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
      */
     @Override
-    public boolean startNext(ChronoTime relativeTime, int lane) throws RaceException {
+    public void startNext(ChronoTime relativeTime, int lane) throws RaceException {
         //Does nothing, all racers are started,
         // but there is no need to add racers as they are dummy racers anyways.
-        return true;
     }
 
     /**
@@ -101,7 +145,7 @@ public class GRPRunManager implements RunManager {
      * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
      */
     @Override
-    public boolean finishNext(ChronoTime relativeTime, int lane) throws RaceException {
+    public void finishNext(ChronoTime relativeTime, int lane) throws RaceException {
         if (this.finishedRacers.size() == MAX_RACERS) {
             throw new RaceException("Maximum number of racers have already finished.");
         }
@@ -118,11 +162,9 @@ public class GRPRunManager implements RunManager {
 
             this.finishedRacers.add(newRacer);
 
-            return true;
         } catch (InvalidTimeException e) {
             //INVALID TIME!
             //Don't do anything.
-            return false;
         }
     }
 
@@ -135,9 +177,8 @@ public class GRPRunManager implements RunManager {
      * @precondition race has started but not yet ended
      */
     @Override
-    public boolean cancelNextRacer(int lane) throws RaceException {
+    public void cancelNextRacer(int lane) throws RaceException {
         //Does nothing as there is not a queue and no list of running racers.
-        return true;
     }
 
     /**
@@ -149,9 +190,8 @@ public class GRPRunManager implements RunManager {
      * @precondition race has started but not yet ended
      */
     @Override
-    public boolean didNotFinishNextRacer(int lane) throws RaceException {
+    public void didNotFinishNextRacer(int lane) throws RaceException {
         //Does nothing as there is not a list of running racers to DNF from
         //There is no way to discern what person DNFs.
-        return true;
     }
 }

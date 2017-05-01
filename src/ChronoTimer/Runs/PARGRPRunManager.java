@@ -1,5 +1,6 @@
 package ChronoTimer.Runs;
 
+import ChronoTimer.Card;
 import ChronoTimer.ChronoTime;
 import ChronoTimer.Racer;
 import Exceptions.InvalidTimeException;
@@ -45,6 +46,25 @@ public class PARGRPRunManager implements RunManager {
      */
     private Queue<Racer> getRunningRacers(int lane) {
         return this.runningLanes.get(lane-1);
+    }
+
+    /**
+     * Returns a card that will be displayed by the system.
+     *
+     * @param elapsedTime is the current elapsed time of the run.
+     * @return a valid card.
+     */
+    @Override
+    public Card getCard(ChronoTime elapsedTime) {
+        return null;
+    }
+
+    /**
+     * This will move DNF any currently running racers.
+     */
+    @Override
+    public void endRun() {
+
     }
 
     /**

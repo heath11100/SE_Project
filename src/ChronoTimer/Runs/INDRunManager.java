@@ -1,5 +1,6 @@
 package ChronoTimer.Runs;
 
+import ChronoTimer.Card;
 import ChronoTimer.ChronoTime;
 import ChronoTimer.Racer;
 import Exceptions.InvalidTimeException;
@@ -24,6 +25,87 @@ public class INDRunManager implements RunManager{
         this.queuedRacers = new LinkedList<>();
         this.runningRacers = new LinkedList<>();
         this.finishedRacers = new LinkedList<>();
+    }
+
+    /**
+     * Returns a card that will be displayed by the system.
+     *
+     * @param elapsedTime is the current elapsed time of the run.
+     * @return a valid card.
+     */
+    @Override
+    public Card getCard(ChronoTime elapsedTime) {
+        Card card = new Card();
+        //Header
+        Queue<Racer> nextThreeRacers = new LinkedList<Racer>();
+        //Puts the next three racers into the nextThreeQueue
+        for (Racer racer : this.queuedRacers) {
+            if (nextThreeRacers.size() == 3) {
+                break;
+            } else {
+                nextThreeRacers.add(racer);
+            }
+        }
+
+        //For loop exits when there are no longer racers to add OR there are 3 racers.
+        if (nextThreeRacers.size() == 0) {
+            card.setHeader("NO RACERS QUEUED");
+        } else {
+            card.setHeader(nextThreeRacers);
+        }
+
+
+        //Body
+        //Set body as the list of running racers.
+        String bodyString = "";
+
+        for (Racer racer : this.runningRacers) {
+            String elapsedTimeString = "";
+
+            try {
+                //Calculate the current elapsed time
+                //This puts the current time (that is passed in) relative to the run start time.
+                ChronoTime racerElapsed = elapsedTime.elapsedSince(racer.getStartTime());
+                elapsedTimeString = racerElapsed.toString();
+
+            } catch (InvalidTimeException e) {
+                elapsedTimeString = "INVALID TIME";
+            }
+
+            bodyString += racer.toString() + " " + elapsedTimeString + "\n";
+        }
+
+        card.setBody(bodyString);
+
+        //Footer
+        Racer lastRacer = null;
+        if (this.finishedRacers.size() > 0) {
+            lastRacer = ((LinkedList<Racer>)this.finishedRacers).getLast();
+        }
+
+        if (lastRacer != null) {
+            card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString());
+
+        } else {
+            card.setFooter("NO RACER FINISHED");
+        }
+
+        return card;
+    }
+
+    /**
+     * This will move DNF any currently running racers.
+     */
+    @Override
+    public void endRun() {
+        //DNF Every running racer.
+        //Do nothing with the queued racers.
+        for (Racer racer : this.runningRacers) {
+            racer.didNotFinish();
+            this.finishedRacers.add(racer);
+        }
+
+        this.runningRacers.clear();
     }
 
     /**
@@ -93,14 +175,14 @@ public class INDRunManager implements RunManager{
      * @precondition the run has not already started, racerNumber is valid (in bounds [1,9999])
      */
     @Override
-    public boolean queueRacer(int racerNumber) throws RaceException {
+    public void queueRacer(int racerNumber) throws RaceException {
         if (this.doesRacerExist(racerNumber)) {
             //Racer already exists, throw an exception.
             throw new RaceException("Racer already exists with number: " + racerNumber);
 
         } else {
             Racer newRacer = new Racer(racerNumber);
-            return this.queuedRacers.add(newRacer);
+            this.queuedRacers.add(newRacer);
         }
     }
 
@@ -114,14 +196,13 @@ public class INDRunManager implements RunManager{
      * @precondition racerNumber is in bounds [1,9999]
      */
     @Override
-    public boolean deQueueRacer(int racerNumber) throws RaceException {
+    public void deQueueRacer(int racerNumber) throws RaceException {
         LinkedList<Racer> linkedList = (LinkedList<Racer>)this.queuedRacers;
         final int size = this.queuedRacers.size();
 
         for (int i = 0; i < size; i++) {
             if (linkedList.get(i).getNumber() == racerNumber) {
                 linkedList.remove(i);
-                return true;
             }
         }
 
@@ -138,7 +219,7 @@ public class INDRunManager implements RunManager{
      * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
      */
     @Override
-    public boolean startNext(ChronoTime relativeTime, int lane) throws RaceException {
+    public void startNext(ChronoTime relativeTime, int lane) throws RaceException {
         Racer racer = this.queuedRacers.poll();
 
         if (racer != null) {
@@ -150,7 +231,6 @@ public class INDRunManager implements RunManager{
             racer.start(relativeTime);
             this.runningRacers.add(racer);
 
-            return true;
         } else {
             throw new RaceException("No racer to start");
         }
@@ -166,7 +246,7 @@ public class INDRunManager implements RunManager{
      * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
      */
     @Override
-    public boolean finishNext(ChronoTime relativeTime, int lane) throws RaceException {
+    public void finishNext(ChronoTime relativeTime, int lane) throws RaceException {
         Racer racer = this.runningRacers.poll();
 
         if (racer != null) {
@@ -181,11 +261,8 @@ public class INDRunManager implements RunManager{
                 //Add the racer to the finished queue.
                 this.finishedRacers.add(racer);
 
-                return true;
-
             } catch (InvalidTimeException e) {
                 //Relative time was invalid (probably before the start time for the racer.
-                return false;
             }
 
         } else {
@@ -202,7 +279,7 @@ public class INDRunManager implements RunManager{
      * @precondition race has started but not yet ended
      */
     @Override
-    public boolean cancelNextRacer(int lane) throws RaceException {
+    public void cancelNextRacer(int lane) throws RaceException {
         Racer racer = this.runningRacers.poll();
 
         if (racer != null) {
@@ -213,8 +290,6 @@ public class INDRunManager implements RunManager{
             this.runningRacers.remove();
 
             this.queuedRacers.add(racer);
-
-            return true;
 
         } else {
             //Then there is not a racer to cancel.
@@ -231,7 +306,7 @@ public class INDRunManager implements RunManager{
      * @precondition race has started but not yet ended
      */
     @Override
-    public boolean didNotFinishNextRacer(int lane) throws RaceException{
+    public void didNotFinishNextRacer(int lane) throws RaceException{
         Racer racer = this.runningRacers.poll();
 
         if (racer != null) {
@@ -242,8 +317,6 @@ public class INDRunManager implements RunManager{
             this.runningRacers.remove();
 
             this.finishedRacers.add(racer);
-
-            return true;
 
         } else {
             //Then there is not a racer to DNF.

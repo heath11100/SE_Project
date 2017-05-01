@@ -1,5 +1,6 @@
 package ChronoTimer.Runs;
 
+import ChronoTimer.Card;
 import ChronoTimer.ChronoTime;
 import ChronoTimer.Racer;
 import Exceptions.InvalidTimeException;
@@ -46,6 +47,80 @@ public class PARINDRunManager implements RunManager {
      */
     private Queue<Racer> getRunningRacers(int lane) {
         return this.runningLanes.get(lane-1);
+    }
+
+    /**
+     * Returns a card that will be displayed by the system.
+     *
+     * @param elapsedTime is the current elapsed time of the run.
+     * @return a valid card.
+     */
+    @Override
+    public Card getCard(ChronoTime elapsedTime) {
+        Card card = new Card();
+
+        //Header
+        //Next pair to run (essentially next two racers).
+        Queue<Racer> nextPair = new LinkedList<Racer>();
+
+        for (Racer racer : this.queuedRacers) {
+            if (nextPair.size() < 2) {
+                nextPair.add(racer);
+            } else {
+                break;
+            }
+        }
+
+        //For loop exits when there are no longer racers to add OR there are 2 racers.
+        if (nextPair.size() > 0) {
+            card.setHeader(nextPair);
+        } else {
+            //Then there are no racers paired to run.
+            card.setHeader("NO RACERS QUEUED");
+        }
+
+        //Body
+        //Nothing
+
+        //Footer
+        //Finish times of the last pair to finish (essentially last two racers).
+        LinkedList<Racer> linkedList = (LinkedList<Racer>) this.finishedRacers;
+        final int size = linkedList.size();
+
+        if (size > 1) {
+            //Then there is at least 2 racers (one pair)
+            Racer lastRacer = linkedList.get(size-1);
+            Racer secondLast = linkedList.get(size-2);
+
+            card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString()+ ", " +
+                    secondLast.toString() + " " + secondLast.getElapsedTimeString());
+
+        } else if (size > 0) {
+            //Then only one racer has finished.
+            Racer lastRacer = linkedList.get(size-1);
+
+            card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString());
+
+        } else {
+            //Then no one has finished.
+            card.setFooter("NO PAIR HAS FINISHED");
+        }
+
+        return card;
+    }
+
+    /**
+     * This will move DNF any currently running racers.
+     */
+    @Override
+    public void endRun() {
+        for (Queue<Racer> runningLane : this.runningLanes) {
+            for (Racer racer : runningLane) {
+                racer.didNotFinish();
+                this.finishedRacers.add(racer);
+            }
+            runningLane.clear();
+        }
     }
 
     /**
@@ -122,14 +197,14 @@ public class PARINDRunManager implements RunManager {
      * racerNumber is valid (in bounds [1,9999])
      */
     @Override
-    public boolean queueRacer(int racerNumber) throws RaceException {
+    public void queueRacer(int racerNumber) throws RaceException {
         if (this.doesRacerExist(racerNumber)) {
             //Racer already exists, throw an exception.
             throw new RaceException("Racer already exists with number: " + racerNumber);
 
         } else {
             Racer newRacer = new Racer(racerNumber);
-            return this.queuedRacers.add(newRacer);
+            this.queuedRacers.add(newRacer);
         }
     }
 
@@ -143,14 +218,13 @@ public class PARINDRunManager implements RunManager {
      *                       1) racerNumber is not within bounds [1,9999]
      */
     @Override
-    public boolean deQueueRacer(int racerNumber) throws RaceException {
+    public void deQueueRacer(int racerNumber) throws RaceException {
         LinkedList<Racer> linkedList = (LinkedList<Racer>)this.queuedRacers;
         final int size = this.queuedRacers.size();
 
         for (int i = 0; i < size; i++) {
             if (linkedList.get(i).getNumber() == racerNumber) {
                 linkedList.remove(i);
-                return true;
             }
         }
 
@@ -167,7 +241,7 @@ public class PARINDRunManager implements RunManager {
      * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
      */
     @Override
-    public boolean startNext(ChronoTime relativeTime, int lane) throws RaceException {
+    public void startNext(ChronoTime relativeTime, int lane) throws RaceException {
         if (!this.isValidLane(lane)) {
             //Not valid lane
             throw new RaceException("Invalid lane: " + lane);
@@ -185,7 +259,6 @@ public class PARINDRunManager implements RunManager {
                 Queue<Racer> runningRacers = this.getRunningRacers(lane);
                 runningRacers.add(racer);
 
-                return true;
             } else {
                 throw new RaceException("No racer to start");
             }
@@ -202,7 +275,7 @@ public class PARINDRunManager implements RunManager {
      * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
      */
     @Override
-    public boolean finishNext(ChronoTime relativeTime, int lane) throws RaceException {
+    public void finishNext(ChronoTime relativeTime, int lane) throws RaceException {
         if (!this.isValidLane(lane)) {
             //Not valid lane
             throw new RaceException("Invalid lane: " + lane);
@@ -223,11 +296,8 @@ public class PARINDRunManager implements RunManager {
                     //Add the racer to the finished queue.
                     this.finishedRacers.add(racer);
 
-                    return true;
-
                 } catch (InvalidTimeException e) {
                     //Relative time was invalid (probably before the start time for the racer.
-                    return false;
                 }
 
             } else {
@@ -245,7 +315,7 @@ public class PARINDRunManager implements RunManager {
      * @precondition race has started but not yet ended
      */
     @Override
-    public boolean cancelNextRacer(int lane) throws RaceException {
+    public void cancelNextRacer(int lane) throws RaceException {
         if (!this.isValidLane(lane)) {
             //Not valid lane
             throw new RaceException("Invalid lane: " + lane);
@@ -263,8 +333,6 @@ public class PARINDRunManager implements RunManager {
 
                 this.queuedRacers.add(racer);
 
-                return true;
-
             } else {
                 //Then there is not a racer to cancel.
                 throw new RaceException("No racer to cancel");
@@ -281,7 +349,7 @@ public class PARINDRunManager implements RunManager {
      * @precondition race has started but not yet ended
      */
     @Override
-    public boolean didNotFinishNextRacer(int lane) throws RaceException {
+    public void didNotFinishNextRacer(int lane) throws RaceException {
         if (!this.isValidLane(lane)) {
             //Not valid lane
             throw new RaceException("Invalid lane: " + lane);
@@ -298,8 +366,6 @@ public class PARINDRunManager implements RunManager {
                 runningRacers.remove();
 
                 this.finishedRacers.add(racer);
-
-                return true;
 
             } else {
                 //Then there is not a racer to DNF.

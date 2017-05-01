@@ -1,8 +1,8 @@
 package ChronoTimer.Runs;
 
+import ChronoTimer.Card;
 import ChronoTimer.Racer;
 import ChronoTimer.ChronoTime;
-import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
 
 import java.util.ArrayList;
@@ -15,6 +15,18 @@ import java.util.ArrayList;
  */
 public interface RunManager {
     int MAX_RACERS = 9_999;
+
+    /**
+     * Returns a card that will be displayed by the system.
+     * @param  elapsedTime is the current elapsed time of the run.
+     * @return a valid card.
+     */
+    Card getCard(ChronoTime elapsedTime);
+
+    /**
+     * This will move DNF any currently running racers.
+     */
+    void endRun();
 
     /**
      * Returns a list of all racers within a run.
@@ -41,7 +53,7 @@ public interface RunManager {
      * @throws RaceException with any of the following conditions:
      * 1) Racer already exists with racerNumber
      */
-    boolean queueRacer(int racerNumber) throws RaceException;
+    void queueRacer(int racerNumber) throws RaceException;
 
 
     /**
@@ -51,7 +63,7 @@ public interface RunManager {
      * @return true if the racer was de-queued successfully, false otherwise.
      * @throws RaceException when racer with racerNumber does not exist in the queue.
      */
-    boolean deQueueRacer(int racerNumber) throws RaceException;
+    void deQueueRacer(int racerNumber) throws RaceException;
 
     /**
      * This method is called when the run should start the next racer, or next batch of racers, dependent on the eventType.
@@ -62,7 +74,7 @@ public interface RunManager {
      * @return true if the next racer, or batch of racers, were started successfully, false otherwise.
      * @throws RaceException see specific eventType implementations for conditions where this exception is thrown.
      */
-    boolean startNext(ChronoTime relativeTime, int lane) throws RaceException;
+    void startNext(ChronoTime relativeTime, int lane) throws RaceException;
 
     /**
      * This method is called when the run should finish the next racer, or next batch of racers, dependent ofn the eventType.
@@ -73,7 +85,7 @@ public interface RunManager {
      * @return true if the next racer, or batch of racers, were finished successfully, false otherwise.
      * @throws RaceException see specific eventType implementations for conditions where this exception is thrown.
      */
-    boolean finishNext(ChronoTime relativeTime, int lane) throws RaceException;
+    void finishNext(ChronoTime relativeTime, int lane) throws RaceException;
 
     /**
      * Cancels the next racer to finish, in the corresponding lane, and places that racer back in the queue of racers yet to start.
@@ -82,7 +94,7 @@ public interface RunManager {
      * @return true if a racer is successfully placed into the queue, false otherwise.
      * @throws RaceException when eventType is GRP
      */
-    boolean cancelNextRacer(int lane) throws RaceException;
+    void cancelNextRacer(int lane) throws RaceException;
 
     /**
      * Marks the next racer to finish, in the corresponding lane, as a did not finish.
@@ -92,5 +104,5 @@ public interface RunManager {
      * @return true if a racer is successfully marked as a DNF, false otherwise.
      * @throws RaceException when eventType is GRP
      */
-    boolean didNotFinishNextRacer(int lane) throws RaceException;
+    void didNotFinishNextRacer(int lane) throws RaceException;
 }
