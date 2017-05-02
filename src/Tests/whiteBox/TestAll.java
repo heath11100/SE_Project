@@ -1,5 +1,6 @@
 package Tests.whiteBox;
 
+import ChronoTimer.ChronoTrigger;
 import org.junit.runners.Suite;
 
 import Tests.whiteBox.ChronoTime.TestChronoTime;
@@ -16,6 +17,9 @@ import org.junit.runner.RunWith;
 
         //Test ChronoTrigger
         TestChronoTrigger.class,
+
+        //Other ChronoTrigger stuff.
+        ChronoTrigger.TestCT.class,
 
         //Test Racer
         TestRacer.class,

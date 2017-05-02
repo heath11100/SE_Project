@@ -6,10 +6,14 @@ import ChronoTimer.Log;
 import ChronoTimer.Racer;
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Queue;
 import java.util.LinkedList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Created by austinheath on 4/30/17.
@@ -256,7 +260,7 @@ public class PARINDRunManager implements RunManager {
             throw new RaceException("Invalid lane: " + lane);
 
         } else {
-            Racer racer = this.queuedRacers.poll();
+            Racer racer = this.queuedRacers.peek();
 
             if (racer != null) {
                 //*Could* throw NoSuchElementException, although it should never throw this.
@@ -293,7 +297,7 @@ public class PARINDRunManager implements RunManager {
 
         } else {
             Queue<Racer> runningRacers = this.getRunningRacers(lane);
-            Racer racer = runningRacers.poll();
+            Racer racer = runningRacers.peek();
 
             if (racer != null) {
                 try {
@@ -335,7 +339,7 @@ public class PARINDRunManager implements RunManager {
 
         } else {
             Queue<Racer> runningRacers = this.getRunningRacers(lane);
-            Racer racer = runningRacers.poll();
+            Racer racer = runningRacers.peek();
 
             if (racer != null) {
                 racer.cancel();
@@ -371,7 +375,7 @@ public class PARINDRunManager implements RunManager {
 
         } else {
             Queue<Racer> runningRacers = this.getRunningRacers(lane);
-            Racer racer = runningRacers.poll();
+            Racer racer = runningRacers.peek();
 
             if (racer != null) {
                 racer.didNotFinish();
@@ -388,6 +392,777 @@ public class PARINDRunManager implements RunManager {
                 //Then there is not a racer to DNF.
                 throw new RaceException("No racer to DNF");
             }
+        }
+    }
+
+    public static class TestINDRunManager {
+        private PARINDRunManager runManager;
+
+        private int racerNumber;
+
+        private ChronoTime time1, time2, time3;
+
+        public TestINDRunManager() throws InvalidTimeException {
+            this.runManager = new PARINDRunManager(new Log());
+
+            racerNumber = 1234;
+
+            time1 = new ChronoTime(0,0,0,0);
+            time2 = new ChronoTime(1,0,0,0);
+            time3 = new ChronoTime(2,0,0,0);
+        }
+
+        @Test
+        /**
+         * Ensure that data objects are initialized correctly.
+         */
+        public void testInitialization() {
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            //Ensure that each running lane is empty.
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+        }
+
+
+        @Test
+        public void testQueueRacer() throws RaceException {
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            //Queue a racer with racerNumber.
+            this.runManager.queueRacer(racerNumber);
+
+            /* Sizes:
+            Queue = 1
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(1, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+
+            Racer racer = this.runManager.queuedRacers.peek();
+            //The racer should have the same racer number as originally provided.
+            assertEquals(racer.getNumber(), this.racerNumber);
+        }
+
+
+        /**
+         * This tests that you cannot queue a racer with the same racer number as a racer in the queue.
+         */
+        @Test(expected = RaceException.class)
+        public void testFailQueueRacer_1() throws RaceException {
+            try {
+                this.runManager.queueRacer(racerNumber);
+            } catch (RaceException e) {
+                fail("Queueing failed when queueing first racer.");
+            }
+
+            //Should fail at this point, cannot double queue racer.
+            this.runManager.queueRacer(racerNumber);
+        }
+
+        /**
+         * This tests that you cannot queue a racer with the same racer number as a racer running.
+         * This uses lane = 1.
+         */
+        @Test(expected = RaceException.class)
+        public void testFailQueueRacer_2() throws RaceException{
+            final int lane = 1;
+            try {
+                this.runManager.queueRacer(racerNumber);
+
+                this.runManager.startNext(this.time1, lane);
+            } catch (RaceException e) {
+                fail("Queueing failed when queueing first racer.");
+            }
+
+            //Should fail at this point, cannot double queue racer.
+            this.runManager.queueRacer(racerNumber);
+        }
+
+        /**
+         * This tests that you cannot queue a racer with the same racer number as a racer running.
+         * This uses lane = 2.
+         */
+        @Test(expected = RaceException.class)
+        public void testFailQueueRacer_3() throws RaceException{
+            final int lane = 2;
+            try {
+                this.runManager.queueRacer(racerNumber);
+
+                this.runManager.startNext(this.time1, lane);
+            } catch (RaceException e) {
+                fail("Queueing failed when queueing first racer.");
+            }
+
+            //Should fail at this point, cannot double queue racer.
+            this.runManager.queueRacer(racerNumber);
+        }
+
+
+        /**
+         * This tests that you cannot queue a racer with the same racer number as a racer finished.
+         * This uses lane = 1.
+         */
+        @Test(expected = RaceException.class)
+        public void testFailQueueRacer_4() throws RaceException{
+            final int lane = 1;
+            try {
+                this.runManager.queueRacer(racerNumber);
+
+                //Lane should be ignored for IND type.
+                this.runManager.startNext(this.time1, lane);
+
+                //Lane should be ignored for IND type.
+                this.runManager.finishNext(this.time2, lane);
+            } catch (RaceException e) {
+                fail("Queueing failed when queueing first racer.");
+            }
+
+            //Should fail at this point, cannot double queue racer.
+            this.runManager.queueRacer(racerNumber);
+        }
+
+        /**
+         * This tests that you cannot queue a racer with the same racer number as a racer finished.
+         * This uses lane = 2.
+         */
+        @Test(expected = RaceException.class)
+        public void testFailQueueRacer_5() throws RaceException{
+            final int lane = 2;
+            try {
+                this.runManager.queueRacer(racerNumber);
+
+                //Lane should be ignored for IND type.
+                this.runManager.startNext(this.time1, lane);
+
+                //Lane should be ignored for IND type.
+                this.runManager.finishNext(this.time2, lane);
+            } catch (RaceException e) {
+                fail("Queueing failed when queueing first racer.");
+            }
+
+            //Should fail at this point, cannot double queue racer.
+            this.runManager.queueRacer(racerNumber);
+        }
+
+        /**
+         * Tests that starting a racer in lane 1, that is queued, will put them into the running list for lane 1
+         */
+        @Test
+        public void testStartNext_Lane1() throws RaceException {
+            final int lane = 1;
+            final int laneIndex = lane-1;
+            //Queue the racer with racerNumber.
+            this.runManager.queueRacer(racerNumber);
+
+            /* Sizes:
+            Queue = 1
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(1, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            //Lane should be ignored for IND type.
+            this.runManager.startNext(this.time1, lane);
+
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 1
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(1, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            Racer race = this.runManager.runningLanes.get(laneIndex).peek();
+            //Assert that the racer has the correct racer number.
+            assertEquals(racerNumber, race.getNumber());
+        }
+
+        /**
+         * Tests that you cannot startNext if a racer is not queued.
+         * This uses lane 1.
+         */
+        @Test(expected =  RaceException.class)
+        public void testStartNextFail_1() throws RaceException {
+            final int lane = 1;
+            //Lane should be ignored.
+            this.runManager.startNext(this.time1, lane);
+        }
+
+        /**
+         * Tests that you cannot startNext if a racer is not queued.
+         * This uses lane 2.
+         */
+        @Test(expected =  RaceException.class)
+        public void testStartNextFail_2() throws RaceException {
+            final int lane = 2;
+            //Lane should be ignored.
+            this.runManager.startNext(this.time1, lane);
+        }
+
+        /**
+         * Tests that finishing a racer, that is running, will put them into the finished list.
+         * This uses lane = 1.
+         */
+        @Test
+        public void startFinishNext_Lane1() throws RaceException {
+            final int lane = 1;
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.queueRacer(racerNumber);
+
+            /* Sizes:
+            Queue = 1
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(1, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+
+            //Start next for lane 1.
+            this.runManager.startNext(this.time1, lane);
+
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 1
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(1, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            //Finish racer in lane 1.
+            this.runManager.finishNext(this.time2, lane);
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 1
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(1, this.runManager.finishedRacers.size());
+
+            Racer race = this.runManager.finishedRacers.peek();
+            //Assert that the racer has the correct racer number.
+            assertEquals(racerNumber, race.getNumber());
+        }
+
+        /**
+         * Tests that finishing a racer, that is running, will put them into the finished list.
+         * This uses lane = 2.
+         */
+        @Test
+        public void startFinishNext_Lane2() throws RaceException {
+            final int lane = 2;
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.queueRacer(racerNumber);
+
+            /* Sizes:
+            Queue = 1
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(1, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+
+            //Start next for lane 1.
+            this.runManager.startNext(this.time1, lane);
+
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 1
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(1, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            //Finish racer in lane 1.
+            this.runManager.finishNext(this.time2, lane);
+
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 1
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(1, this.runManager.finishedRacers.size());
+
+            Racer race = this.runManager.finishedRacers.peek();
+            //Assert that the racer has the correct racer number.
+            assertEquals(racerNumber, race.getNumber());
+        }
+
+        /**
+         * Tests that you cannot finishNext if a racer is not running.
+         * This uses lane 1.
+         */
+        @Test(expected =  RaceException.class)
+        public void testFinishNextFail_1() throws RaceException {
+            final int lane = 1;
+            //Lane should be ignored.
+            this.runManager.finishNext(this.time1, lane);
+        }
+
+        /**
+         * Tests that you cannot finishNext if a racer is not running.
+         * This uses lane 2.
+         */
+        @Test(expected =  RaceException.class)
+        public void testFinishNextFail_2() throws RaceException {
+            final int lane = 2;
+            //Lane should be ignored.
+            this.runManager.finishNext(this.time1, lane);
+        }
+
+
+        /**
+         * Tests that cancelling a running racer will move them to the queue.
+         * This uses lane = 1.
+         */
+        @Test
+        public void testCancelRunningRacer_Lane1() throws RaceException {
+            final int lane = 1;
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.queueRacer(racerNumber);
+
+            /* Sizes:
+            Queue = 1
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(1, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.startNext(this.time1, lane);
+
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 1
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(1, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.cancelNextRacer(lane);
+
+            /* Sizes:
+            Queue = 1
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(1, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+        }
+
+        /**
+         * Tests that cancelling a running racer will move them to the queue.
+         * This uses lane = 2.
+         */
+        @Test
+        public void testCancelRunningRacer_Lane2() throws RaceException {
+            final int lane = 2;
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.queueRacer(racerNumber);
+
+            /* Sizes:
+            Queue = 1
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(1, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.startNext(this.time1, lane);
+
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 1
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(1, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.cancelNextRacer(lane);
+
+            /* Sizes:
+            Queue = 1
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(1, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+        }
+
+        /**
+         * Tests that cancelling a racer, when no are running, throws an exception.
+         * This is for lane = 1.
+         */
+        @Test(expected = RaceException.class)
+        public void testCancelFail_1() throws RaceException {
+            final int lane = 1;
+            //Lane should be ignored.
+            this.runManager.cancelNextRacer(lane);
+        }
+
+        /**
+         * Tests that cancelling a racer, when no are running, throws an exception.
+         * This is for lane = 2.
+         */
+        @Test(expected = RaceException.class)
+        public void testCancelFail_2() throws RaceException {
+            final int lane = 2;
+            //Lane should be ignored.
+            this.runManager.cancelNextRacer(lane);
+        }
+
+
+        /**
+         * Tests that DNFing a racer will move them to the finished queue.
+         * This is for lane = 1.
+         */
+        @Test
+        public void testDNFRunningRacer_Lane1() throws RaceException {
+            final int lane = 1;
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.queueRacer(racerNumber);
+
+            /* Sizes:
+            Queue = 1
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(1, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.startNext(this.time1, lane);
+
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 1
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(1, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.didNotFinishNextRacer(lane);
+
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 1
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(1, this.runManager.finishedRacers.size());
+        }
+
+        /**
+         * Tests that DNFing a racer will move them to the finished queue.
+         * This is for lane = 2.
+         */
+        @Test
+        public void testDNFRunningRacer_Lane2() throws RaceException {
+            final int lane = 2;
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.queueRacer(racerNumber);
+
+            /* Sizes:
+            Queue = 1
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 0
+             */
+            assertEquals(1, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.startNext(this.time1, lane);
+
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 1
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(1, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.didNotFinishNextRacer(lane);
+
+            /* Sizes:
+            Queue = 0
+            Running Lanes = 2
+                - Lane 1 = 0
+                - Lane 2 = 0
+            Finished = 1
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(2, this.runManager.runningLanes.size());
+            assertEquals(0, this.runManager.runningLanes.get(0).size());
+            assertEquals(0, this.runManager.runningLanes.get(1).size());
+
+            assertEquals(1, this.runManager.finishedRacers.size());
+        }
+
+        /**
+         * Tests that DNFing a racer, when no are running, throws an exception.
+         * This is for lane = 1.
+         */
+        @Test(expected = RaceException.class)
+        public void testDNFFail_1() throws RaceException {
+            final int lane = 1;
+            //Lane should be ignored.
+            this.runManager.didNotFinishNextRacer(lane);
+        }
+
+        /**
+         * Tests that DNFing a racer, when no are running, throws an exception.
+         * This is for lane = 2.
+         */
+        @Test(expected = RaceException.class)
+        public void testDNFFail_2() throws RaceException {
+            final int lane = 2;
+            //Lane should be ignored.
+            this.runManager.didNotFinishNextRacer(lane);
         }
     }
 }

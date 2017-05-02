@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /**
  * Created by austinheath on 4/30/17.
  *
@@ -226,7 +229,7 @@ public class INDRunManager implements RunManager{
      */
     @Override
     public void startNext(ChronoTime relativeTime, int lane) throws RaceException {
-        Racer racer = this.queuedRacers.poll();
+        Racer racer = this.queuedRacers.peek();
 
         if (racer != null) {
             //*Could* throw NoSuchElementException, although it should never throw this.
@@ -255,7 +258,7 @@ public class INDRunManager implements RunManager{
      */
     @Override
     public void finishNext(ChronoTime relativeTime, int lane) throws RaceException {
-        Racer racer = this.runningRacers.poll();
+        Racer racer = this.runningRacers.peek();
 
         if (racer != null) {
             try {
@@ -290,7 +293,7 @@ public class INDRunManager implements RunManager{
      */
     @Override
     public void cancelNextRacer(int lane) throws RaceException {
-        Racer racer = this.runningRacers.poll();
+        Racer racer = this.runningRacers.peek();
 
         if (racer != null) {
             racer.cancel();
@@ -319,7 +322,7 @@ public class INDRunManager implements RunManager{
      */
     @Override
     public void didNotFinishNextRacer(int lane) throws RaceException{
-        Racer racer = this.runningRacers.poll();
+        Racer racer = this.runningRacers.peek();
 
         if (racer != null) {
             racer.didNotFinish();
@@ -335,6 +338,341 @@ public class INDRunManager implements RunManager{
         } else {
             //Then there is not a racer to DNF.
             throw new RaceException("No racer to DNF");
+        }
+    }
+
+
+    public static class TestINDRunManager {
+        private INDRunManager runManager;
+
+        private int racerNumber;
+
+        private ChronoTime time1, time2, time3;
+
+        public TestINDRunManager() throws InvalidTimeException {
+            this.runManager = new INDRunManager(new Log());
+
+            racerNumber = 1234;
+
+            time1 = new ChronoTime(0,0,0,0);
+            time2 = new ChronoTime(1,0,0,0);
+            time3 = new ChronoTime(2,0,0,0);
+        }
+
+        @Test
+        public void testInitialization() {
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            assertEquals(0, this.runManager.runningRacers.size());
+
+            assertEquals(0, this.runManager.finishedRacers.size());
+        }
+
+
+        @Test
+        public void testQueueRacer() throws RaceException {
+            //Queue should be empty.
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            //Queue a racer with racerNumber.
+            this.runManager.queueRacer(racerNumber);
+
+            //Queue should have 1 racer
+            assertEquals(1, this.runManager.queuedRacers.size());
+
+            Racer racer = this.runManager.queuedRacers.peek();
+            //The racer should have the same racer number as originally provided.
+            assertEquals(racer.getNumber(), this.racerNumber);
+        }
+
+
+        /**
+         * This tests that you cannot queue a racer with the same racer number as a racer in the queue.
+         */
+        @Test(expected = RaceException.class)
+        public void testFailQueueRacer_1() throws RaceException {
+            try {
+                this.runManager.queueRacer(racerNumber);
+            } catch (RaceException e) {
+                fail("Queueing failed when queueing first racer.");
+            }
+
+            //Should fail at this point, cannot double queue racer.
+            this.runManager.queueRacer(racerNumber);
+        }
+
+        /**
+         * This tests that you cannot queue a racer with the same racer number as a racer running.
+         */
+        @Test(expected = RaceException.class)
+        public void testFailQueueRacer_2() throws RaceException{
+            try {
+                this.runManager.queueRacer(racerNumber);
+                //Lane should be ignored for IND type.
+                this.runManager.startNext(this.time1, 0);
+            } catch (RaceException e) {
+                fail("Queueing failed when queueing first racer.");
+            }
+
+            //Should fail at this point, cannot double queue racer.
+            this.runManager.queueRacer(racerNumber);
+        }
+
+        /**
+         * This tests that you cannot queue a racer with the same racer number as a racer finished.
+         */
+        @Test(expected = RaceException.class)
+        public void testFailQueueRacer_3() throws RaceException{
+            try {
+                this.runManager.queueRacer(racerNumber);
+
+                //Lane should be ignored for IND type.
+                this.runManager.startNext(this.time1, 0);
+
+                //Lane should be ignored for IND type.
+                this.runManager.finishNext(this.time2, 0);
+            } catch (RaceException e) {
+                fail("Queueing failed when queueing first racer.");
+            }
+
+            //Should fail at this point, cannot double queue racer.
+            this.runManager.queueRacer(racerNumber);
+        }
+
+
+        /**
+         * Tests that deQueueing a racer from the queue will remove them from the queue.
+         */
+        @Test
+        public void testDeQueueing() throws RaceException {
+            /*Sizes:
+            Queue = 0
+            Running = 0
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+            assertEquals(0, this.runManager.runningRacers.size());
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.queueRacer(racerNumber);
+
+            /*Sizes:
+            Queue = 1
+            Running = 0
+            Finished = 0
+             */
+            assertEquals(1, this.runManager.queuedRacers.size());
+            assertEquals(0, this.runManager.runningRacers.size());
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.deQueueRacer(racerNumber);
+
+            /*Sizes:
+            Queue = 0
+            Running = 0
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+            assertEquals(0, this.runManager.runningRacers.size());
+            assertEquals(0, this.runManager.finishedRacers.size());
+        }
+
+        /**
+         * Tests that deQueuing a racer that does not exist will throw an exception.
+         */
+        @Test(expected = RaceException.class)
+        public void testDeQueueingFail_1() throws RaceException {
+            /*Sizes:
+            Queue = 0
+            Running = 0
+            Finished = 0
+             */
+            assertEquals(0, this.runManager.queuedRacers.size());
+            assertEquals(0, this.runManager.runningRacers.size());
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+            this.runManager.deQueueRacer(racerNumber);
+        }
+
+        /**
+         * Tests that deQueueing a racer does NOT remove a racer from the running list.
+         */
+        @Test(expected = RaceException.class)
+        public void testDeQueueingFail_2() throws RaceException {
+            try {
+                this.runManager.queueRacer(racerNumber);
+                this.runManager.startNext(this.time1, -1);
+
+                /*Sizes:
+                Queue = 0
+                Running = 1
+                Finished = 0
+                 */
+                assertEquals(0, this.runManager.queuedRacers.size());
+                assertEquals(1, this.runManager.runningRacers.size());
+                assertEquals(0, this.runManager.finishedRacers.size());
+            } catch (RaceException e) {
+                fail("Test should not fail until deQueueing");
+            }
+
+            this.runManager.deQueueRacer(racerNumber);
+        }
+
+        /**
+         * Tests that starting a racer, that is queued, will put them into the running list.
+         */
+        @Test
+        public void testStartNext() throws RaceException {
+            //Queue the racer with racerNumber.
+            this.runManager.queueRacer(racerNumber);
+
+            //Running racers should have 0 at this point.
+            assertEquals(0, this.runManager.runningRacers.size());
+
+            //Lane should be ignored for IND type.
+            this.runManager.startNext(this.time1, 0);
+
+            //Queued racers should have 0 at this point.
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            //Running racers should have 1 at this point.
+            assertEquals(1, this.runManager.runningRacers.size());
+
+            Racer race = this.runManager.runningRacers.peek();
+
+            //Assert that the racer has the correct racer number.
+            assertEquals(racerNumber, race.getNumber());
+        }
+
+        /**
+         * Tests that you cannot startNext if a racer is not queued.
+         */
+        @Test(expected =  RaceException.class)
+        public void testStartNextFail_1() throws RaceException {
+            //Lane should be ignored.
+            this.runManager.startNext(this.time1, 0);
+        }
+
+
+        /**
+         * Tests that finishing a racer, that is running, will put them into the finished list.
+         */
+        @Test
+        public void startFinishNext() throws RaceException {
+            //Queue the racer with racerNumber.
+            this.runManager.queueRacer(racerNumber);
+
+
+            //Running racers should have 0 at this point.
+            assertEquals(0, this.runManager.runningRacers.size());
+
+            //Finished racers should have 0 at this point.
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+
+            //Lane should be ignored for IND type.
+            this.runManager.startNext(this.time1, 0);
+
+            //Queued racers should have 0 at this point.
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            //Running racers should have 1 at this point.
+            assertEquals(1, this.runManager.runningRacers.size());
+
+            //Finished racers should have 0 at this point.
+            assertEquals(0, this.runManager.finishedRacers.size());
+
+
+            //Lane should be ignored for IND type.
+            this.runManager.finishNext(this.time2, 0);
+
+            //Queued racers should have 0 at this point.
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            //Running racers should have 0 at this point.
+            assertEquals(0, this.runManager.runningRacers.size());
+
+            //Finished racers should have 1 at this point.
+            assertEquals(1, this.runManager.finishedRacers.size());
+
+
+            Racer race = this.runManager.finishedRacers.peek();
+            //Assert that the racer has the correct racer number.
+            assertEquals(racerNumber, race.getNumber());
+        }
+
+        /**
+         * Tests that you cannot finishNext if a racer is not running.
+         */
+        @Test(expected =  RaceException.class)
+        public void testFinishNextFail_1() throws RaceException {
+            //Lane should be ignored.
+            this.runManager.finishNext(this.time1, 0);
+        }
+
+        /**
+         * Tests that cancelling a running racer will move them to the queue.
+         */
+        @Test
+        public void testCancelRunningRacer() throws RaceException {
+            this.runManager.queueRacer(racerNumber);
+            this.runManager.startNext(this.time1, 0);
+
+            //Running Racer should have 1 racer, Queued racers should have 0.
+            assertEquals(1, this.runManager.runningRacers.size());
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            //Lane should be ignored for IND.
+            this.runManager.cancelNextRacer(0);
+
+            //Running Racer should have 0 racer, Queued racers should have 1.
+            assertEquals(0, this.runManager.runningRacers.size());
+            assertEquals(1, this.runManager.queuedRacers.size());
+        }
+
+        /**
+         * Tests that cancelling a racer, when no are running, throws an exception.
+         */
+        @Test(expected = RaceException.class)
+        public void testCancelFail() throws RaceException {
+            //Lane should be ignored.
+            this.runManager.cancelNextRacer(0);
+        }
+
+
+        /**
+         * Tests that DNFing a racer will move them to the finished queue.
+         */
+        @Test
+        public void testDNFRunningRacer() throws RaceException {
+            this.runManager.queueRacer(racerNumber);
+            this.runManager.startNext(this.time1, 0);
+
+            //Finished racers should have 0
+            //Running racers should have 1
+            //Queued racers should have 0
+            assertEquals(0, this.runManager.finishedRacers.size());
+            assertEquals(1, this.runManager.runningRacers.size());
+            assertEquals(0, this.runManager.queuedRacers.size());
+
+            //Lane should be ignored for IND.
+            this.runManager.didNotFinishNextRacer(0);
+
+            //Finished racers should have 1
+            //Running racers should have 0
+            //Queued racers should have 0
+            assertEquals(1, this.runManager.finishedRacers.size());
+            assertEquals(0, this.runManager.runningRacers.size());
+            assertEquals(0, this.runManager.queuedRacers.size());
+        }
+
+        /**
+         * Tests that DNFing a racer, when no are running, throws an exception.
+         */
+        @Test(expected = RaceException.class)
+        public void testDNFFail() throws RaceException {
+            //Lane should be ignored.
+            this.runManager.didNotFinishNextRacer(0);
         }
     }
 }

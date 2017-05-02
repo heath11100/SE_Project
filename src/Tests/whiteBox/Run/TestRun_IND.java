@@ -1,9 +1,7 @@
 package Tests.whiteBox.Run;
 
-import junit.framework.TestCase;
 import ChronoTimer.*;
 import Exceptions.InvalidTimeException;
-import Exceptions.RaceException;
 
 import org.junit.Test;
 import org.junit.Before;
@@ -34,26 +32,4 @@ public class TestRun_IND {
 	
 	
 	//Mark: Lane Testing
-	/**
-	 * Tests creating a single lane with IND.
-	 */
-	@Test
-	public void testCreateFirstLane() {
-	}
-	
-	/**
-	 * Tests to ensure failure when creating multiple lanes with IND.
-	 */
-	@Test
-	public void testMultipleLanes() {
-	}
-	
-	/**
-	 * Tests to ensure that upon changing eventType from PARIND to IND that all but one lane is deleted.
-	 */
-	@Test
-	public void testLaneDeletionAfterEventTypeChange() {
-		int laneCount = -1;
-		boolean isINDType = false;
-	}
 }

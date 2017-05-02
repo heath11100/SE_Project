@@ -1,8 +1,6 @@
 package ChronoTimer;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import ChronoTimer.Runs.*;
 import Exceptions.*;
@@ -25,7 +23,6 @@ public class Run {
 
 	private final int MIN_BIB_NUMBER = 1;
 	private final int MAX_BIB_NUMBER = 9999;
-	private final int MAX_LANES = 8;
 
 	public Run(EventType eventType) {
 		this.eventType = eventType;
@@ -318,7 +315,6 @@ public class Run {
 	 * OR the maximum number of runners have finished (9999) for GRP event type.
 	 */
 	public void finishNextRacer(ChronoTime atTime, int lane) throws InvalidTimeException, RaceException {
-
 		if (!this.hasStarted()) {
 			throw new RaceException("Race has not started");
 
