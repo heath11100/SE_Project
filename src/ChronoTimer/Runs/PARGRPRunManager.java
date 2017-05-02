@@ -17,13 +17,15 @@ import java.util.Queue;
  */
 public class PARGRPRunManager implements RunManager {
     private Queue<Racer> queuedRacers;
-    private ArrayList<Queue<Racer>> runningLanes;
+    private ArrayList<Racer> runningRacers;
     private Queue<Racer> finishedRacers;
+
+    private final int NUM_OF_LANES = 8;
 
     public PARGRPRunManager() {
         this.queuedRacers = new LinkedList<>();
 
-        this.runningLanes = new ArrayList<>();
+        this.runningRacers = new ArrayList<>(NUM_OF_LANES);
 
         this.finishedRacers = new LinkedList<>();
     }
@@ -35,17 +37,7 @@ public class PARGRPRunManager implements RunManager {
      * @return true if the lane is valid, false otherwise.
      */
     private boolean isValidLane(int lane) {
-        return lane >= 1 && lane <= 8;
-    }
-
-    /**
-     * Returns the running list for the given lane. Note: it is assumed that lane is valid, and is NOT indexed.
-     * @param lane corresponding to the running lane to be returned.
-     * @return the running lane.
-     * @precondition lane is valid
-     */
-    private Queue<Racer> getRunningRacers(int lane) {
-        return this.runningLanes.get(lane-1);
+        return lane >= 1 && lane <= NUM_OF_LANES;
     }
 
     /**
@@ -79,9 +71,7 @@ public class PARGRPRunManager implements RunManager {
 
         allRacers.addAll(this.queuedRacers);
 
-        for (Queue<Racer> runningLane : this.runningLanes) {
-            allRacers.addAll(runningLane);
-        }
+        allRacers.addAll(this.runningRacers);
 
         allRacers.addAll(this.finishedRacers);
 
@@ -107,13 +97,10 @@ public class PARGRPRunManager implements RunManager {
         }
 
         if (!doesExist) {
-            for (Queue<Racer> runningLane : this.runningLanes) {
-                //Loop through each running lane.
-                for (Racer racer : runningLane) {
-                    if (racer.getNumber() == racerNumber) {
-                        doesExist = true;
-                        break;
-                    }
+            for (Racer racer : this.runningRacers) {
+                if (racer != null && racer.getNumber() == racerNumber) {
+                    doesExist = true;
+                    break;
                 }
             }
         }
@@ -142,7 +129,7 @@ public class PARGRPRunManager implements RunManager {
      * racerNumber is valid (in bounds [1,9999])
      */
     @Override
-    public boolean queueRacer(int racerNumber) throws RaceException {
+    public void queueRacer(int racerNumber) throws RaceException {
         if (this.doesRacerExist(racerNumber)) {
             //Racer already exists, throw an exception.
             throw new RaceException("Racer already exists with number: " + racerNumber);
@@ -152,7 +139,7 @@ public class PARGRPRunManager implements RunManager {
 
         } else {
             Racer newRacer = new Racer(racerNumber);
-            return this.queuedRacers.add(newRacer);
+            this.queuedRacers.add(newRacer);
         }
     }
 
@@ -165,14 +152,14 @@ public class PARGRPRunManager implements RunManager {
      * @throws RaceException when racer with racerNumber does not exist in the queue.
      */
     @Override
-    public boolean deQueueRacer(int racerNumber) throws RaceException {
+    public void deQueueRacer(int racerNumber) throws RaceException {
         LinkedList<Racer> linkedList = (LinkedList<Racer>)this.queuedRacers;
         final int size = this.queuedRacers.size();
 
         for (int i = 0; i < size; i++) {
             if (linkedList.get(i).getNumber() == racerNumber) {
                 linkedList.remove(i);
-                return true;
+                return;
             }
         }
 
@@ -189,7 +176,7 @@ public class PARGRPRunManager implements RunManager {
      * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
      */
     @Override
-    public boolean startNext(ChronoTime relativeTime, int lane) throws RaceException {
+    public void startNext(ChronoTime relativeTime, int lane) throws RaceException {
         //START ALL RACERS.
         if (lane < 1 || lane > 8) {
             throw new RaceException("Invalid lane number: " + lane);
@@ -197,11 +184,15 @@ public class PARGRPRunManager implements RunManager {
         } else {
             int runIndex = 0;
 
+            //start all racers
             for (Racer racer : this.queuedRacers) {
                 //Ensure that we are not getting a running lane that does not exist.
-                if (runIndex < this.runningLanes.size()) {
-                    this.runningLanes.get(runIndex).add(racer);
+                if (runIndex < this.runningRacers.size()) {
+                    this.runningRacers.add(runIndex, racer);
+
                     racer.start(relativeTime);
+                    runIndex++;
+
                 } else {
                     throw new RaceException("INTERNAL INCONSISTENCY: Not enough run lanes.");
                 }
@@ -210,8 +201,6 @@ public class PARGRPRunManager implements RunManager {
             //At this point: all runners have been added to the running queue.
             //Remove all racers from the queue.
             this.queuedRacers.clear();
-
-            return true;
         }
     }
 
@@ -225,31 +214,32 @@ public class PARGRPRunManager implements RunManager {
      * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
      */
     @Override
-    public boolean finishNext(ChronoTime relativeTime, int lane) throws RaceException {
+    public void finishNext(ChronoTime relativeTime, int lane) throws RaceException {
         //Test if lane is valid [1,8]
         if (lane < 1 || lane > 8) {
             throw new RaceException("Invalid lane number: " + lane);
 
         } else {
+            final int laneIndex = lane-1;
 
-            if (lane <= this.runningLanes.size()) {
-                //Then there are enough lanes to grab it.
-                LinkedList<Racer> runningLane = (LinkedList<Racer>)this.runningLanes.get(lane-1);
+            if (laneIndex >= 0 || laneIndex < this.runningRacers.size()) {
+                //Lane is valid - indexed [0, number of running racers]
 
-                Racer racer = runningLane.pollFirst();
+                Racer racer = this.runningRacers.get(laneIndex);
 
                 if (racer != null) {
                     try {
                         racer.finish(relativeTime);
-                        return true;
-                    } catch (InvalidTimeException e) {
-                        //Do nothing.
-                    }
-                }
-            }
-        }
+                        this.runningRacers.set(laneIndex, null);
 
-        return false;
+                    } catch (InvalidTimeException e) { /*Do nothing.*/ }
+                }
+
+            } else {
+                throw new RaceException("Lane " + lane +" is invalid");
+            }
+
+        }
     }
 
     /**
@@ -261,18 +251,20 @@ public class PARGRPRunManager implements RunManager {
      * @precondition race has started but not yet ended
      */
     @Override
-    public boolean cancelNextRacer(int lane) throws RaceException {
-        for (Queue<Racer> runningLane : this.runningLanes) {
-            for (Racer racer : runningLane) {
+    public void cancelNextRacer(int lane) throws RaceException {
+        for (int i = 0; i < this.runningRacers.size(); i++) {
+            Racer racer = this.runningRacers.get(i);
+            if (racer != null) {
                 this.queuedRacers.add(racer);
+
+                this.runningRacers.set(i, null);
             }
         }
 
         for (Racer racer : this.finishedRacers) {
             this.queuedRacers.add(racer);
         }
-
-        return true;
+        this.finishedRacers.clear();
     }
 
     /**
@@ -284,27 +276,21 @@ public class PARGRPRunManager implements RunManager {
      * @precondition race has started but not yet ended
      */
     @Override
-    public boolean didNotFinishNextRacer(int lane) throws RaceException {
-        if (lane < 1 || lane > 8) {
+    public void didNotFinishNextRacer(int lane) throws RaceException {
+        if (lane < 1 || lane > NUM_OF_LANES) {
             throw new RaceException("Lane is not within bounds [1,8]");
 
         } else {
-            final int adjustedLane = lane-1;
+            final int laneIndex = lane-1;
 
-            if (adjustedLane < this.runningLanes.size()) {
-                //Then the lane exists, attempt to pull the first racer (as there should only be one per lane).
-                LinkedList<Racer> runningLane = (LinkedList<Racer>)this.runningLanes.get(adjustedLane);
+            Racer racer = this.runningRacers.get(laneIndex);
 
-                if (!runningLane.isEmpty()) {
-                    //Then there is a racer.
-                    Racer racer = runningLane.get(0);
-                    racer.didNotFinish();
-                    return true;
-                }
+            if (racer != null) {
+                racer.didNotFinish();
+                this.finishedRacers.add(racer);
+                this.runningRacers.set(laneIndex, null);
             }
         }
-
-        return false;
     }
 
 }
