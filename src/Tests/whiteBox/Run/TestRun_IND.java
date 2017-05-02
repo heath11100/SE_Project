@@ -39,12 +39,6 @@ public class TestRun_IND {
 	 */
 	@Test
 	public void testCreateFirstLane() {
-		try {
-			run.newLane();
-			
-		} catch (RaceException e) {
-			fail("Should not throw error on first lane creation");
-		}
 	}
 	
 	/**
@@ -52,19 +46,6 @@ public class TestRun_IND {
 	 */
 	@Test
 	public void testMultipleLanes() {
-		int laneCount = 0;
-		try {
-			run.newLane();
-			laneCount++;
-			
-			run.newLane();
-			fail("Should not reach this point, should fail at the newLane directly above");
-			
-		} catch (RaceException e) {
-			if (laneCount == 0) {
-				fail("Should not throw error on first lane creation");
-			} //else it is not an error, because IND can only support 1 lane.
-		}
 	}
 	
 	/**
@@ -74,27 +55,5 @@ public class TestRun_IND {
 	public void testLaneDeletionAfterEventTypeChange() {
 		int laneCount = -1;
 		boolean isINDType = false;
-		try {
-			run.setEventType("PARIND");
-			run.newLane();
-			run.newLane();
-			
-			laneCount = 2; //PARIND supports multiple lanes.
-						
-			run.setEventType("IND");
-			
-			//Event Type should now be IND.
-			isINDType = true;
-			
-			run.newLane();
-			//Creating a newLane should fail because run should have kept
-			// one lane after the event type switch.
-			fail("Should not reach this point, should fail at the newLane directly above");
-			
-		} catch (RaceException e) {
-			if (laneCount == 2 && !isINDType) {
-				fail("Should not throw error yet.");
-			} //else it is not an error, because IND can only support 1 lane.
-		}
 	}
 }

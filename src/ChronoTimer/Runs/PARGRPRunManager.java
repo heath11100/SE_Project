@@ -163,7 +163,7 @@ public class PARGRPRunManager implements RunManager {
             Racer newRacer = new Racer(racerNumber);
             this.queuedRacers.add(newRacer);
 
-            this.log.add("Queued " + newRacer);
+            this.log.add("Added " + newRacer.toString() + " to lane " + this.queuedRacers.size());
         }
     }
 

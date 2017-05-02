@@ -201,4 +201,8 @@ public class GRPRunManager implements RunManager {
         //Does nothing as there is not a list of running racers to DNF from
         //There is no way to discern what person DNFs.
     }
+
+    public void markNextRacer(int racerNumber) {
+        //TODO:
+    }
 }

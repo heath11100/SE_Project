@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import ChronoTimer.Runs.INDRunManager;
-import ChronoTimer.Runs.RunManager;
+import ChronoTimer.Runs.*;
 import Exceptions.*;
 
 /**
@@ -22,28 +21,15 @@ public class Run {
 
 	private RunManager runManager;
 
-	
-	private Queue<Racer> queuedRacers;
-	private ArrayList<Queue<Racer>> runningLanes;
-	private Queue<Racer> finishedRacers;
-	private int nextRacerToMarkIndex = 0;
-	
 	private Log log;
-	private Card card = new Card();
 
 	private final int MIN_BIB_NUMBER = 1;
 	private final int MAX_BIB_NUMBER = 9999;
-	private final int MAX_RACERS = 9999;
-
 	private final int MAX_LANES = 8;
 
 	public Run(EventType eventType) {
 		this.eventType = eventType;
-		
-		this.queuedRacers = new LinkedList<>();
-		this.runningLanes = new ArrayList<>();
-		this.finishedRacers = new LinkedList<>();
-		
+
 		this.log = new Log();
 		
 		this.log.add("Created run");
@@ -53,28 +39,22 @@ public class Run {
 				this.runManager = new INDRunManager(this.log);
 				break;
 
-			default:
+			case PARIND:
+				this.runManager = new PARINDRunManager(this.log);
+				break;
+
+			case GRP:
+				this.runManager = new GRPRunManager(this.log);
+				break;
+
+			case PARGRP:
+				this.runManager = new PARGRPRunManager(this.log);
 				break;
 		}
 	}
 	
 	public Run() {
 		this(EventType.IND);
-	}
-	
-	/**
-	 * Determines whether or not a lane number is valid. A lane number is valid when it is in bounds [1,8] AND 
-	 * the lane number is less than or equal to the number of lanes available.
-	 * @param laneNumber corresponding to index+1 in the lists
-	 * @return true if lane number is valid, false otherwise.
-	 */
-	private boolean isValidLane(int laneNumber) {
-		switch (this.eventType) {
-			case IND:
-				return laneNumber == 1;
-			default:
-				return (laneNumber >= 1 && laneNumber <= MAX_LANES) && (laneNumber <= this.runningLanes.size());
-		}
 	}
 	
 	/**
@@ -120,14 +100,18 @@ public class Run {
 	public Card getCard(ChronoTime currentTime) {
 		//Format card based on event type.
 
-		try {
-			ChronoTime elapsedTime = currentTime.elapsedSince(this.startTime);
+		if (this.hasStarted()) {
+			try {
+				ChronoTime elapsedTime = currentTime.elapsedSince(this.startTime);
 
-			return this.runManager.getCard(elapsedTime);
+				return this.runManager.getCard(elapsedTime);
 
-		} catch (InvalidTimeException e) {	}
-
-		return new Card();
+			} catch (InvalidTimeException e) {
+				return new Card();
+			}
+		} else {
+			return this.runManager.getCard(currentTime);
+		}
 	}
 
 	/**
@@ -154,79 +138,6 @@ public class Run {
 	public EventType getEventType() {
 		return this.eventType;
 	}
-
-
-	/**
-	 * The elapsed time of the Run
-	 * @return the elapsed time
-	 * @throws InvalidTimeException
-	 */
-	private ChronoTime getElapsedTime() throws InvalidTimeException {
-		if (this.startTime == null) {
-			//0 elapsed time.
-			return new ChronoTime(0,0,0,0);
-
-		} else if (this.endTime == null) {
-			return ChronoTime.now().elapsedSince(this.startTime);
-
-		} else {
-			return this.endTime.elapsedSince(this.startTime);
-		}
-	}
-
-
-	/**
-	 * Creates a new lane for runners to be added to.
-	 * @return lane number corresponding to the lane just created.
-	 * @throws RaceException when attempting to create a multiple lanes for an IND run
-	 * OR if the run has started
-	 * OR if the run has ended
-	 * OR if the number of lanes will exceed 8 (after creating this new one)
-	 */
-	public int newLane() throws RaceException {
-		//Verify event type & lane count.
-		if (!this.canAddLaneFor(this.getEventType())) {
-			throw new RaceException("Cannot create another lane for run type " + this.getEventType());
-		} else if (this.hasStarted()) {
-			throw new RaceException("Cannot create new lane after run started");
-		} else if (this.hasEnded()) {
-			throw new RaceException("Cannot create new lane after run ended");
-		} else if (this.runningLanes.size() >= 8) {
-			throw new RaceException("Cannot have more than 8 lanes.");
-		}
-		
-		this.runningLanes.add(new LinkedList<>());
-		
-		return this.runningLanes.size();
-	}
-
-	/**
-	 * Determines whether or not you can add another lane for the given event type.
-	 * The lane restrictions are different for each event type, and are ([min lanes, max lanes]):
-	 * IND: [1, 1]
-	 * PARIND: [1, 8]
-	 * GRP: [0,0]
-	 * @param eventType used to determine if another lane can be added
-	 * @return true if another lane can be added, false otherwise.
-     */
-	private boolean canAddLaneFor(EventType eventType) {
-		switch (eventType) {
-			case IND:
-				return this.runningLanes.size() == 0;
-
-			case PARIND:
-				return this.runningLanes.size() >= 0 && this.runningLanes.size() <= 7;
-
-			case GRP:
-				return false;
-
-			case PARGRP:
-				return this.runningLanes.size() >= 0 && this.runningLanes.size() <= 7;
-
-			default:
-				return false;
-		}
-	}
 	
 	/**
 	 * Returns an ArrayList of all racers.
@@ -235,33 +146,7 @@ public class Run {
 	 * @throws IllegalStateException when the lists are not the same size (this would be an internal error)
 	 */
 	public ArrayList<Racer> getAllRacers(){
-		ArrayList<Racer> allRacers = new ArrayList<>();
-		for (Racer r: queuedRacers)
-			allRacers.add(r);
-		for (Queue<Racer> q: runningLanes)
-			for (Racer r: q)
-				allRacers.add(r);
-		for (Racer r: finishedRacers)
-			allRacers.add(r);
-		return allRacers;
-	}
-	
-	/**
-	 * Removes the last lane from the list.
-	 * @return the number of the removed lane.
-	 * @throws RaceException when there is not a lane to remove
-	 * @throws IllegalStateException when the lists are not the same size (this would be an internal error)
-	 */
-	public int removeLane() throws RaceException {
-		int size = this.runningLanes.size();
-		
-		if (size == 0) {
-			throw new RaceException("No lane to remove");
-		}
-		
-		this.runningLanes.remove(size - 1);
-		
-		return this.runningLanes.size()+1;
+		return  this.runManager.getAllRacers();
 	}
 	
 	/**
@@ -284,26 +169,9 @@ public class Run {
 		} else if (!this.startTime.isBefore(atTime)) {
 			throw new InvalidTimeException("Run has not started.");
 
-		} else if (this.getEventType() == EventType.IND || this.getEventType() == EventType.PARIND){
-			this.endTime = atTime;
-
-			//Move any currently running racers into the finished list,
-			//while setting every running racer to DNF
-			for (Queue<Racer> queue : this.runningLanes) {
-				//Iterate through every running queue
-				for (Racer racer : queue) {
-					//Add the racer to the corresponding finished queue
-					this.finishedRacers.add(racer);
-					racer.didNotFinish();
-				}
-
-				queue.clear();
-			}
-
 		} else {
-			//Event type is GRP.
+			this.runManager.endRun();
 			this.endTime = atTime;
-			//We do not move racers from the running queue because none exist.
 		}
 
 		this.log.add("Ended run at " + atTime);
@@ -328,44 +196,22 @@ public class Run {
 		switch (newEventType) {
 			case "IND":
 				this.eventType = EventType.IND;
-
-				//Remove all existing lanes
-				this.runningLanes.clear();
-
-				//Add one lane back to each of the lists
-				this.newLane();
-
+				this.runManager = new INDRunManager(this.log);
 				break;
 			
 			case "PARIND":
 				this.eventType = EventType.PARIND;
-
-				this.runningLanes.clear();
-
-				//Add two lanes back to each of the lists
-				this.newLane();
-				this.newLane();
-
+				this.runManager = new PARINDRunManager(this.log);
 				break;
 
 			case "GRP":
 				this.eventType = EventType.GRP;
-
-				//Remove any racers queued, and also any lanes.
-				this.runningLanes.clear();
-				this.queuedRacers.clear();
-				this.finishedRacers.clear();
-
+				this.runManager = new GRPRunManager(this.log);
 				break;
 
 			case "PARGRP":
 				this.eventType = EventType.PARGRP;
-
-				//Remove any racers queued, and also any lanes.
-				this.runningLanes.clear();
-				this.queuedRacers.clear();
-				this.finishedRacers.clear();
-
+				this.runManager = new PARGRPRunManager(this.log);
 				break;
 			
 		default:
@@ -373,47 +219,6 @@ public class Run {
 		}
 		
 		this.log.add("Event type is " + newEventType);
-	}
-	
-	/**
-	 * Determines whether or not a racer can be queued with a given racer number.
-	 * Note: racer can only be queued if another racer does NOT exist with that racer's number 
-	 * (regardless of the lane they are in)
-	 * @param racerNumber corresponding to the racer's number
-	 * @return true if the racer can be queued, false otherwise.
-	 */
-	private boolean doesRacerExist(int racerNumber) {
-		//Only valid if there is not a racer with that number.
-		boolean isValid = true;
-				
-		for (Racer racer : this.queuedRacers) {
-			if (racer.getNumber() == racerNumber) {
-				isValid = false;
-				break;
-			}
-		}
-
-		if (isValid) {
-			for (Queue<Racer> runningLane : this.runningLanes) {
-				for (Racer racer : runningLane) {
-					if (racer.getNumber() == racerNumber) {
-						isValid = false;
-						break;
-					}
-				}
-			}
-		}
-
-		if (isValid) {
-			for (Racer racer : this.finishedRacers) {
-				if (racer.getNumber() == racerNumber) {
-					isValid = false;
-					break;
-				}
-			}
-		}
-		
-		return isValid;
 	}
 	
 	/**
@@ -426,85 +231,34 @@ public class Run {
 	 * OR when the event type is GRP
 	 */
 	public void queueRacer(int racerNumber) throws RaceException {
-		if (racerNumber < 1 || racerNumber > 9999) {
-			throw new RaceException("Number must be 1 to 9999");
-
-		} else if (!this.doesRacerExist(racerNumber)) {
-			throw new RaceException("Racer already exists with number: " + racerNumber);
+		if (racerNumber < MIN_BIB_NUMBER || racerNumber > MAX_BIB_NUMBER) {
+			throw new RaceException("Number must be " + MIN_BIB_NUMBER + " to " + MAX_BIB_NUMBER);
 
 		} else if (this.hasEnded()) {
 			throw new RaceException("Run has already ended");
 
-		} else if (this.eventType == EventType.GRP) {
-			if (this.hasStarted()) {
-				//Then we should attempt to mark the next racer.
-				this.markNextRacer(racerNumber);
-			} else {
-				throw new RaceException("Cannot queue a racer for event type GRP.");
-			}
-
-		} else if (this.eventType == EventType.PARGRP) {
-			if (this.queuedRacers.size() < 8) {
-				//Then there is at least one spot for the racer.
-				Racer racer = new Racer(racerNumber);
-				this.queuedRacers.add(racer);
-
-				//Can throw error, should never tho.
-				this.newLane();
-
-				//Log that the racer was added.
-				this.log.add("Added " + racer.toString() + " to lane " + this.queuedRacers.size());
-			}
+		} else if (this.eventType == EventType.GRP && this.hasStarted()) {
+			//Then we should attempt to mark the next racer.
+			((GRPRunManager)this.runManager).markNextRacer(racerNumber);
 
 		} else {
-			//PAR IND, IND
-			Racer racer = new Racer(racerNumber);
-			this.queuedRacers.add(racer);
-
-			this.log.add("Queued "+racer);
+			this.runManager.queueRacer(racerNumber);
 		}
 	}
 
 	/**
 	 * Removes a racer, identified with racerNumber, from the queue of racers yet to begin the run.
 	 * @param racerNumber is used to identify the racer, racer must exist, number must be in bounds [1,9999]
-	 * @param lane is the lane corresponding to the racer's lane
 	 * @throws RaceException when a queued racer does not exist with racerNumber
 	 * or when the racerNumber is not within bounds [1,9999]
 	 * OR when the lane is invalid
 	 * OR when eventType is GRP
 	 */
-	public void removeRacer(int racerNumber, int lane) throws RaceException {
+	public void removeRacer(int racerNumber) throws RaceException {
 		if (racerNumber < MIN_BIB_NUMBER || racerNumber > MAX_BIB_NUMBER) {
-			throw new RaceException("Number must be within bounds [1,9999]");
-
-		} else if (this.eventType == EventType.GRP) {
-			throw new RaceException("Cannot remove a racer from GRP run.");
-
-		} else if (!this.isValidLane(lane)) {
-			throw new RaceException("Invalid lane: " + lane);
-
+			throw new RaceException("Number must be " + MIN_BIB_NUMBER + " to " + MAX_BIB_NUMBER);
 		} else {
-			Racer racer = null;
-			for (Racer r : this.queuedRacers) {
-				if (r.equals(racer)) {
-					racer = r;
-					break;
-				}
-			}
-
-			if (racer == null) {
-				throw new RaceException("No racer to remove");
-			} else {
-				this.queuedRacers.remove(racer);
-
-				if (this.eventType == EventType.PARGRP) {
-					//Remove a lane as well
-					this.removeLane();
-				}
-
-				this.log.add("Removed "+racer);
-			}
+			this.runManager.deQueueRacer(racerNumber);
 		}
 	}
 	
@@ -541,73 +295,13 @@ public class Run {
 		} else if (this.hasEnded()) {
 			throw new RaceException("Race has already ended");
 
-		} else if ((this.eventType == EventType.IND || this.eventType == EventType.PARIND)
-				&& this.isValidLane(lane)) {
-			//EventType is IND OR PARIND, lane is valid
+		} else {
 
-			if (this.eventType == EventType.IND && this.runningLanes.size() == 0) {
-				this.newLane();
-			}
+			ChronoTime elapsedTime = atTime.elapsedSince(tempStartTime);
 
-			Racer nextRacer = queuedRacers.poll();
+			this.runManager.startNext(elapsedTime, lane);
 
-			if (nextRacer == null) {
-				throw new RaceException("No racer to start");
-
-			} else {
-				this.startTime = tempStartTime;
-				queuedRacers.remove(nextRacer);
-				this.runningLanes.get(lane - 1).add(nextRacer);
-
-				ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
-				nextRacer.start(elapsedTime);
-
-				String racerLogString = "" + atTime +" "+nextRacer+" started";
-
-				//Log which lane the racer started in for PARIND only
-				if (this.eventType == EventType.PARIND) {
-					racerLogString += " in lane " + lane;
-				}
-
-				this.log.add(racerLogString);
-			}
-
-		}  else if (this.eventType == EventType.GRP) {
-			if (this.hasStarted()) {
-				throw new RaceException("Run has already started");
-			} else {
-				//Then we set the start time of the run to be atTime.
-				this.startTime = atTime;
-				this.log.add("Started group run at " + atTime);
-			}
-		} else if (this.eventType == EventType.PARGRP) {
-			if (lane < 1 || lane > 8) {
-				throw new RaceException("Invalid lane number: " + lane);
-
-			} else if (this.hasStarted()) {
-				throw new RaceException("Run has already started");
-
-			} else {
-				int runIndex = 0;
-
-				for (Racer racer : this.queuedRacers) {
-					//Ensure that we are not getting a running lane that does not exist.
-					if (runIndex < this.runningLanes.size()) {
-						this.runningLanes.get(runIndex).add(racer);
-						ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
-						racer.start(elapsedTime);
-					} else {
-						throw new RaceException("INTERNAL INCONSISTENCY: Not enough run lanes.");
-					}
-				}
-
-				//At this point: all runners have been added to the running queue.
-				//Remove all racers from the queue.
-				this.queuedRacers.clear();
-
-				this.startTime = atTime;
-				this.log.add("Started run at " + atTime);
-			}
+			this.startTime = tempStartTime;
 		}
 	}
 	
@@ -637,107 +331,10 @@ public class Run {
 		} else if (this.hasEnded()) {
 			throw new RaceException("Race has ended");
 
-		} else if ((this.eventType == EventType.IND || this.eventType == EventType.PARIND)
-				&& this.isValidLane(lane)) {
-			//Event type is IND or PARIND and lane is valid
-
-			Queue<Racer> runningQueue = this.runningLanes.get(lane - 1);
-			Racer nextRacer = runningQueue.poll();
-
-			if (nextRacer == null) {
-				throw new RaceException("No racer to finish");
-
-			} else {
-				runningQueue.remove(nextRacer);
-				this.finishedRacers.add(nextRacer);
-
-				ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
-				nextRacer.finish(elapsedTime);
-
-				String racerLogString = "" + atTime +" "+nextRacer+" finished with time "+nextRacer.getElapsedTime().getTimeStamp();
-
-				//Log which lane the racer ended in for PARIND only
-				if (this.eventType == EventType.PARIND) {
-					racerLogString += " in lane " + lane;
-				}
-				this.log.add(racerLogString);
-			}
-		} else if (this.eventType == EventType.GRP) {
-			if (this.finishedRacers.size() == MAX_RACERS) {
-				throw new RaceException("Maximum number of racers have already finished.");
-			}
-
-			final int currentSize = this.finishedRacers.size();
-			//Negative number denotes that it is a placeholder racer.
-			int racerNumber = (currentSize+1) * (-1);
-			//Create racer with negative bib number because they are place holder.
-			Racer newRacer = new Racer(racerNumber);
-
-			ChronoTime emptyTime = new ChronoTime(0,0,0,0);
-            ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
-
-			newRacer.start(emptyTime);
-			newRacer.finish(elapsedTime);
-
-			this.finishedRacers.add(newRacer);
-
-		}  else if (this.eventType == EventType.PARGRP) {
-
-			//Test if lane is valid [1,8]
-			if (lane < 1 || lane > 8) {
-				throw new RaceException("Invalid lane number: " + lane);
-
-			} else if (!this.hasStarted()) {
-				//Run has NOT started, cannot finish the lane.
-				throw new RaceException("Lane (" + lane + ") cannot finish before the run starts");
-
-			} else {
-
-				if (lane <= this.runningLanes.size()) {
-					//Then there are enough lanes to grab it.
-					LinkedList<Racer> runningLane = (LinkedList<Racer>)this.runningLanes.get(lane-1);
-
-					Racer racer = runningLane.pollFirst();
-
-					if (racer != null) {
-						ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
-						racer.finish(elapsedTime);
-					}
-				}
-			}
-
+		} else {
+			ChronoTime elapsedTime = atTime.elapsedSince(this.startTime);
+			this.runManager.finishNext(elapsedTime, lane);
 		}
-	}
-
-	/**
-	 * Marks the next racer in the finish queue with a bibnumber (versus the default number.
-	 * @param racerNumber corresponding to the next racer to be marked.
-	 * @throws RaceException when there is not another racer to mark with a bib number
-	 * OR eventType is not GRP
-     */
-	public void markNextRacer(int racerNumber) throws RaceException {
-		if (this.eventType == EventType.IND ||
-				this.eventType == EventType.PARIND ||
-				this.eventType == EventType.PARGRP) {
-			throw new RaceException("Cannot mark next racer with event " + this.eventType);
-
-		} else if (this.nextRacerToMarkIndex >= this.finishedRacers.size()) {
-			throw new RaceException("No racer to mark");
-		}
-
-		Racer dummyRacer = ((LinkedList<Racer>)this.finishedRacers).get(this.nextRacerToMarkIndex);
-		Racer newRacer = new Racer(racerNumber);
-
-		newRacer.start(dummyRacer.getStartTime());
-		try {
-			newRacer.finish(dummyRacer.getEndTime());
-		} catch (InvalidTimeException e) {
-			throw new RaceException("Racer to be marked had invalid finish time");
-		}
-
-		//Increment the bib marker
-		//Bib marker index is used mark the next dummy racer
-		this.nextRacerToMarkIndex++;
 	}
 
 	/**
@@ -747,35 +344,11 @@ public class Run {
 	 * OR when eventType is GRP
 	 */
 	public void cancelNextRacer(int lane) throws RaceException {
-		
 		if (this.hasEnded()) {
 			throw new RaceException("Race has ended");
 			
-		} else if (!this.isValidLane(lane)) {
-			throw new RaceException("Invalid lane: " + lane);
-
-		} else if (this.eventType == EventType.GRP) {
-			throw new RaceException("Cannot cancel next racer for GRP run");
-
-		} else if (this.runningLanes.isEmpty() || this.runningLanes.get(lane-1)==null) {
-			throw new RaceException("No racer to cancel");
-
-		}else {
-			LinkedList<Racer> runningQueue = (LinkedList<Racer>) this.runningLanes.get(lane - 1);
-			Racer lastRacer = runningQueue.poll();
-			
-			if (lastRacer == null) {
-				throw new RaceException("No racer to cancel");
-				
-			} else {
-				runningQueue.remove(lastRacer);
-				
-				this.queuedRacers.add(lastRacer);
-								
-				lastRacer.cancel();
-				
-				this.log.add(lastRacer+" cancelled");
-			}
+		} else {
+			this.runManager.cancelNextRacer(lane);
 		}
 	}
 	
@@ -790,51 +363,8 @@ public class Run {
 	public void didNotFinishNextRacer(int lane) throws RaceException {
 		 if (this.hasEnded()) {
 			throw new RaceException("Race has ended");
-			
-		} else if (!this.isValidLane(lane)) {
-			throw new RaceException("Invalid lane: " + lane);
-
-		} else if (this.eventType == EventType.GRP) {
-			throw new RaceException("Cannot DNF next racer for GRP type");
-
-		} else if (this.runningLanes.isEmpty() || lane <= this.runningLanes.size()) {
-			throw new RaceException("No racer to DNF");
-
-		}  else if (this.eventType == EventType.PARGRP) {
-
-		 	if (lane < 1 || lane > 8) {
-		 		throw new RaceException("Lane is not within bounds [1,8]");
-
-			} else {
-		 		final int adjustedLane = lane-1;
-
-		 		if (adjustedLane < this.runningLanes.size()) {
-		 			//Then the lane exists, attempt to pull the first racer (as there should only be one per lane).
-					LinkedList<Racer> runningLane = (LinkedList<Racer>)this.runningLanes.get(adjustedLane);
-
-					if (!runningLane.isEmpty()) {
-						//Then there is a racer.
-						Racer racer = runningLane.get(0);
-						racer.didNotFinish();
-					}
-				}
-			}
-
-		 } else {
-			LinkedList<Racer> runningQueue = (LinkedList<Racer>) this.runningLanes.get(lane - 1);
-			Racer lastRacer = runningQueue.poll();
-			
-			if (lastRacer == null) {
-				throw new RaceException("No racer to DNF");
-				
-			} else {
-				runningQueue.remove(lastRacer);
-				this.finishedRacers.add(lastRacer);
-				
-				lastRacer.didNotFinish();
-				
-				this.log.add(lastRacer+" did not finish");
-			}
+		} else {
+		 	this.runManager.didNotFinishNextRacer(lane);
 		}
 	}
 
