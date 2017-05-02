@@ -2,6 +2,7 @@ package ChronoTimer;
 
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
+import com.sun.javaws.exceptions.InvalidArgumentException;
 
 public class Racer {
 	/**
@@ -31,6 +32,21 @@ public class Racer {
 	 */
 	public int getNumber() {
 		return this.number;
+	}
+
+
+	/**
+	 * Sets the racers number to the new number, provided it is valid.
+	 * A valid number is in bounds [-9999, -1] (for placeholders), and [1,9999] for non-placeholder racers.
+	 * @param newNumber the new number of the racer
+	 * @throws IllegalArgumentException if the new number is not within the specified bounds.
+	 */
+	public void setNumber(int newNumber) throws IllegalArgumentException {
+		if (newNumber > 9999 || newNumber < -9999 || newNumber == 0) {
+			throw new IllegalArgumentException("Racer cannot have a number greater than 4 digits, or 0");
+		} else {
+			this.number = newNumber;
+		}
 	}
 
 	/**
@@ -95,13 +111,8 @@ public class Racer {
 	 * @param number the identification number corresponding to the racer.
 	 */
 	public Racer(int number) throws IllegalArgumentException {
-	if (number > 9999 || number < -9999 || number == 0) {
-			throw new IllegalArgumentException("Racer cannot have a number greater than 4 digits, or 0");
-
-		} else {
-			this.number = number;
-			this.status = Status.QUEUED;
-		}
+		this.status = Status.QUEUED;
+		this.setNumber(number);
 	}
 	
 	/**

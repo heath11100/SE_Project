@@ -6,24 +6,29 @@ import ChronoTimer.Log;
 import ChronoTimer.Racer;
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Created by austinheath on 4/30/17.
  */
 public class GRPRunManager implements RunManager {
     private Queue<Racer> finishedRacers;
-    private int nextRacerIndex;
+    private int nextRacerToMarkIndex;
 
     private Log log;
 
     public GRPRunManager(Log log) {
         this.finishedRacers = new LinkedList<>();
 
-        this.nextRacerIndex = 0;
+        this.nextRacerToMarkIndex = 0;
 
         this.log = log;
     }
@@ -202,7 +207,137 @@ public class GRPRunManager implements RunManager {
         //There is no way to discern what person DNFs.
     }
 
-    public void markNextRacer(int racerNumber) {
-        //TODO:
+    /**
+     * Sets the bib number for the next *placeholder* racer that has finished.
+     * @param racerNumber the bib number that will be set.
+     * @throws RaceException when there is not a racer to be marked.
+     */
+    public void markNextRacer(int racerNumber) throws RaceException {
+        LinkedList<Racer> linkedList = (LinkedList<Racer>)this.finishedRacers;
+        if (this.nextRacerToMarkIndex < this.finishedRacers.size()) {
+            linkedList.get(this.nextRacerToMarkIndex).setNumber(racerNumber);
+            this.nextRacerToMarkIndex++;
+        } else {
+            throw new RaceException("No racer to mark bib number for");
+        }
+    }
+
+
+    public static class TestINDRunManager {
+        private GRPRunManager runManager;
+
+        private int racerNumber;
+
+        private ChronoTime time1, time2, time3;
+
+        public TestINDRunManager() throws InvalidTimeException {
+            this.runManager = new GRPRunManager(new Log());
+
+            racerNumber = 1234;
+
+            time1 = new ChronoTime(0,0,1,0);
+            time2 = new ChronoTime(1,0,0,0);
+            time3 = new ChronoTime(2,0,0,0);
+        }
+
+        @Test
+        public void testInitialization() {
+            assertEquals(0, this.runManager.finishedRacers.size());
+        }
+
+
+        /**
+         * Test that queueing a racer throws an exception.
+         */
+        @Test(expected = RaceException.class)
+        public void testQueueRacer() throws RaceException {
+            this.runManager.queueRacer(racerNumber);
+        }
+
+        /**
+         * Test that deQueueing a racer throws an exception.
+         */
+        @Test(expected = RaceException.class)
+        public void testDeQueueRacer() throws RaceException {
+            this.runManager.deQueueRacer(racerNumber);
+        }
+
+        /**
+         * Tests that starting a racer does not affect the data fields within the RunManager
+         */
+        @Test
+        public void testStartNext() throws RaceException {
+            //Finished racers should have 0 racers
+            assertEquals(0,this.runManager.finishedRacers.size());
+
+            //Lane should be ignored for GRP.
+            this.runManager.startNext(this.time1, 0);
+
+            //Finished racers should have 0 racers
+            assertEquals(0,this.runManager.finishedRacers.size());
+        }
+
+        /**
+         * Tests that finishing a racer properly adds it to the finished list, and that the racer is a "dummy" or placeholder.
+         */
+        @Test
+        public void startFinishNext() throws RaceException {
+
+            /**
+             * This method is called when the run should finish the next racer, or next batch of racers, dependent ofn the eventType.
+             *
+             * @param relativeTime corresponds to the end time, relative to the start of the run.
+             * @param lane         corresponds to the lane to start the next racer from. Note: this may be ignored for some eventTypes.
+             * @return true if the next racer, or batch of racers, were finished successfully, false otherwise.
+             * @throws RaceException see specific eventType implementations for conditions where this exception is thrown.
+             * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
+             */
+
+            //Finished racers should have 0 racers
+            assertEquals(0,this.runManager.finishedRacers.size());
+
+            //Lane should be ignored for GRP type
+            this.runManager.finishNext(this.time1, 0);
+
+            //Finished racers should have 1 racers
+            assertEquals(1 ,this.runManager.finishedRacers.size());
+            Racer racer = this.runManager.finishedRacers.peek();
+
+            assertTrue(racer != null);
+
+            //Number will be -1 because it is a placeholder.
+            assertEquals(-1, racer.getNumber());
+        }
+
+        /**
+         * Tests that cancelling a running racer will do nothing. Not even an error.
+         */
+        @Test
+        public void testCancelRunningRacer() throws RaceException {
+            //Finished racers should have 0 racers
+            assertEquals(0,this.runManager.finishedRacers.size());
+
+            //Lane should be ignored for GRP.
+            this.runManager.cancelNextRacer(0);
+
+            //Finished racers should have 0 racers
+            assertEquals(0,this.runManager.finishedRacers.size());
+        }
+
+        /**
+         * Tests that DNFing a racer will do nothing. Not even an error.
+         */
+        @Test
+        public void testDNFRunningRacer() throws RaceException {
+            //Finished racers should have 0 racers
+            assertEquals(0,this.runManager.finishedRacers.size());
+
+            //Lane should be ignored for GRP.
+            this.runManager.cancelNextRacer(0);
+
+            //Finished racers should have 0 racers
+            assertEquals(0,this.runManager.finishedRacers.size());
+        }
+
     }
 }
