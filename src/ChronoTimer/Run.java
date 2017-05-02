@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import ChronoTimer.Runs.INDRunManager;
+import ChronoTimer.Runs.RunManager;
 import Exceptions.*;
 
 /**
@@ -17,6 +19,9 @@ public class Run {
 	private ChronoTime endTime;
 	
 	private EventType eventType;
+
+	private RunManager runManager;
+
 	
 	private Queue<Racer> queuedRacers;
 	private ArrayList<Queue<Racer>> runningLanes;
@@ -42,6 +47,15 @@ public class Run {
 		this.log = new Log();
 		
 		this.log.add("Created run");
+
+		switch (this.eventType) {
+			case IND:
+				this.runManager = new INDRunManager(this.log);
+				break;
+
+			default:
+				break;
+		}
 	}
 	
 	public Run() {
@@ -105,198 +119,15 @@ public class Run {
      */
 	public Card getCard(ChronoTime currentTime) {
 		//Format card based on event type.
-		switch (this.eventType) {
-			case IND:
 
-				setINDcard(currentTime);
-				break;
-
-			case PARIND:
-				setPARINDcard();
-				break;
-
-			case GRP:
-				setGRPcard();
-				break;
-		}
-
-		return this.card;
-	}
-
-	/**
-	 * Sets this.card with the following information:
-	 *
-	 * Event Type - IND:
-	 * 	Header:
-	 * 	- Next three racers to start
-	 * 	Body:
-	 * 	- Current racers racing
-	 * 	Footer:
-	 * 	- Last Racer to finish
-	 */
-	private void setINDcard(ChronoTime currentTime) {
-		this.card = new Card();
-		//Header
-		Queue<Racer> nextThreeRacers = new LinkedList<Racer>();
-		//Puts the next three racers into the nextThreeQueue
-		for (Racer racer : this.queuedRacers) {
-			if (nextThreeRacers.size() == 3) {
-				break;
-			} else {
-				nextThreeRacers.add(racer);
-			}
-		}
-
-		//For loop exits when there are no longer racers to add OR there are 3 racers.
-		if (nextThreeRacers.size() == 0) {
-			this.card.setHeader("NO RACERS QUEUED");
-		} else {
-			this.card.setHeader(nextThreeRacers);
-		}
-
-
-		//Body
-		//Set body as the list of running racers (first and only running queue).
-		if (this.runningLanes.size() > 0) {
-			String bodyString = "";
-
-			for (Racer racer : this.runningLanes.get(0)) {
-				String elapsedTimeString = "";
-
-				try {
-					//Calculate the current elapsed time
-					//This puts the current time (that is passed in) relative to the run start time.
-					ChronoTime currentElapsedTime = currentTime.elapsedSince(this.startTime);
-					ChronoTime elapsedTime = currentElapsedTime.elapsedSince(racer.getStartTime());
-					elapsedTimeString = elapsedTime.toString();
-
-				} catch (InvalidTimeException e) {
-					elapsedTimeString = "INVALID TIME";
-				}
-
-				bodyString += racer.toString() + " " + elapsedTimeString + "\n";
-			}
-
-			this.card.setBody(bodyString);
-		}
-
-		//Footer
-		Racer lastRacer = null;
-		if (this.finishedRacers.size() > 0) {
-			lastRacer = ((LinkedList<Racer>)this.finishedRacers).getLast();
-		}
-
-		if (lastRacer != null) {
-			this.card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString());
-
-		} else {
-			this.card.setFooter("NO RACER FINISHED");
-		}
-	}
-
-	/**
-	 * Sets this.card with the following information:
-	 *
-	 * Event Type - PARIND:
-	 * 	Header:
-	 * 	- Next pair to run
-	 * 	Body:
-	 * 	- NOTHING
-	 * 	Footer:
-	 * 	- Finish times of the last pair to finish
-	 */
-	private void setPARINDcard() {
-		this.card = new Card();
-
-		//Header
-		//Next pair to run (essentially next two racers).
-		Queue<Racer> nextPair = new LinkedList<Racer>();
-
-		for (Racer racer : this.queuedRacers) {
-			if (nextPair.size() < 2) {
-				nextPair.add(racer);
-			} else {
-				break;
-			}
-		}
-
-		//For loop exits when there are no longer racers to add OR there are 2 racers.
-		if (nextPair.size() > 0) {
-			this.card.setHeader(nextPair);
-		} else {
-			//Then there are no racers paired to run.
-			this.card.setHeader("NO RACERS QUEUED");
-		}
-
-		//Body
-		//Nothing
-
-		//Footer
-		//Finish times of the last pair to finish (essentially last two racers).
-		LinkedList<Racer> linkedList = (LinkedList<Racer>) this.finishedRacers;
-		final int size = linkedList.size();
-
-		if (size > 1) {
-			//Then there is at least 2 racers (one pair)
-			Racer lastRacer = linkedList.get(size-1);
-			Racer secondLast = linkedList.get(size-2);
-
-			this.card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString()+ ", " +
-					secondLast.toString() + " " + secondLast.getElapsedTimeString());
-
-		} else if (size > 0) {
-			//Then only one racer has finished.
-			Racer lastRacer = linkedList.get(size-1);
-
-			this.card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString());
-
-		} else {
-			//Then no one has finished.
-			this.card.setFooter("NO PAIR HAS FINISHED");
-		}
-	}
-
-	/**
-	 * Sets this.card with the following information:
-	 *
-	 * Event Type - GRP:
-	 * 	Header:
-	 * 	- Running time
-	 * 	Body:
-	 * 	- NOTHING
-	 * 	Footer:
-	 * 	- Last finish time
-	 */
-	private void setGRPcard() {
-		this.card = new Card();
-		//Header
-		//Running Time
 		try {
-			this.card.setHeader("Race Time: " + this.getElapsedTime().toString());
+			ChronoTime elapsedTime = currentTime.elapsedSince(this.startTime);
 
-		} catch (InvalidTimeException e) {
-			//We should never reach this point
+			return this.runManager.getCard(elapsedTime);
 
-			this.card.setHeader("INVALID RACE TIME");
-		}
+		} catch (InvalidTimeException e) {	}
 
-		//Body
-		//Nothing
-
-		//Footer
-		//Last Finish Time
-		LinkedList<Racer> linkedList = (LinkedList<Racer>)this.finishedRacers;
-		final int size = linkedList.size();
-
-		if (size > 0) {
-			//Then there is a valid finish time.
-			Racer lastRacer = linkedList.get(size-1);
-			this.card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString());
-
-		} else {
-			//Then no one has finished.
-			this.card.setFooter("NO RACER FINISHED");
-		}
+		return new Card();
 	}
 
 	/**
@@ -626,6 +457,7 @@ public class Run {
 			}
 
 		} else {
+			//PAR IND, IND
 			Racer racer = new Racer(racerNumber);
 			this.queuedRacers.add(racer);
 

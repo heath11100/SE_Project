@@ -2,6 +2,7 @@ package ChronoTimer.Runs;
 
 import ChronoTimer.Card;
 import ChronoTimer.ChronoTime;
+import ChronoTimer.Log;
 import ChronoTimer.Racer;
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
@@ -17,10 +18,14 @@ public class GRPRunManager implements RunManager {
     private Queue<Racer> finishedRacers;
     private int nextRacerIndex;
 
-    public GRPRunManager() {
+    private Log log;
+
+    public GRPRunManager(Log log) {
         this.finishedRacers = new LinkedList<>();
 
         this.nextRacerIndex = 0;
+
+        this.log = log;
     }
 
     /**
@@ -161,6 +166,8 @@ public class GRPRunManager implements RunManager {
             newRacer.finish(relativeTime);
 
             this.finishedRacers.add(newRacer);
+
+            this.log.add("Finished " + newRacer);
 
         } catch (InvalidTimeException e) {
             //INVALID TIME!

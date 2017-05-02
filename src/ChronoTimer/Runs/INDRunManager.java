@@ -1,8 +1,6 @@
 package ChronoTimer.Runs;
 
-import ChronoTimer.Card;
-import ChronoTimer.ChronoTime;
-import ChronoTimer.Racer;
+import ChronoTimer.*;
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
 
@@ -21,10 +19,14 @@ public class INDRunManager implements RunManager{
     private Queue<Racer> runningRacers;
     private Queue<Racer> finishedRacers;
 
-    public INDRunManager() {
+    private Log log;
+
+    public INDRunManager(Log log) {
         this.queuedRacers = new LinkedList<>();
         this.runningRacers = new LinkedList<>();
         this.finishedRacers = new LinkedList<>();
+
+        this.log = log;
     }
 
     /**
@@ -183,6 +185,8 @@ public class INDRunManager implements RunManager{
         } else {
             Racer newRacer = new Racer(racerNumber);
             this.queuedRacers.add(newRacer);
+
+            this.log.add("Queued " + newRacer);
         }
     }
 
@@ -202,7 +206,9 @@ public class INDRunManager implements RunManager{
 
         for (int i = 0; i < size; i++) {
             if (linkedList.get(i).getNumber() == racerNumber) {
-                linkedList.remove(i);
+                Racer racer = linkedList.remove(i);
+                this.log.add("Removed " + racer);
+                return;
             }
         }
 
@@ -230,6 +236,8 @@ public class INDRunManager implements RunManager{
             //Start the racer and add it to the running queue.
             racer.start(relativeTime);
             this.runningRacers.add(racer);
+
+            this.log.add(relativeTime.getTimeStamp() + " " + racer +" started");
 
         } else {
             throw new RaceException("No racer to start");
@@ -261,6 +269,8 @@ public class INDRunManager implements RunManager{
                 //Add the racer to the finished queue.
                 this.finishedRacers.add(racer);
 
+                this.log.add(relativeTime.getTimeStamp() +" "+racer+" finished with time "+racer.getElapsedTime().getTimeStamp());
+
             } catch (InvalidTimeException e) {
                 //Relative time was invalid (probably before the start time for the racer.
             }
@@ -291,6 +301,8 @@ public class INDRunManager implements RunManager{
 
             this.queuedRacers.add(racer);
 
+            this.log.add(racer+" cancelled");
+
         } else {
             //Then there is not a racer to cancel.
             throw new RaceException("No racer to cancel");
@@ -317,6 +329,8 @@ public class INDRunManager implements RunManager{
             this.runningRacers.remove();
 
             this.finishedRacers.add(racer);
+
+            this.log.add(racer+" did not finish");
 
         } else {
             //Then there is not a racer to DNF.

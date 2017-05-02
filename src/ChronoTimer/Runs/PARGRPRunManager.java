@@ -2,6 +2,7 @@ package ChronoTimer.Runs;
 
 import ChronoTimer.Card;
 import ChronoTimer.ChronoTime;
+import ChronoTimer.Log;
 import ChronoTimer.Racer;
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
@@ -22,12 +23,15 @@ public class PARGRPRunManager implements RunManager {
 
     private final int NUM_OF_LANES = 8;
 
-    public PARGRPRunManager() {
+    private Log log;
+
+    public PARGRPRunManager(Log log) {
+
         this.queuedRacers = new LinkedList<>();
-
         this.runningRacers = new ArrayList<>(NUM_OF_LANES);
-
         this.finishedRacers = new LinkedList<>();
+
+        this.log = log;
     }
 
     /**
@@ -66,7 +70,15 @@ public class PARGRPRunManager implements RunManager {
      */
     @Override
     public void endRun() {
+        for (int i = 0; i < this.runningRacers.size(); i++) {
+            Racer racer = this.runningRacers.get(i);
+            if (racer != null) {
+                racer.didNotFinish();
 
+                this.finishedRacers.add(racer);
+                this.runningRacers.set(i, null);
+            }
+        }
     }
 
     /**
@@ -150,6 +162,8 @@ public class PARGRPRunManager implements RunManager {
         } else {
             Racer newRacer = new Racer(racerNumber);
             this.queuedRacers.add(newRacer);
+
+            this.log.add("Queued " + newRacer);
         }
     }
 
@@ -168,7 +182,9 @@ public class PARGRPRunManager implements RunManager {
 
         for (int i = 0; i < size; i++) {
             if (linkedList.get(i).getNumber() == racerNumber) {
-                linkedList.remove(i);
+                Racer racer = linkedList.remove(i);
+                this.log.add("Removed " + racer);
+
                 return;
             }
         }
@@ -202,6 +218,8 @@ public class PARGRPRunManager implements RunManager {
 
                     racer.start(relativeTime);
                     runIndex++;
+
+                    this.log.add("Started " + racer + " at time " + relativeTime.getTimeStamp());
 
                 } else {
                     throw new RaceException("INTERNAL INCONSISTENCY: Not enough run lanes.");
@@ -242,6 +260,8 @@ public class PARGRPRunManager implements RunManager {
                         racer.finish(relativeTime);
                         this.runningRacers.set(laneIndex, null);
 
+                        this.log.add("Finished " + racer + " at time " + relativeTime.getTimeStamp());
+
                     } catch (InvalidTimeException e) { /*Do nothing.*/ }
                 }
 
@@ -275,6 +295,8 @@ public class PARGRPRunManager implements RunManager {
             this.queuedRacers.add(racer);
         }
         this.finishedRacers.clear();
+
+        this.log.add("Cancelled all racers");
     }
 
     /**
@@ -299,6 +321,8 @@ public class PARGRPRunManager implements RunManager {
                 racer.didNotFinish();
                 this.finishedRacers.add(racer);
                 this.runningRacers.set(laneIndex, null);
+
+                this.log.add(racer.toString() + " did not finish");
             }
         }
     }
