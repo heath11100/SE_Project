@@ -48,7 +48,17 @@ public class PARGRPRunManager implements RunManager {
      */
     @Override
     public Card getCard(ChronoTime elapsedTime) {
-        return null;
+        Card card = new Card();
+
+        card.setHeader("PARGRP Card.");
+
+        //Body
+        //idk
+
+        //Footer
+        //idk
+
+        return card;
     }
 
     /**
@@ -178,8 +188,8 @@ public class PARGRPRunManager implements RunManager {
     @Override
     public void startNext(ChronoTime relativeTime, int lane) throws RaceException {
         //START ALL RACERS.
-        if (lane < 1 || lane > 8) {
-            throw new RaceException("Invalid lane number: " + lane);
+        if (!this.isValidLane(lane)) {
+            throw new RaceException("Lane " + lane + " is invalid");
 
         } else {
             int runIndex = 0;
@@ -216,8 +226,8 @@ public class PARGRPRunManager implements RunManager {
     @Override
     public void finishNext(ChronoTime relativeTime, int lane) throws RaceException {
         //Test if lane is valid [1,8]
-        if (lane < 1 || lane > 8) {
-            throw new RaceException("Invalid lane number: " + lane);
+        if (!this.isValidLane(lane)) {
+            throw new RaceException("Lane " + lane + " is invalid");
 
         } else {
             final int laneIndex = lane-1;
@@ -277,8 +287,8 @@ public class PARGRPRunManager implements RunManager {
      */
     @Override
     public void didNotFinishNextRacer(int lane) throws RaceException {
-        if (lane < 1 || lane > NUM_OF_LANES) {
-            throw new RaceException("Lane is not within bounds [1,8]");
+        if (!this.isValidLane(lane)) {
+            throw new RaceException("Lane " + lane + " is invalid");
 
         } else {
             final int laneIndex = lane-1;
