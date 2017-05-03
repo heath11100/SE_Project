@@ -41,6 +41,9 @@ public class Run {
 		
 		this.log.add("Created run");
 
+		// And From your main() method or any other method
+		timer = new Timer();
+
 		switch (this.eventType) {
 			case IND:
 				this.runManager = new INDRunManager(this.log);
@@ -59,8 +62,6 @@ public class Run {
 				break;
 		}
 
-		// And From your main() method or any other method
-		timer = new Timer();
 		timer.schedule(new WriteState(this.runManager), 0, 500);
 	}
 
@@ -259,9 +260,8 @@ public class Run {
 		this.timer.cancel();
 		this.timer.purge();
 
-		timer = new Timer();
 		// And From your main() method or any other method
-		timer.schedule(new WriteState(this.runManager), 0, 500);
+		this.timer.schedule(new WriteState(this.runManager), 0, 500);
 
 		this.log.add("Event type is " + newEventType);
 	}

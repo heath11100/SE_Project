@@ -42,58 +42,64 @@ public class INDRunManager implements RunManager{
     public Card getCard(ChronoTime elapsedTime) {
         Card card = new Card();
         //Header
-        Queue<Racer> nextThreeRacers = new LinkedList<Racer>();
-        //Puts the next three racers into the nextThreeQueue
-        for (Racer racer : this.queuedRacers) {
-            if (nextThreeRacers.size() == 3) {
-                break;
-            } else {
-                nextThreeRacers.add(racer);
+        String headerString = "Next 3 Queued Racers:\n";
+        if (this.queuedRacers.size() == 0) {
+            //Then there are no racers to queue.
+            //Add 2 new lines to compensate for
+            headerString += "None";
+
+        } else {
+            //queueSize will be used to iterate through the queuedRacers beginning at queueSize to 0.
+            //We are going backwards so the string will display the next racer to start at the bottom of the list.
+            //Since we only want the first 3 racers, if queuedRacers.size() > 3, we only want 3, thus taking the minimum.
+            //If the size is 2 or 1 we don't want to IndexOutOfBounds so we will use the size instead.
+            final int queueSize = Math.min(this.queuedRacers.size(), 3);
+
+            LinkedList<Racer> linkedQueue = (LinkedList<Racer>)this.queuedRacers;
+            for (int index = queueSize-1; index >= 0; index--) {
+                Racer racer = linkedQueue.get(index);
+                headerString += racer.toString() + "\n";
             }
         }
-
-        //For loop exits when there are no longer racers to add OR there are 3 racers.
-        if (nextThreeRacers.size() == 0) {
-            card.setHeader("NO RACERS QUEUED");
-        } else {
-            card.setHeader(nextThreeRacers);
-        }
-
+        card.setHeader(headerString);
 
         //Body
         //Set body as the list of running racers.
-        String bodyString = "";
+        String bodyString = "Running Racers:\n";
 
-        for (Racer racer : this.runningRacers) {
-            String elapsedTimeString = "";
+        LinkedList<Racer> linkedListRunning = (LinkedList<Racer>)this.runningRacers;
+        //Iterate through running racers backwards.
+        if (this.runningRacers.size() > 0) {
+            for (int i = this.runningRacers.size()-1; i >= 0; i--) {
+                Racer racer = linkedListRunning.get(i);
 
-            try {
-                //Calculate the current elapsed time
-                //This puts the current time (that is passed in) relative to the run start time.
-                ChronoTime racerElapsed = elapsedTime.elapsedSince(racer.getStartTime());
-                elapsedTimeString = racerElapsed.toString();
+                String elapsedTimeString;
+                try {
+                    //Calculate the current elapsed time
+                    //This puts the current time (that is passed in) relative to the run start time.
+                    ChronoTime racerElapsed = elapsedTime.elapsedSince(racer.getStartTime());
+                    elapsedTimeString = racerElapsed.toString();
 
-            } catch (InvalidTimeException e) {
-                elapsedTimeString = "INVALID TIME";
+                } catch (InvalidTimeException e) {
+                    elapsedTimeString = "<INVALID TIME>";
+                }
+
+                bodyString += racer.toString() + " " + elapsedTimeString + "\n";
             }
-
-            bodyString += racer.toString() + " " + elapsedTimeString + "\n";
+        } else {
+            bodyString += "None";
         }
-
         card.setBody(bodyString);
 
         //Footer
-        Racer lastRacer = null;
-        if (this.finishedRacers.size() > 0) {
-            lastRacer = ((LinkedList<Racer>)this.finishedRacers).getLast();
-        }
-
+        String footerString = "Last Racer to Finish:\n";
+        Racer lastRacer = ((LinkedList<Racer>)this.finishedRacers).peekLast();
         if (lastRacer != null) {
-            card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString());
-
+            footerString += lastRacer.toString() + " " + lastRacer.getElapsedTimeString();
         } else {
-            card.setFooter("NO RACER FINISHED");
+            footerString += "None";
         }
+        card.setFooter(footerString);
 
         return card;
     }
@@ -293,16 +299,22 @@ public class INDRunManager implements RunManager{
      */
     @Override
     public void cancelNextRacer(int lane) throws RaceException {
-        Racer racer = this.runningRacers.peek();
+        LinkedList<Racer> linkedRunning = (LinkedList<Racer>)this.runningRacers;
+        //Peek last will get
+        Racer racer = linkedRunning.peekLast();
 
         if (racer != null) {
             racer.cancel();
 
             //*Could* throw NoSuchElementException, although it should never throw this.
             //Since racer != null, there is at least one element in the running queue.
-            this.runningRacers.remove();
+            linkedRunning.removeLast();
 
-            this.queuedRacers.add(racer);
+            LinkedList<Racer> linkedQueued = (LinkedList<Racer>)this.queuedRacers;
+            if (!linkedQueued.offerFirst(racer)) {
+                //Racer could not be added, for whatever reason?
+                throw new RaceException("INTERNAL ERROR: Could not add racer.");
+            }
 
             this.log.add(racer+" cancelled");
 
@@ -637,7 +649,7 @@ public class INDRunManager implements RunManager{
          * Tests that cancelling a running racer will move them to the queue.
          */
         @Test
-        public void testCancelRunningRacer() throws RaceException {
+        public void testCancelRunningRacer_1() throws RaceException {
             this.runManager.queueRacer(racerNumber);
             this.runManager.startNext(this.time1, 0);
 
@@ -651,6 +663,51 @@ public class INDRunManager implements RunManager{
             //Running Racer should have 0 racer, Queued racers should have 1.
             assertEquals(0, this.runManager.runningRacers.size());
             assertEquals(1, this.runManager.queuedRacers.size());
+        }
+
+        /**
+         * Tests that cancelling a running racer will move them to the queue.
+         */
+        @Test
+        public void testCancelRunningRacer_2() throws RaceException {
+            final int racerNumber2 = 4321;
+            final int racerNumber3 = 8080;
+
+            this.runManager.queueRacer(racerNumber);
+            this.runManager.queueRacer(racerNumber2);
+            this.runManager.queueRacer(racerNumber3);
+            //Queue should be: 1) racerNumber[1234], 2) racerNumber2[4321], 3) racerNumber3[8080]
+
+            this.runManager.startNext(this.time1, 0);
+            this.runManager.startNext(this.time2, 0);
+            //Queue should be: 1) racerNumber3[8080]
+            //Running should be 1) racerNumber[1234], 2) racerNumber2[4321]
+
+            //Running Racer should have 2 racer, Queued racers should have 1.
+            assertEquals(1, this.runManager.queuedRacers.size());
+            assertEquals(2, this.runManager.runningRacers.size());
+
+            LinkedList<Racer> runningLinked = (LinkedList<Racer>)this.runManager.runningRacers;
+            //The last racer to start.
+            Racer racerToCancel = runningLinked.getLast();
+            //Last racer to start should be racerNumber2[4321]
+            assertEquals(4321, racerToCancel.getNumber());
+
+            //Lane should be ignored for IND.
+            this.runManager.cancelNextRacer(0);
+            //Queue should be: 1) racerNumber2[4321], 2) racerNumber3[8080]
+            //Running should be 1) racerNumber[1234]
+
+            //Running Racer should have 0 racer, Queued racers should have 1.
+            assertEquals(1, this.runManager.runningRacers.size());
+            assertEquals(2, this.runManager.queuedRacers.size());
+
+            //Peek is the head of the queue, or the next racer to start.
+            Racer cancelledRacer = this.runManager.queuedRacers.peek();
+
+            //Head of the queue should be racerNumber2[4321]
+            assertEquals(4321, cancelledRacer.getNumber());
+            //The last racer to start (racerToCancel) should be equal the the nextRacer to start at this point (cancelledRacer)
         }
 
         /**
