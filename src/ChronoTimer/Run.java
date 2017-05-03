@@ -74,7 +74,7 @@ public class Run {
 
 		@Override
 		public void run() {
-			final String filePath = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + "/runState.txt";
+			final String filePath = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + "runState.txt";
 
 			try {
 				FileWriter fileWriter = new FileWriter(filePath, false);
@@ -257,7 +257,9 @@ public class Run {
 		}
 
 		this.timer.cancel();
-		this.timer = new Timer();
+		this.timer.purge();
+
+		timer = new Timer();
 		// And From your main() method or any other method
 		timer.schedule(new WriteState(this.runManager), 0, 500);
 

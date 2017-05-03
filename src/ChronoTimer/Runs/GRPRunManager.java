@@ -222,6 +222,20 @@ public class GRPRunManager implements RunManager {
         }
     }
 
+    @Override
+    public String toString() {
+        String outputString = "GRP RUN OUTPUT\n";
+
+        outputString += "\nFinished:\n";
+
+        for (Racer racer : this.finishedRacers) {
+            outputString += racer.toString() + "\n";
+        }
+
+        outputString += "\n\n\n";
+        return outputString;
+    }
+
 
     public static class TestINDRunManager {
         private GRPRunManager runManager;

@@ -327,4 +327,87 @@ public class PARGRPRunManager implements RunManager {
         }
     }
 
+
+    @Override
+    public String toString() {
+        String outputString = "PARGRP RUN OUTPUT\nQueued:\n";
+
+        for (Racer racer : this.queuedRacers) {
+            outputString += racer.toString() + "\n";
+        }
+
+        outputString += "\nRunning (lane 1): ";
+        Racer racer = this.runningRacers.get(0);
+        if (racer != null) {
+            outputString += racer.toString() + "\n";
+        } else {
+            outputString += "\n";
+        }
+
+        outputString += "\nRunning (lane 2): ";
+        racer = this.runningRacers.get(1);
+        if (racer != null) {
+            outputString += racer.toString() + "\n";
+        } else {
+            outputString += "\n";
+        }
+
+        outputString += "\nRunning (lane 3): ";
+        racer = this.runningRacers.get(2);
+        if (racer != null) {
+            outputString += racer.toString() + "\n";
+        } else {
+            outputString += "\n";
+        }
+
+        outputString += "\nRunning (lane 4): ";
+        racer = this.runningRacers.get(3);
+        if (racer != null) {
+            outputString += racer.toString() + "\n";
+        } else {
+            outputString += "\n";
+        }
+
+        outputString += "\nRunning (lane 5): ";
+        racer = this.runningRacers.get(4);
+        if (racer != null) {
+            outputString += racer.toString() + "\n";
+        } else {
+            outputString += "\n";
+        }
+
+        outputString += "\nRunning (lane 6): ";
+        racer = this.runningRacers.get(5);
+        if (racer != null) {
+            outputString += racer.toString() + "\n";
+        } else {
+            outputString += "\n";
+        }
+
+        outputString += "\nRunning (lane 7): ";
+        racer = this.runningRacers.get(6);
+        if (racer != null) {
+            outputString += racer.toString() + "\n";
+        } else {
+            outputString += "\n";
+        }
+
+        outputString += "\nRunning (lane 8): ";
+        racer = this.runningRacers.get(7);
+        if (racer != null) {
+            outputString += racer.toString() + "\n";
+        } else {
+            outputString += "\n";
+        }
+
+        outputString += "\nFinished:\n";
+
+        for (Racer finRacer : this.finishedRacers) {
+            outputString += finRacer.toString() + "\n";
+        }
+
+        outputString += "\n\n\n";
+        return outputString;
+    }
+
 }
