@@ -2,7 +2,6 @@ package ChronoTimer;
 
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
-import com.sun.javaws.exceptions.InvalidArgumentException;
 
 public class Racer {
 	/**
