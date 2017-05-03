@@ -590,7 +590,7 @@ public class ChronoTrigger
 			try {
 				officialTime = commandTime.withOffset(offset);
 			} catch (InvalidTimeException e) {
-				// TODO Auto-generated catch block
+				// TODO Auto-generated catch block 
 				e.printStackTrace();
 			}
 			
