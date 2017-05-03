@@ -594,7 +594,7 @@ public class ChronoTrigger
 				e.printStackTrace();
 			}
 			
-			if (!runs.isEmpty())
+			if (!runs.isEmpty() && runs.size() > runNum)
 				runprinter.print(runs.get(runNum).getLog());
 			else
 				history.add("runNum " + runNum+ " was invalid");

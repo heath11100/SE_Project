@@ -171,7 +171,7 @@ public class GUI {
 		printerText.setEditable(false);
 		printerText.setLineWrap(true);
 		printerText.setWrapStyleWord(true);
-		printerText.setPreferredSize(new Dimension(250,250));
+		//printerText.setPreferredSize(new Dimension(250,250));
 		DefaultCaret caret = (DefaultCaret)printerText.getCaret();
 		 caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		
