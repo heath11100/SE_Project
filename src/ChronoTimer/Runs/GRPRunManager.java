@@ -245,7 +245,6 @@ public class GRPRunManager implements RunManager {
             assertEquals(0, this.runManager.finishedRacers.size());
         }
 
-
         /**
          * Test that queueing a racer throws an exception.
          */

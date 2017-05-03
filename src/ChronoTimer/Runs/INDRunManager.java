@@ -341,6 +341,29 @@ public class INDRunManager implements RunManager{
         }
     }
 
+    @Override
+    public String toString() {
+        String outputString = "IND RUN OUTPUT\nQueued:\n";
+
+        for (Racer racer : this.queuedRacers) {
+            outputString += racer.toString() + "\n";
+        }
+
+        outputString += "\nRunning:\n";
+
+        for (Racer racer : this.runningRacers) {
+            outputString += racer.toString() + "\n";
+        }
+
+        outputString += "\nFinished:\n";
+
+        for (Racer racer : this.finishedRacers) {
+            outputString += racer.toString() + "\n";
+        }
+
+        outputString += "\n\n\n";
+        return outputString;
+    }
 
     public static class TestINDRunManager {
         private INDRunManager runManager;

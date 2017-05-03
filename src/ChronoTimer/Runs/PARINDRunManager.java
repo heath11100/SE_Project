@@ -395,6 +395,40 @@ public class PARINDRunManager implements RunManager {
         }
     }
 
+    @Override
+    public String toString() {
+        String outputString = "PARIND RUN OUTPUT\nQueued:\n";
+
+        for (Racer racer : this.queuedRacers) {
+            outputString += racer.toString() + "\n";
+        }
+
+        outputString += "\nRunning (lane 1):\n";
+
+        for (Racer racer : this.runningLanes.get(0)) {
+            outputString += racer.toString() + "\n";
+        }
+
+        outputString += "\nRunning (lane 2):\n";
+
+        for (Racer racer : this.runningLanes.get(1)) {
+            outputString += racer.toString() + "\n";
+        }
+
+        outputString += "\nFinished:\n";
+
+        for (Racer racer : this.finishedRacers) {
+            outputString += racer.toString() + "\n";
+        }
+
+        outputString += "\n\n\n";
+        return outputString;
+    }
+
+
+
+
+
     public static class TestINDRunManager {
         private PARINDRunManager runManager;
 

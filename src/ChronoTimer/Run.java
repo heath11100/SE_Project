@@ -1,9 +1,17 @@
 package ChronoTimer;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import ChronoTimer.Runs.*;
 import Exceptions.*;
+
+import javax.swing.filechooser.FileSystemView;
 
 /**
  * PARGRP:
@@ -23,6 +31,8 @@ public class Run {
 
 	private final int MIN_BIB_NUMBER = 1;
 	private final int MAX_BIB_NUMBER = 9999;
+
+	private Timer timer;
 
 	public Run(EventType eventType) {
 		this.eventType = eventType;
@@ -47,6 +57,37 @@ public class Run {
 			case PARGRP:
 				this.runManager = new PARGRPRunManager(this.log);
 				break;
+		}
+
+		// And From your main() method or any other method
+		timer = new Timer();
+		timer.schedule(new WriteState(this.runManager), 0, 500);
+	}
+
+	public class WriteState extends TimerTask {
+		private RunManager runManager;
+
+		public WriteState(RunManager runManager) {
+			super();
+			this.runManager = runManager;
+		}
+
+		@Override
+		public void run() {
+			final String filePath = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + "/runState.txt";
+
+			try {
+				FileWriter fileWriter = new FileWriter(filePath, false);
+
+				BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+				bufferedWriter.write(this.runManager.toString());
+
+				bufferedWriter.close();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -214,7 +255,12 @@ public class Run {
 		default:
 			throw new RaceException("Invalid event type: " + newEventType);
 		}
-		
+
+		this.timer.cancel();
+		this.timer = new Timer();
+		// And From your main() method or any other method
+		timer.schedule(new WriteState(this.runManager), 0, 500);
+
 		this.log.add("Event type is " + newEventType);
 	}
 	
