@@ -126,6 +126,7 @@ public class ChronoTrigger
 	public void setPrinter(Printer s)
 	{
 		runprinter = s;
+		printer = s;
 	}
 	/**
 	 * Sets the officialTime of the race
