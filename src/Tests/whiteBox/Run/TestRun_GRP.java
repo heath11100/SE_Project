@@ -1,4 +1,4 @@
-package Tests.RunTests;
+package Tests.whiteBox.Run;
 
 import ChronoTimer.ChronoTime;
 import ChronoTimer.Run;
@@ -34,7 +34,6 @@ public class TestRun_GRP {
 	public void testCreateLane() throws RaceException {
 		//Attempt to create a new lane
 		//Should fail, because we don't have "lanes" for GRP.
-		run.newLane();
 	}
 
 	@Test(expected = RaceException.class)

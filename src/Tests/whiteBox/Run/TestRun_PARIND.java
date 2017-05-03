@@ -1,4 +1,4 @@
-package Tests.RunTests;
+package Tests.whiteBox.Run;
 
 import junit.framework.TestCase;
 import ChronoTimer.*;
@@ -39,125 +39,24 @@ public class TestRun_PARIND extends TestCase {
 	 * Tests creating a single lane with PARIND.
 	 */
 	public void testCreateFirstLane() {
-		try {
-			run.newLane();
-			
-		} catch (RaceException e) {
-			fail("Should not throw error on first lane creation");
-		}
+
 	}
 	
 	/**
 	 * Tests to ensure failure when creating multiple lanes with IND.
 	 */
-	public void testMultipleLanes_MidCapactiy() {		
-		try {
-			int laneNumber;
-			
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 1);
-			
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 2);
-
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 3);
-						
-		} catch (RaceException e) {
-			fail("This should not fail, not exceeding maximum lane capacity.");
-		}
+	public void testMultipleLanes_MidCapactiy() {
 	}
 	
 	/**
 	 * Ensures that multiple lanes can be added, up to capacity (8 lanes)
 	 */
 	public void testMultipleLanes_MaximumCapacity() {
-		try {
-			int laneNumber;
-			
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 1);
-			
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 2);
 
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 3);
-			
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 4);
-			
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 5);
-			
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 6);
-			
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 7);
-			
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 8);
-						
-		} catch (RaceException e) {
-			fail("This should not fail, not exceeding maximum lane capacity.");
-		}
 	}
 	
 	public void testMultipleLanes_ExceedingMaximumCapacity() {
-		int laneNumber = 0;
 
-		try {
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 1);
-			
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 2);
-
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 3);
-			
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 4);
-			
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 5);
-			
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 6);
-			
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 7);
-			
-			laneNumber = run.newLane();
-			
-			assertEquals(laneNumber, 8);
-			
-			laneNumber = run.newLane();
-			
-			fail("Should not be able to meet 9 lanes.");
-						
-		} catch (RaceException e) {
-			assertTrue(laneNumber > 0 && laneNumber < 9);
-		}
 	}
 	
 	/**
@@ -165,12 +64,7 @@ public class TestRun_PARIND extends TestCase {
 	 */
 	
 	public void testFinishingRacers() {
-		//Add new lane.
-		try {
-			run.newLane();
-		} catch (RaceException e) {
-			fail("Should not fail in this instance.");
-		}
+
 		
 		//Add racer 1.
 		try {
@@ -182,20 +76,6 @@ public class TestRun_PARIND extends TestCase {
 		//Add racer 2.
 		try {
 			run.queueRacer(racerNumber2);
-		} catch (RaceException e) {
-			fail("Should not fail in this instance.");
-		}
-		
-		//Add new lane.
-		try {
-			run.newLane();
-		} catch (RaceException e) {
-			fail("Should not fail in this instance.");
-		}
-		
-		//Add new lane.
-		try {
-			run.newLane();
 		} catch (RaceException e) {
 			fail("Should not fail in this instance.");
 		}

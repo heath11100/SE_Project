@@ -1,4 +1,4 @@
-package Tests.RunTests;
+package Tests.whiteBox.Run;
 
 import ChronoTimer.*;
 import Exceptions.*;
@@ -89,13 +89,8 @@ public class TestRun extends TestCase {
 		}
 	}
 	
-	public void testEventTypeChangeAfterRacerStart() {	
+	public void testEventTypeChangeAfterRacerStart() {
 		int laneNumber = -1;
-		try {
-			laneNumber = run.newLane();
-		} catch (RaceException e) {
-			fail("Could not create a new lane for run");
-		}
 		
 		if (laneNumber == -1) {
 			fail("Lane number was not properly initialized");
@@ -131,7 +126,6 @@ public class TestRun extends TestCase {
 	 * Successfully queues a racer (with raceNumber, in lane 1)
 	 */
 	private void queueRacer() throws RaceException {
-		run.newLane();
 		run.queueRacer(racerNumber);
 	}
 	
@@ -250,11 +244,6 @@ public class TestRun extends TestCase {
 	
 	public void testEndRunInvalidTime() {
 		int laneNumber = -1;
-		try {
-			laneNumber = run.newLane();
-		} catch (RaceException e) {
-			fail("Could not create a new lane for run");
-		}
 		
 		if (laneNumber == -1) {
 			fail("Lane number was not properly initialized");
@@ -284,11 +273,6 @@ public class TestRun extends TestCase {
 	
 	public void testEndRunWithNotStartedRun() {
 		int laneNumber = -1;
-		try {
-			laneNumber = run.newLane();
-		} catch (RaceException e) {
-			fail("Could not create a new lane for run");
-		}
 		
 		if (laneNumber == -1) {
 			fail("Lane number was not properly initialized");
@@ -316,11 +300,6 @@ public class TestRun extends TestCase {
 	
 	public void testEndRunAfterRunEnd() {
 		int laneNumber = -1;
-		try {
-			laneNumber = run.newLane();
-		} catch (RaceException e) {
-			fail("Could not create a new lane for run");
-		}
 		
 		if (laneNumber == -1) {
 			fail("Lane number was not properly initialized");

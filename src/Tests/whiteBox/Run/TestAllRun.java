@@ -1,5 +1,7 @@
-package Tests.RunTests;
+package Tests.whiteBox.Run;
 
+
+import ChronoTimer.Runs.INDRunManager;
 import org.junit.runners.Suite;
 import org.junit.runner.RunWith;
 
@@ -8,7 +10,10 @@ import org.junit.runner.RunWith;
         TestRun.class,
         TestRun_GRP.class,
         TestRun_IND.class,
-        TestRun_PARIND.class
+        TestRun_PARIND.class,
+        
+        //MARK: Run Managers
+        INDRunManager.TestINDRunManager.class
 })
 
 /**

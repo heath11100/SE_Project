@@ -1,4 +1,5 @@
-package Tests;
+package Tests.whiteBox.ChronoTime;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 

@@ -16,8 +16,10 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.time.Instant;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 
 public class GUI {
 
@@ -37,6 +39,7 @@ public class GUI {
 	private ChannelPad channelPad;
 
 	// Displays
+	private JScrollPane printerScroll;
 	private JTextArea displayText,printerText; 
 
 	//Style
@@ -164,15 +167,22 @@ public class GUI {
 		printerPower.addActionListener(new Listener(handler,"PRINTER POWER"));
 		panels[2].add(printerPower,c);
 
+		
 		printerText.setEditable(false);
-		printerText.setPreferredSize(new Dimension(250,250));
-		//printerScroll = new JScrollPane(printerText,
-				//JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		//printerScroll.setPreferredSize(new Dimension(250,250));
+		printerText.setLineWrap(true);
+		printerText.setWrapStyleWord(true);
+		//printerText.setPreferredSize(new Dimension(250,250)); 
+		DefaultCaret caret = (DefaultCaret)printerText.getCaret();
+		 caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		
+		printerScroll = new JScrollPane(printerText,
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		printerScroll.setPreferredSize(new Dimension(250,250));
+		
 		c = new GridBagConstraints();
 		c.gridx = 0;c.gridy = 1;
 		c.weightx = c.weighty = 1;
-		panels[2].add(printerText,c);
+		panels[2].add(printerScroll,c);
 	}
 
 	/**

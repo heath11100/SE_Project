@@ -1,4 +1,4 @@
-package Tests;
+package Tests.whiteBox.Racer;
 
 import ChronoTimer.ChronoTime;
 import ChronoTimer.Racer;

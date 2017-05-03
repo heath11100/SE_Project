@@ -20,11 +20,13 @@ public class PrinterStream extends PrintStream
 	public void println(String string) 
 	{
 		textArea.append(string+"\n");
+		textArea.validate();
 	}
 	 
 	public void print(String string) 
 	{
 		textArea.append(string);
+		textArea.validate();
 	}
 
 }
