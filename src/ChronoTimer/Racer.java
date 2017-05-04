@@ -35,6 +35,15 @@ public class Racer {
 
 
 	/**
+	 * Determines whether or not a racer has finished. DNF is considered a finish.
+	 * @return true if the racer has finished, false otherwise.
+	 */
+	public boolean hasFinished() {
+		return this.status == Status.DNF || this.status == Status.FINISHED;
+	}
+
+
+	/**
 	 * Sets the racers number to the new number, provided it is valid.
 	 * A valid number is in bounds [-9999, -1] (for placeholders), and [1,9999] for non-placeholder racers.
 	 * @param newNumber the new number of the racer

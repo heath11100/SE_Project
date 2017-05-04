@@ -19,17 +19,30 @@ import java.util.Queue;
 public class PARGRPRunManager implements RunManager {
     private Queue<Racer> queuedRacers;
     private ArrayList<Racer> runningRacers;
-    private Queue<Racer> finishedRacers;
+
+    //This is the lane in which each racer finished.s
+
+    private ArrayList<Racer> finishedRacers;
 
     private final int NUM_OF_LANES = 8;
 
     private Log log;
 
+    private boolean hasRunEnded = false;
+
     public PARGRPRunManager(Log log) {
 
         this.queuedRacers = new LinkedList<>();
-        this.runningRacers = new ArrayList<>(NUM_OF_LANES);
-        this.finishedRacers = new LinkedList<>();
+
+        this.runningRacers = new ArrayList<>();
+        for (int i = 0; i < NUM_OF_LANES; i++) {
+            runningRacers.add(null);
+        }
+
+        this.finishedRacers = new ArrayList<>();
+        for (int i = 0; i < NUM_OF_LANES; i++) {
+            finishedRacers.add(null);
+        }
 
         this.log = log;
     }
@@ -54,13 +67,57 @@ public class PARGRPRunManager implements RunManager {
     public Card getCard(ChronoTime elapsedTime) {
         Card card = new Card();
 
-        card.setHeader("PARGRP Card.");
+        String headerString;
+        if (this.hasRunEnded) {
+            headerString = "Run Finished at " + elapsedTime.toString();
 
-        //Body
-        //idk
+        } else if (elapsedTime == null) {
+            //Run has not ended, but has not started either.
+            headerString = "Parallel Group Run\n";
+
+            //Show Queued Racers
+            int count = 1;
+            String queuedString = "\nQueued Racers:\n";
+
+            if (this.queuedRacers.size() > 0) {
+                for (Racer racer : this.queuedRacers) {
+                    queuedString += "Lane " + (count) + ": " + racer.toString() + "\n";
+                    count++;
+                }
+            } else {
+                queuedString += "None";
+            }
+
+            headerString += queuedString;
+
+        } else {
+            //Run has not ended, but has started.
+            headerString = "Run Time:\n" + elapsedTime.toString();
+        }
+        card.setHeader(headerString);
+
+        String bodyString = "\n";
+        for (int i = 0; i < NUM_OF_LANES; i++) {
+            Racer racer = this.runningRacers.get(i);
+
+            if (racer == null) {
+                //Then this lane does NOT have a racer in it that is running.
+                //Check if there is a racer in this lane that has finished.
+                racer = this.finishedRacers.get(i);
+            }
+
+            if (racer != null && racer.hasFinished()) {
+                bodyString += "Lane " + (i+1) + ": " + racer.toString() + " " + racer.getElapsedTimeString() + "\n\n";
+
+            } else if (racer != null) {
+                //Racer still going.
+                bodyString += "Lane " + (i+1) + ": " + racer.toString() + "\n\n";
+            }
+        }
+        card.setBody(bodyString);
 
         //Footer
-        //idk
+        //None
 
         return card;
     }
@@ -79,6 +136,8 @@ public class PARGRPRunManager implements RunManager {
                 this.runningRacers.set(i, null);
             }
         }
+
+        this.hasRunEnded = true;
     }
 
     /**
@@ -129,7 +188,7 @@ public class PARGRPRunManager implements RunManager {
 
         if (!doesExist) {
             for (Racer racer : this.finishedRacers) {
-                if (racer.getNumber() == racerNumber) {
+                if (racer != null && racer.getNumber() == racerNumber) {
                     doesExist = true;
                     break;
                 }
@@ -258,6 +317,8 @@ public class PARGRPRunManager implements RunManager {
                 if (racer != null) {
                     try {
                         racer.finish(relativeTime);
+
+                        this.finishedRacers.set(laneIndex, racer);
                         this.runningRacers.set(laneIndex, null);
 
                         this.log.add("Finished " + racer + " at time " + relativeTime.getTimeStamp());
@@ -336,74 +397,28 @@ public class PARGRPRunManager implements RunManager {
             outputString += racer.toString() + "\n";
         }
 
-        outputString += "\nRunning (lane 1): ";
-        Racer racer = this.runningRacers.get(0);
-        if (racer != null) {
-            outputString += racer.toString() + "\n";
-        } else {
-            outputString += "\n";
-        }
+        outputString += "\nRunning:\n";
+        for (int i = 0; i < NUM_OF_LANES; i++) {
+            outputString += "\nLane " + (i+1) + ": ";
+            Racer racer = this.runningRacers.get(i);
 
-        outputString += "\nRunning (lane 2): ";
-        racer = this.runningRacers.get(1);
-        if (racer != null) {
-            outputString += racer.toString() + "\n";
-        } else {
-            outputString += "\n";
-        }
+            if (racer != null) {
+                outputString += racer.toString() + "\n";
+            }
 
-        outputString += "\nRunning (lane 3): ";
-        racer = this.runningRacers.get(2);
-        if (racer != null) {
-            outputString += racer.toString() + "\n";
-        } else {
-            outputString += "\n";
-        }
-
-        outputString += "\nRunning (lane 4): ";
-        racer = this.runningRacers.get(3);
-        if (racer != null) {
-            outputString += racer.toString() + "\n";
-        } else {
-            outputString += "\n";
-        }
-
-        outputString += "\nRunning (lane 5): ";
-        racer = this.runningRacers.get(4);
-        if (racer != null) {
-            outputString += racer.toString() + "\n";
-        } else {
-            outputString += "\n";
-        }
-
-        outputString += "\nRunning (lane 6): ";
-        racer = this.runningRacers.get(5);
-        if (racer != null) {
-            outputString += racer.toString() + "\n";
-        } else {
-            outputString += "\n";
-        }
-
-        outputString += "\nRunning (lane 7): ";
-        racer = this.runningRacers.get(6);
-        if (racer != null) {
-            outputString += racer.toString() + "\n";
-        } else {
-            outputString += "\n";
-        }
-
-        outputString += "\nRunning (lane 8): ";
-        racer = this.runningRacers.get(7);
-        if (racer != null) {
-            outputString += racer.toString() + "\n";
-        } else {
             outputString += "\n";
         }
 
         outputString += "\nFinished:\n";
+        for (int i = 0; i < NUM_OF_LANES; i++) {
+            outputString += "\nLane " + (i+1) + ": ";
+            Racer racer = this.finishedRacers.get(i);
 
-        for (Racer finRacer : this.finishedRacers) {
-            outputString += finRacer.toString() + "\n";
+            if (racer != null) {
+                outputString += racer.toString() + "\n";
+            }
+
+            outputString += "\n";
         }
 
         outputString += "\n\n\n";
