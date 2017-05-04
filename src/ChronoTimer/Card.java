@@ -2,6 +2,10 @@ package ChronoTimer;
 import java.util.Queue;
 
 public class Card extends UIPrint {
+	//The amount of rows the card can properly display.
+	//Note: Card will NOT truncate the string, this is just here for card creation usage.
+	public static final int MAX_ROWS = 22;
+
 	private String header, body, footer;
 	
 	public Card(){

@@ -43,18 +43,19 @@ public class INDRunManager implements RunManager{
         Card card = new Card();
         //Header
         String headerString = "Next 3 Queued Racers:\n";
+        //queueSize will be used to iterate through the queuedRacers beginning at queueSize to 0.
+        //We are going backwards so the string will display the next racer to start at the bottom of the list.
+        //Since we only want the first 3 racers, if queuedRacers.size() > 3, we only want 3, thus taking the minimum.
+        //If the size is 2 or 1 we don't want to IndexOutOfBounds so we will use the size instead.
+        //Finally, we get the queue size here so the body is able to determine the max number of racers to show.
+        final int queueSize = Math.min(this.queuedRacers.size(), 3);
+
         if (this.queuedRacers.size() == 0) {
             //Then there are no racers to queue.
             //Add 2 new lines to compensate for
             headerString += "None";
 
         } else {
-            //queueSize will be used to iterate through the queuedRacers beginning at queueSize to 0.
-            //We are going backwards so the string will display the next racer to start at the bottom of the list.
-            //Since we only want the first 3 racers, if queuedRacers.size() > 3, we only want 3, thus taking the minimum.
-            //If the size is 2 or 1 we don't want to IndexOutOfBounds so we will use the size instead.
-            final int queueSize = Math.min(this.queuedRacers.size(), 3);
-
             LinkedList<Racer> linkedQueue = (LinkedList<Racer>)this.queuedRacers;
             for (int index = queueSize-1; index >= 0; index--) {
                 Racer racer = linkedQueue.get(index);
@@ -63,14 +64,25 @@ public class INDRunManager implements RunManager{
         }
         card.setHeader(headerString);
 
-        //Body
-        //Set body as the list of running racers.
-        String bodyString = "Running Racers:\n";
+        String bodyString = "Running Racers:";
 
         LinkedList<Racer> linkedListRunning = (LinkedList<Racer>)this.runningRacers;
         //Iterate through running racers backwards.
         if (this.runningRacers.size() > 0) {
-            for (int i = this.runningRacers.size()-1; i >= 0; i--) {
+            int lineCount = 0;
+            //Body
+            //Set body as the list of running racers.
+            //From the max number of rows allowed, subtract the amount for the header (queueSize)
+            //Note: I subtract 3 to account for the "Next 3 Queued Racers:" line, which is not counted in queueSize
+            //  while also accounting for the "Last Racer to finish" and "None" in the footer.
+            //Subtracting 4 to account for the double line spaces we have.
+            final int maxBodyLine = Card.MAX_ROWS - queueSize - 3 - 4;
+            final int runningQueueSize = this.runningRacers.size();
+            System.out.println("maxBodyLine = " + maxBodyLine);
+
+            bodyString += " (showing " + Math.min(maxBodyLine, runningQueueSize) + " of " + runningQueueSize + ")\n";
+
+            for (int i = runningQueueSize-1; i >= 0; i--) {
                 Racer racer = linkedListRunning.get(i);
 
                 String elapsedTimeString;
@@ -85,9 +97,15 @@ public class INDRunManager implements RunManager{
                 }
 
                 bodyString += racer.toString() + " " + elapsedTimeString + "\n";
+                lineCount++;
+
+                if (lineCount >= maxBodyLine) {
+                    //Then we have reached the cap on racers to add, break from adding racers.
+                    break;
+                }
             }
         } else {
-            bodyString += "None";
+            bodyString += "\nNone";
         }
         card.setBody(bodyString);
 

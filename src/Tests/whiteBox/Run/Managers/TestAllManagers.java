@@ -13,5 +13,4 @@ import org.junit.runners.Suite;
         TestINDRunManager.class
 })
 
-public class TestAllManagers {
-}
+public class TestAllManagers { }
