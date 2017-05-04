@@ -78,11 +78,11 @@ public class INDRunManager implements RunManager{
             //Subtracting 4 to account for the double line spaces we have.
             final int maxBodyLine = Card.MAX_ROWS - queueSize - 3 - 4;
             final int runningQueueSize = this.runningRacers.size();
-            System.out.println("maxBodyLine = " + maxBodyLine);
 
             bodyString += " (showing " + Math.min(maxBodyLine, runningQueueSize) + " of " + runningQueueSize + ")\n";
 
-            for (int i = runningQueueSize-1; i >= 0; i--) {
+            final int sizeOffset = 1 + runningQueueSize - Math.min(maxBodyLine, runningQueueSize);
+            for (int i = runningQueueSize-sizeOffset; i >= 0; i--) {
                 Racer racer = linkedListRunning.get(i);
 
                 String elapsedTimeString;
