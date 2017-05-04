@@ -149,7 +149,7 @@ public class Run {
 				return new Card();
 			}
 		} else {
-			return this.runManager.getCard(currentTime);
+			return this.runManager.getCard(null);
 		}
 	}
 
@@ -259,6 +259,8 @@ public class Run {
 
 		this.timer.cancel();
 		this.timer.purge();
+
+		this.timer = new Timer();
 
 		// And From your main() method or any other method
 		this.timer.schedule(new WriteState(this.runManager), 0, 500);

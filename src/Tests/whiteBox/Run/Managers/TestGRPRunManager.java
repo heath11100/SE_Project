@@ -4,14 +4,14 @@ package Tests.whiteBox.Run.Managers;
  * Created by austinheath on 5/3/17.
  */
 
-
+import ChronoTimer.Runs.GRPRunManager;
+import ChronoTimer.Runs.INDRunManager;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        TestINDRunManager.class,
-        TestGRPRunManager.class
+        GRPRunManager.TestGRPRunManager.class
 })
 
-public class TestAllManagers { }
+public class TestGRPRunManager { }

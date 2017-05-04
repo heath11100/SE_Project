@@ -43,25 +43,29 @@ public class GRPRunManager implements RunManager {
         Card card = new Card();
         //Header
         //Running Time
-        card.setHeader("Race Time: " + elapsedTime.toString());
+        String headerString = "Race Time:\n";
+        if (elapsedTime == null) {
+            headerString += "Not started";
+
+        } else {
+            headerString += elapsedTime.toString();
+        }
+        card.setHeader(headerString);
 
         //Body
         //Nothing
 
         //Footer
-        //Last Finish Time
-        LinkedList<Racer> linkedList = (LinkedList<Racer>)this.finishedRacers;
-        final int size = linkedList.size();
+        //Last Racer Finish Time
+        Racer racer = ((LinkedList<Racer>)this.finishedRacers).peekLast();
+        String footerString = "Last Racer to Finish:\n";
 
-        if (size > 0) {
-            //Then there is a valid finish time.
-            Racer lastRacer = linkedList.get(size-1);
-            card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString());
-
+        if (racer != null) {
+            footerString += racer.toString() + " " + racer.getElapsedTimeString();
         } else {
-            //Then no one has finished.
-            card.setFooter("NO RACER FINISHED");
+            footerString += "None";
         }
+        card.setFooter(footerString);
 
         return card;
     }
@@ -149,7 +153,7 @@ public class GRPRunManager implements RunManager {
      * This method is called when the run should finish the next racer, or next batch of racers, dependent ofn the eventType.
      *
      * @param relativeTime corresponds to the end time, relative to the start of the run.
-     * @param lane         corresponds to the lane to start the next racer from. Note: this may be ignored for some eventTypes.
+     * @param lane         corresponds to the lane to start the next racer from. GRP only supports lane 1.
      * @return true if the next racer, or batch of racers, were finished successfully, false otherwise.
      * @throws RaceException see specific eventType implementations for conditions where this exception is thrown.
      * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
@@ -158,6 +162,9 @@ public class GRPRunManager implements RunManager {
     public void finishNext(ChronoTime relativeTime, int lane) throws RaceException {
         if (this.finishedRacers.size() == MAX_RACERS) {
             throw new RaceException("Maximum number of racers have already finished.");
+
+        } else if (lane != 1) {
+            throw new RaceException("Racer can only finish in lane 1.");
         }
 
         final int currentSize = this.finishedRacers.size();
@@ -191,6 +198,7 @@ public class GRPRunManager implements RunManager {
     @Override
     public void cancelNextRacer(int lane) throws RaceException {
         //Does nothing as there is not a queue and no list of running racers.
+        throw new RaceException("Cannot Cancel for GRP event");
     }
 
     /**
@@ -205,6 +213,7 @@ public class GRPRunManager implements RunManager {
     public void didNotFinishNextRacer(int lane) throws RaceException {
         //Does nothing as there is not a list of running racers to DNF from
         //There is no way to discern what person DNFs.
+        throw new RaceException("Cannot DNF for GRP event");
     }
 
     /**
@@ -215,8 +224,17 @@ public class GRPRunManager implements RunManager {
     public void markNextRacer(int racerNumber) throws RaceException {
         LinkedList<Racer> linkedList = (LinkedList<Racer>)this.finishedRacers;
         if (this.nextRacerToMarkIndex < this.finishedRacers.size()) {
-            linkedList.get(this.nextRacerToMarkIndex).setNumber(racerNumber);
+            Racer racer = linkedList.get(this.nextRacerToMarkIndex);
+
+            String logString = "Marked " + racer.toString() + " as ";
+
+            //Set the new number.
+            racer.setNumber(racerNumber);
             this.nextRacerToMarkIndex++;
+
+            logString += racer.toString();
+
+            this.log.add(logString);
         } else {
             throw new RaceException("No racer to mark bib number for");
         }
@@ -237,14 +255,14 @@ public class GRPRunManager implements RunManager {
     }
 
 
-    public static class TestINDRunManager {
+    public static class TestGRPRunManager {
         private GRPRunManager runManager;
 
         private int racerNumber;
 
         private ChronoTime time1, time2, time3;
 
-        public TestINDRunManager() throws InvalidTimeException {
+        public TestGRPRunManager() throws InvalidTimeException {
             this.runManager = new GRPRunManager(new Log());
 
             racerNumber = 1234;
@@ -284,7 +302,7 @@ public class GRPRunManager implements RunManager {
             assertEquals(0,this.runManager.finishedRacers.size());
 
             //Lane should be ignored for GRP.
-            this.runManager.startNext(this.time1, 0);
+            this.runManager.startNext(this.time1, 1);
 
             //Finished racers should have 0 racers
             assertEquals(0,this.runManager.finishedRacers.size());
@@ -309,8 +327,8 @@ public class GRPRunManager implements RunManager {
             //Finished racers should have 0 racers
             assertEquals(0,this.runManager.finishedRacers.size());
 
-            //Lane should be ignored for GRP type
-            this.runManager.finishNext(this.time1, 0);
+            //Lane must be 1 for GRP.
+            this.runManager.finishNext(this.time1, 1);
 
             //Finished racers should have 1 racers
             assertEquals(1 ,this.runManager.finishedRacers.size());
@@ -323,30 +341,27 @@ public class GRPRunManager implements RunManager {
         }
 
         /**
-         * Tests that cancelling a running racer will do nothing. Not even an error.
+         * Tests that cancelling a running racer will do nothing.
          */
-        @Test
+        @Test(expected = RaceException.class)
         public void testCancelRunningRacer() throws RaceException {
             //Finished racers should have 0 racers
             assertEquals(0,this.runManager.finishedRacers.size());
 
             //Lane should be ignored for GRP.
-            this.runManager.cancelNextRacer(0);
-
-            //Finished racers should have 0 racers
-            assertEquals(0,this.runManager.finishedRacers.size());
+            this.runManager.cancelNextRacer(1);
         }
 
         /**
-         * Tests that DNFing a racer will do nothing. Not even an error.
+         * Tests that DNFing a racer will do nothing.
          */
-        @Test
+        @Test(expected = RaceException.class)
         public void testDNFRunningRacer() throws RaceException {
             //Finished racers should have 0 racers
             assertEquals(0,this.runManager.finishedRacers.size());
 
             //Lane should be ignored for GRP.
-            this.runManager.cancelNextRacer(0);
+            this.runManager.cancelNextRacer(1);
 
             //Finished racers should have 0 racers
             assertEquals(0,this.runManager.finishedRacers.size());

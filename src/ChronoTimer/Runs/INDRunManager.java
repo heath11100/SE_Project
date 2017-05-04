@@ -92,7 +92,10 @@ public class INDRunManager implements RunManager{
                     ChronoTime racerElapsed = elapsedTime.elapsedSince(racer.getStartTime());
                     elapsedTimeString = racerElapsed.toString();
 
-                } catch (InvalidTimeException e) {
+                } catch (Exception e) {
+                    //Most likely invalid time exception
+                    //Could be a NulLPointerException because elapsed time *could* be a null pointer
+                    //Although, it should not if there is a runner racing.
                     elapsedTimeString = "<INVALID TIME>";
                 }
 
