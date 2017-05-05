@@ -11,6 +11,7 @@ import ChronoTimer.Printer;
 
 public class TestHandler extends Handler {
 	
+	
 	static final boolean _reportOn = true;
 	static final int RUN = 0, END = 1;
 	static final String DELIMITERS = "\\n";
@@ -80,17 +81,26 @@ public class TestHandler extends Handler {
 					warning("Unhandled IOException.");
 			}
 			main.issue(cCmd);
+			main.issue("UPDATE");
 			System.out.println(main.getDisplay());
 			System.out.println(main.getPrinter());
+			System.out.println("---------------------------------------------------");
+			/*try {
+				main.wait(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
 		}
 		main.main.flush();
 		
 		//main.main.setPrinter(new Printer(System.out));
-		
+		System.exit(0);
 	}
 	
 	public TestHandler(JTextArea d, JTextArea p) {
 	super(d, p);
+	STARTDELAY = 0;
 	}
 	
 	public String getDisplay()

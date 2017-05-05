@@ -31,7 +31,7 @@ public class Handler {
 	boolean extraInput = false;
 	
 	final int TIMERDELAY = 100;
-	final int STARTDELAY = 1000;
+	protected int STARTDELAY = 1000;
 	final int SERVERDELAY = 10000;
 	
 	boolean SERVERENABLED;
