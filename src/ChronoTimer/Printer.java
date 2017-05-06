@@ -4,7 +4,11 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 
 
+
+import java.lang.reflect.Modifier;
+
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 
 /**
@@ -36,8 +40,8 @@ public class Printer
 	/** Exports the parameter run to a file. */
 	public void export(int runNumber, Run r){
 		String fileName = "run"+runNumber+".txt";
-		
-		try(PrintWriter p = new PrintWriter(fileName)){p.write(new Gson().toJson(r));}
+		Gson gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.STATIC).create();
+		try(PrintWriter p = new PrintWriter(fileName)){p.write(gson.toJson(r));}
 		catch (Exception e) {System.out.println("Could not print to file: "+fileName);}
 	}
 }
