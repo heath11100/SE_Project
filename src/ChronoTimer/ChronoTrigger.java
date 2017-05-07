@@ -172,7 +172,7 @@ public class ChronoTrigger
 		}
 		
 		//if valid channel..
-		if(c>=0 && c< 8){
+		if(c>=0 && c< 9){
 			channels[c].toggle();
 			history.add( (logTimes? officialTime+" | " : "") +"Toggled channel " +c);}
 		else
@@ -199,7 +199,7 @@ public class ChronoTrigger
 		}
 		
 		//if valid channel..
-		if(c>=0 && c< 9){
+		if(c >= 0 && c < 9){
 			try{
 				channels[c].connect(type);
 				history.add( (logTimes? officialTime+" | " : "") +"Connected "+type+" sensor to channel "+c);}
