@@ -38,15 +38,39 @@ public class TestExport extends TestCase{
         catch (IOException e) {e.printStackTrace();}
 	}
 
+	public void testNoRuns(){
+		
+	}
 	
+	public void testNoCurrentRun(){
+		
+	}
 	
-	/*
-		A Run is instantiated, 3 Racers are queued
+	public void testUnfinishedRun(){
+		
+	}
 	
-		No runs created
-		No current run
-		Invalid run number
-		Invalid printer
-		Export all types of run
-	*/
+	public void testInvalidRunNumber(){
+		
+	}
+	
+	public void testInvalidPrinter(){
+		// A Run is instantiated, 3 Racers are queued
+	}
+	
+	public void testExportIND(){
+		// A Run is instantiated, 3 Racers are queued
+	}
+	
+	public void testExportPARIND(){
+		// A Run is instantiated, 3 Racers are queued
+	}
+	
+	public void testExportGRP(){
+		// A Run is instantiated, 3 Racers are queued
+	}
+	
+	public void testExportPARGRP(){
+		// A Run is instantiated, 3 Racers are queued
+	}
 }

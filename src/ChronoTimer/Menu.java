@@ -2,8 +2,6 @@ package ChronoTimer;
 
 import java.util.ArrayList;
 
-import GUI.Handler.GUIState;
-
 public class Menu extends UIPrint {
 
 	final String RACEON[] = 

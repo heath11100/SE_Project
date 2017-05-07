@@ -1,8 +1,6 @@
 package GUI;
 
 import java.awt.GridLayout;
-import java.awt.event.KeyEvent;
-
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
