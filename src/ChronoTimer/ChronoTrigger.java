@@ -728,24 +728,26 @@ public class ChronoTrigger
 			{
 				ArrayList<Racer> temp = (runs.get(curRun)).getAllRacers();
 				ArrayList<NamedRacer> racers = new ArrayList<NamedRacer>();
-				int k =0;
+				int k = 1;
 				for(Racer r : temp)
 				{
 					String fname, lname;
 
 					try{
-					String[] name = temps.get(1).split(" ");
-					System.out.println("got this far");
+					String[] name = temps.get(r.getNumber()).split(" ");
+
 					fname = name[0];
+					if(name.length == 2)
 					lname = name[1];
+					else
+						lname = "";
 					}
 					catch(NullPointerException e)
 					{
 						fname = "undefined";
-						lname = "un";
+						lname = "undefined";
 					}
 					racers.add(new NamedRacer(r, fname, lname));
-					k = k++;
 				}
 				for(int i = 0; i < racers.size(); i++)
 				{
