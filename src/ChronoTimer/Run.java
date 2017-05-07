@@ -30,7 +30,7 @@ public class Run {
 	private final int MIN_BIB_NUMBER = 1;
 	private final int MAX_BIB_NUMBER = 9999;
 
-	private Timer timer;
+//	private Timer timer;
 
 	public Run(EventType eventType) {
 		this.startTime = null;
@@ -41,8 +41,8 @@ public class Run {
 		//We must set the runManager so when we set the event type we can access a valid log.
 		this.runManager = new INDRunManager(new Log());
 
-		this.timer = new Timer();
-		this.timer.schedule(new WriteState(this.runManager), 0, 500);
+//		this.timer = new Timer();
+//		this.timer.schedule(new WriteState(this.runManager), 0, 500);
 
 		//This will ensure that runManager correctly corresponds to the event type and not arbitrarily set.
 		try {
@@ -245,13 +245,13 @@ public class Run {
 			throw new RaceException("Invalid event type: " + newEventType);
 		}
 
-		this.timer.cancel();
-		this.timer.purge();
-
-		this.timer = new Timer();
-
-		// And From your main() method or any other method
-		this.timer.schedule(new WriteState(this.runManager), 0, 500);
+//		this.timer.cancel();
+//		this.timer.purge();
+//
+//		this.timer = new Timer();
+//
+//		// And From your main() method or any other method
+//		this.timer.schedule(new WriteState(this.runManager), 0, 500);
 
 		//Add to the log.
 		log.add("Event type is " + newEventType);

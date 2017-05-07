@@ -454,9 +454,9 @@ public class ChronoTrigger
 									{
 										runs.get(curRun).finishNextRacer(officialTime, c);
 									}
-									else
+									else if (c == 1) {
 										runs.get(curRun).startNextRacer(officialTime, 1);
-									
+									}
 							}
 							
 						
@@ -803,8 +803,11 @@ public class ChronoTrigger
 		} catch (InvalidTimeException e1) {
 			e1.printStackTrace();
 		}
-
-		return runs.get(curRun).getCard(officialTime);
+		if (curRun >= 0 && curRun < runs.size()) {
+			return runs.get(curRun).getCard(officialTime);
+		} else {
+			return new Card();
+		}
 	}
 	/**
 	 * The Channel class.
