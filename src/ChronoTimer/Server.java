@@ -152,7 +152,7 @@ public class Server {
     }
     
     private static String generateTable() throws InvalidTimeException{
-    	String result = "<table><tr><th>Bib</th><th>Last Name</th> <th>First Initial</th><th>Time</th></tr>";
+    	String result = "<table><tr><th>Bib</th><th>Last Name, First Initial</th><th>Time</th></tr>";
     	for (int i=0;i<racers.size();i++){
     		NamedRacer cur = racers.get(i);
     		result +="<tr><td>"+cur.getMyRacer().getNumber()+"</td><td>"+cur.getLastName()+", "+cur.getFirstInitial()+"</td><td>"+

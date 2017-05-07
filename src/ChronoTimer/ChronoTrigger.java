@@ -24,7 +24,7 @@ public class ChronoTrigger
 {
 	private Channel[] channels;
 	private ChronoTime officialTime;
-	private int offset;
+	private int offset, nameCounter;
 	private ArrayList<Run> runs = new ArrayList<>();
 	private int curRun = -1;
 	private boolean logTimes = false;
@@ -43,6 +43,7 @@ public class ChronoTrigger
 	{
 		//set official time
 		power = false;
+		nameCounter = 0;
 		try {officialTime = ChronoTime.now();}
 		catch (InvalidTimeException e) {history.add(e.getMessage());}
 		offset = 0;
@@ -83,7 +84,7 @@ public class ChronoTrigger
 		officialTime = t;
 		power = false;
 		offset = 0;
-		
+		nameCounter = 0;
 		
 		
 		
@@ -238,6 +239,7 @@ public class ChronoTrigger
 	public void powerOn(ChronoTime commandTime)
 	{
 		power = true;
+		nameCounter = 0;
 		try {
 			officialTime = commandTime.withOffset(offset);
 			history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is on.");
@@ -278,6 +280,7 @@ public class ChronoTrigger
 	public void powerOff(ChronoTime commandTime)
 	{
 		power = false;
+		nameCounter = 0;
 		try {
 			officialTime = commandTime.withOffset(offset);
 			history.add( (logTimes? officialTime+" | " : "") +"ChronoTrigger is off.");
@@ -729,13 +732,12 @@ public class ChronoTrigger
 				for(Racer r : temp)
 				{
 					String fname, lname;
+
 					try{
-					String[] name = temps.get(r.getNumber()).split(" ");
+					String[] name = temps.get(1).split(" ");
+					System.out.println("got this far");
 					fname = name[0];
-					if(name.length >= 2)
-						lname = name[1];
-					else
-						lname = "";
+					lname = name[1];
 					}
 					catch(NullPointerException e)
 					{
@@ -743,7 +745,7 @@ public class ChronoTrigger
 						lname = "un";
 					}
 					racers.add(new NamedRacer(r, fname, lname));
-					k = k+2;
+					k = k++;
 				}
 				for(int i = 0; i < racers.size(); i++)
 				{
