@@ -249,7 +249,7 @@ public class Handler {
 		default:
 			printerPower = !printerPower;	
 			if(printerPower)
-				printArea.setText("printer On");
+				printArea.setText("printer On\n");
 			else
 				printArea.setText("");
 		}

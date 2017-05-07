@@ -595,7 +595,7 @@ public class ChronoTrigger
 				e.printStackTrace();
 			}
 			
-			if (!runs.isEmpty() && runs.size() > runNum)
+			if (!runs.isEmpty() && runNum >= 0 && runs.size() > runNum)
 				runprinter.print(runs.get(runNum).getLog());
 			else
 				history.add("runNum " + runNum+ " was invalid");
@@ -640,7 +640,7 @@ public class ChronoTrigger
 				e.printStackTrace();
 			}
 			
-			if (!runs.isEmpty() && runNum <= curRun)
+			if (!runs.isEmpty() && runNum >= 0 && runNum <= curRun)
 				runprinter.export(runNum, runs.get(runNum));
 			else
 				history.add("runNum " + runNum+ " was invalid");
