@@ -56,8 +56,8 @@ public class ChronoTrigger
 		catch (InvalidTimeException e) {history.add(e.getMessage());}
 		offset = 0;
 		//create channels
-		channels = new Channel[8];
-		for(int j =0; j < 8; j++){
+		channels = new Channel[9];
+		for(int j =0; j < 9; j++){
 			channels[j] = new Channel();
 			channels[j].connect("EYE");}
 		for(int k = 0; k < 8; k++)
@@ -96,8 +96,8 @@ public class ChronoTrigger
 		
 		
 		//create channels
-		channels = new Channel[8];
-		for(int i = 0; i < 8; i++){
+		channels = new Channel[9];
+		for(int i = 0; i < 9; i++){
 				channels[i] = new Channel();
 				channels[i].connect("EYE");}
 		for(int k = 0; k < 8; k++)
@@ -199,7 +199,7 @@ public class ChronoTrigger
 		}
 		
 		//if valid channel..
-		if(c>=0 && c< 8){
+		if(c>=0 && c< 9){
 			try{
 				channels[c].connect(type);
 				history.add( (logTimes? officialTime+" | " : "") +"Connected "+type+" sensor to channel "+c);}
@@ -229,7 +229,7 @@ public class ChronoTrigger
 		}
 		
 		//if valid channel..
-		if(c>=0 && c< 8){
+		if(c>=0 && c< 9){
 			channels[c].disconnect();
 			history.add( (logTimes? officialTime+" | " : "") +"Disconnected sensor from channel " +c);}
 		else
@@ -252,8 +252,8 @@ public class ChronoTrigger
 			e.printStackTrace();
 		}
 		//create channels
-		channels = new Channel[8];
-		for(int j =0; j < 8; j++){
+		channels = new Channel[9];
+		for(int j =0; j < 9; j++){
 			channels[j] = new Channel();
 			channels[j].connect("EYE");}
 		for(int k = 0; k < 8; k++)
@@ -412,7 +412,7 @@ public class ChronoTrigger
 			}
 			
 			//if valid channel..
-			if(c>=0 && c< 8){
+			if(c>=0 && c< 9){
 				//if trigger is successful and there's a current race
 				if (channels[c].trigger() && !runs.isEmpty()){
 					if(c == 1)
