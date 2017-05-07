@@ -1,6 +1,7 @@
 package ChronoTimer.Runs;
 
 import ChronoTimer.Card;
+import ChronoTimer.Log;
 import ChronoTimer.Racer;
 import ChronoTimer.ChronoTime;
 import Exceptions.RaceException;
@@ -15,6 +16,12 @@ import java.util.ArrayList;
  */
 public interface RunManager {
     int MAX_RACERS = 9_999;
+
+    /**
+     * Returns a Log that contains a log of actions that occurred during the run.
+     * @return a valid log.
+     */
+    Log getLog();
 
     /**
      * Returns a card that will be displayed by the system.

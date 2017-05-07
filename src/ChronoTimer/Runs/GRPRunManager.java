@@ -34,6 +34,17 @@ public class GRPRunManager implements RunManager {
     }
 
     /**
+     * Returns a Log that contains a log of actions that occurred during the run.
+     *
+     * @return a valid log.
+     */
+    @Override
+    public Log getLog() {
+        return this.log;
+    }
+
+
+    /**
      * Returns a card that will be displayed by the system.
      *
      * @return a valid card.

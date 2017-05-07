@@ -27,42 +27,28 @@ public class Run {
 
 	private RunManager runManager;
 
-	private Log log;
-
 	private final int MIN_BIB_NUMBER = 1;
 	private final int MAX_BIB_NUMBER = 9999;
 
 	private Timer timer;
 
 	public Run(EventType eventType) {
+		this.startTime = null;
+		this.endTime = null;
+
 		this.eventType = eventType;
 
-		this.log = new Log();
-		
-		this.log.add("Created run");
+		//We must set the runManager so when we set the event type we can access a valid log.
+		this.runManager = new INDRunManager(new Log());
 
-		// And From your main() method or any other method
-		timer = new Timer();
+		this.timer = new Timer();
+		this.timer.schedule(new WriteState(this.runManager), 0, 500);
 
-		switch (this.eventType) {
-			case IND:
-				this.runManager = new INDRunManager(this.log);
-				break;
+		//This will ensure that runManager correctly corresponds to the event type and not arbitrarily set.
+		try {
+			this.setEventType(eventType.toString());
+		} catch (RaceException e) { /* should never reach this, eventType.toString() will be recognized */ }
 
-			case PARIND:
-				this.runManager = new PARINDRunManager(this.log);
-				break;
-
-			case GRP:
-				this.runManager = new GRPRunManager(this.log);
-				break;
-
-			case PARGRP:
-				this.runManager = new PARGRPRunManager(this.log);
-				break;
-		}
-
-		timer.schedule(new WriteState(this.runManager), 0, 500);
 	}
 
 	public class WriteState extends TimerTask {
@@ -101,7 +87,7 @@ public class Run {
 	 * @return the log
 	 */
 	public Log getLog() {
-		return this.log;
+		return this.runManager.getLog();
 	}
 
 	/**
@@ -205,6 +191,8 @@ public class Run {
 			this.startTime = atTime;
 			this.endTime = atTime;
 
+			this.getLog().add("Started run at " + atTime);
+
 		} else if (!this.startTime.isBefore(atTime)) {
 			throw new InvalidTimeException("Run has not started.");
 
@@ -213,7 +201,7 @@ public class Run {
 			this.endTime = atTime;
 		}
 
-		this.log.add("Ended run at " + atTime);
+		this.getLog().add("Ended run at " + atTime);
 	}
 	
 	/**
@@ -231,26 +219,27 @@ public class Run {
 		} else if (this.hasEnded()) {
 			throw new RaceException("Cannot change event type once run ended");
 		}
-		
+
+		Log log = this.runManager.getLog();
 		switch (newEventType) {
 			case "IND":
 				this.eventType = EventType.IND;
-				this.runManager = new INDRunManager(this.log);
+				this.runManager = new INDRunManager(log);
 				break;
 			
 			case "PARIND":
 				this.eventType = EventType.PARIND;
-				this.runManager = new PARINDRunManager(this.log);
+				this.runManager = new PARINDRunManager(log);
 				break;
 
 			case "GRP":
 				this.eventType = EventType.GRP;
-				this.runManager = new GRPRunManager(this.log);
+				this.runManager = new GRPRunManager(log);
 				break;
 
 			case "PARGRP":
 				this.eventType = EventType.PARGRP;
-				this.runManager = new PARGRPRunManager(this.log);
+				this.runManager = new PARGRPRunManager(log);
 				break;
 			
 		default:
@@ -265,7 +254,8 @@ public class Run {
 		// And From your main() method or any other method
 		this.timer.schedule(new WriteState(this.runManager), 0, 500);
 
-		this.log.add("Event type is " + newEventType);
+		//Add to the log.
+		log.add("Event type is " + newEventType);
 	}
 	
 	/**

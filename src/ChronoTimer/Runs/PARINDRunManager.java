@@ -39,6 +39,17 @@ public class PARINDRunManager implements RunManager {
     }
 
     /**
+     * Returns a Log that contains a log of actions that occurred during the run.
+     *
+     * @return a valid log.
+     */
+    @Override
+    public Log getLog() {
+        return this.log;
+    }
+
+
+    /**
      * Determines whether the given lane is valid.
      * PARIND only supports two lanes, lane 1 and lane 2.
      * @param lane to determine the validity of.
