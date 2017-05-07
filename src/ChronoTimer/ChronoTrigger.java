@@ -124,6 +124,7 @@ public class ChronoTrigger
 	
 	public void setPrinter(Printer s)
 	{
+		if (s == null) return;
 		runprinter = s;
 		printer = s;
 	}

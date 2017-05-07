@@ -23,7 +23,7 @@ import javax.swing.text.DefaultCaret;
 
 public class GUI {
 
-	private final int FRAME_WIDTH = 1200, FRAME_HEIGHT = 700, BACK_WIDTH=400,BACK_HEIGHT = 120;
+	private final int FRAME_WIDTH = 1100, FRAME_HEIGHT = 625, BACK_WIDTH=400,BACK_HEIGHT = 120;
 
 	// Containers
 	private JFrame frame, backFrame;
@@ -137,7 +137,7 @@ public class GUI {
 		c.weightx = c.weighty = 1;
 		power = new JButton("Power");
 		stylize(power);
-		power.setPreferredSize(new Dimension(100, 40));
+		power.setPreferredSize(new Dimension(100, 30));
 		power.addActionListener(new Listener(handler,"POWER"));
 		power.addActionListener(new ActionListener(){
 			@Override
@@ -150,7 +150,7 @@ public class GUI {
 	 */
 	private void createPanel1() {
 		channelPad = new ChannelPad(handler);
-		channelPad.setPreferredSize(new Dimension(600, 300));
+		channelPad.setPreferredSize(new Dimension(600, 250));
 		panels[1].add(channelPad);
 	}
 
@@ -164,6 +164,7 @@ public class GUI {
 		c.weightx = c.weighty = 1;
 		printerPower = new JButton("Printer Power");
 		stylize(printerPower);
+		printerPower.setPreferredSize(new Dimension(150, 30));
 		printerPower.addActionListener(new Listener(handler,"PRINTER POWER"));
 		panels[2].add(printerPower,c);
 
@@ -171,13 +172,12 @@ public class GUI {
 		printerText.setEditable(false);
 		printerText.setLineWrap(true);
 		printerText.setWrapStyleWord(true);
-		//printerText.setPreferredSize(new Dimension(250,250)); 
 		DefaultCaret caret = (DefaultCaret)printerText.getCaret();
 		 caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		
 		printerScroll = new JScrollPane(printerText,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		printerScroll.setPreferredSize(new Dimension(250,250));
+		printerScroll.setPreferredSize(new Dimension(250,225));
 		
 		c = new GridBagConstraints();
 		c.gridx = 0;c.gridy = 1;
@@ -234,9 +234,6 @@ public class GUI {
 	private void createPanel4() {
 		displayText.setEditable(false);
 		displayText.setPreferredSize(new Dimension(600,300));
-		//displayScroll = new JScrollPane(displayText,
-			//	JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		//displayScroll.setPreferredSize(new Dimension(600,300));
 		c = new GridBagConstraints();
 		c.gridx = 0;c.gridy = 0;
 		c.weightx = c.weighty = 1;
@@ -415,7 +412,7 @@ public class GUI {
 	}
 	
 	protected void power(){
-		for (JComboBox b: channelPlugs)
+		for (JComboBox<String> b: channelPlugs)
 			b.setSelectedIndex(1);
 		channelPad.power();
 	}

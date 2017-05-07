@@ -1,12 +1,7 @@
 package Tests.whiteBox.ChronoTrigger;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-
 import ChronoTimer.ChronoTime;
 import ChronoTimer.ChronoTrigger;
 import ChronoTimer.Printer;
@@ -83,7 +78,13 @@ public class TestPrint extends TestCase{
 	}
 	
 	public void testInvalidPrinter(){
-		// A Run is instantiated, 3 Racers are queued
+		ct.newRun(t3);
+		ct.addRacer(t3, 4);
+		ct.toggle(t3, 1);ct.toggle(t3, 2);
+		ct.triggerSensor(t3, 1);ct.triggerSensor(t4, 2);
+		ct.finRun(t5);
+		ct.setPrinter(null);
+		ct.printRun(t6);
 	}
 	
 	public void testExportIND(){
@@ -105,12 +106,10 @@ public class TestPrint extends TestCase{
 	private void doPrint(){
 		ct.setPrinter(new Printer(System.out));
 		ct.printRun(t6);
-		ct.setPrinter(dump);
-	}
+		ct.setPrinter(dump);}
 	
 	private void doPrint(int num){
 		ct.setPrinter(new Printer(System.out));
 		ct.printRun(t6,num);
-		ct.setPrinter(dump);
-	}
+		ct.setPrinter(dump);}
 }
