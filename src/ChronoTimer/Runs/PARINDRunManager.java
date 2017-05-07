@@ -69,51 +69,46 @@ public class PARINDRunManager implements RunManager {
         Card card = new Card();
 
         //Header
-        //Next pair to run (essentially next two racers).
-        Queue<Racer> nextPair = new LinkedList<Racer>();
+        String headerString = "Next Pair Queued:\n";
 
-        for (Racer racer : this.queuedRacers) {
-            if (nextPair.size() < 2) {
-                nextPair.add(racer);
-            } else {
-                break;
+        if (this.queuedRacers.size() > 0) {
+            int count = 0;
+            for (Racer racer : this.queuedRacers) {
+                if (count < 2) {
+                    headerString += racer.toString() + "\n";
+                    count++;
+                } else {
+                    break;
+                }
             }
-        }
 
-        //For loop exits when there are no longer racers to add OR there are 2 racers.
-        if (nextPair.size() > 0) {
-            card.setHeader(nextPair);
         } else {
-            //Then there are no racers paired to run.
-            card.setHeader("NO RACERS QUEUED");
+            //No racers to show.
+            headerString += "None";
         }
+        card.setHeader(headerString);
 
         //Body
         //Nothing
 
         //Footer
         //Finish times of the last pair to finish (essentially last two racers).
-        LinkedList<Racer> linkedList = (LinkedList<Racer>) this.finishedRacers;
-        final int size = linkedList.size();
+        String footerString = "Last Pair to Finish:\n";
 
-        if (size > 1) {
-            //Then there is at least 2 racers (one pair)
-            Racer lastRacer = linkedList.get(size-1);
-            Racer secondLast = linkedList.get(size-2);
+        if (this.finishedRacers.size() > 0) {
+            LinkedList<Racer> linkedFinished = (LinkedList<Racer>) this.finishedRacers;
 
-            card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString()+ ", " +
-                    secondLast.toString() + " " + secondLast.getElapsedTimeString());
-
-        } else if (size > 0) {
-            //Then only one racer has finished.
-            Racer lastRacer = linkedList.get(size-1);
-
-            card.setFooter(lastRacer.toString() + " " + lastRacer.getElapsedTimeString());
+            int count = 0;
+            for (int i = linkedFinished.size()-1; i >= 0 && count < 2; i--, count++) {
+                Racer racer = linkedFinished.get(i);
+                footerString += racer.toString() + " " +racer.getElapsedTimeString() + "\n";
+            }
 
         } else {
-            //Then no one has finished.
-            card.setFooter("NO PAIR HAS FINISHED");
+            //No Racers have finished
+            footerString += "None";
         }
+        card.setFooter(footerString);
 
         return card;
     }
@@ -338,24 +333,44 @@ public class PARINDRunManager implements RunManager {
             throw new RaceException("Invalid lane: " + lane);
 
         } else {
-            Queue<Racer> runningRacers = this.getRunningRacers(lane);
-            Racer racer = runningRacers.peek();
+            LinkedList<Racer> linkedRunning_1 = (LinkedList<Racer>)this.runningLanes.get(0);
+            LinkedList<Racer> linkedRunning_2 = (LinkedList<Racer>)this.runningLanes.get(1);
 
-            if (racer != null) {
-                racer.cancel();
+            Racer lastStart_1 = linkedRunning_1.peekLast(); //Returns a racer if there is one, otherwise doesn't throw error.
+            Racer lastStart_2 = linkedRunning_2.peekLast(); //Returns a racer if there is one, otherwise doesn't throw error.
 
-                //*Could* throw NoSuchElementException, although it should never throw this.
-                //Since racer != null, there is at least one element in the running queue.
-                runningRacers.remove();
+            Racer racerToCancel;
 
-                this.queuedRacers.add(racer);
+            if (lastStart_1 == null && lastStart_2 == null) {
+                //Throw error because there is not a racer running.
+                throw new RaceException("No racer to cancel");
 
-                this.log.add(racer+" cancelled");
+            } else if (lastStart_1 != null && lastStart_2 == null) {
+                //Then remove lastStart_1 as it is the only racer racing.
+                racerToCancel = linkedRunning_1.removeLast();
+
+            } else if (lastStart_1 == null && lastStart_2 != null) {
+                //Then remove lastStart_2 as it is the only racer racing.
+                racerToCancel = linkedRunning_2.removeLast();
 
             } else {
-                //Then there is not a racer to cancel.
-                throw new RaceException("No racer to cancel");
+                //There is a racer in both lanes.
+                //Then we have to determine which racer started LAST and remove that one.
+                if (lastStart_1.getStartTime().isBefore(lastStart_2.getStartTime())) {
+                    //Then we should remove lastStart_2 as it started after lastStart_1
+                    racerToCancel = linkedRunning_2.removeLast();
+
+                } else {
+                    //Then we should remove lastStart_1 as it started after lastStart_2
+                    racerToCancel = linkedRunning_1.removeLast();
+                }
             }
+
+            //Add the racer to be the next to start.
+            ((LinkedList<Racer>)this.queuedRacers).addFirst(racerToCancel);
+            racerToCancel.cancel();
+
+            this.log.add(racerToCancel + " cancelled");
         }
     }
 
@@ -374,24 +389,42 @@ public class PARINDRunManager implements RunManager {
             throw new RaceException("Invalid lane: " + lane);
 
         } else {
-            Queue<Racer> runningRacers = this.getRunningRacers(lane);
-            Racer racer = runningRacers.peek();
+            LinkedList<Racer> linkedRunning_1 = (LinkedList<Racer>)this.runningLanes.get(0);
+            LinkedList<Racer> linkedRunning_2 = (LinkedList<Racer>)this.runningLanes.get(1);
 
-            if (racer != null) {
-                racer.didNotFinish();
+            Racer nextFinish_1 = linkedRunning_1.peekFirst(); //Returns a racer if there is one, otherwise doesn't throw error.
+            Racer nextFinish_2 = linkedRunning_2.peekFirst(); //Returns a racer if there is one, otherwise doesn't throw error.
 
-                //*Could* throw NoSuchElementException, although it should never throw this.
-                //Since racer != null, there is at least one element in the running queue.
-                runningRacers.remove();
+            Racer racerToDNF;
+            if (nextFinish_1 == null && nextFinish_2 == null) {
+                //Throw error because there is not a racer running.
+                throw new RaceException("No racer to DNF");
 
-                this.finishedRacers.add(racer);
+            } else if (nextFinish_1 != null && nextFinish_2 == null) {
+                //Then remove lastStart_1 as it is the only racer racing.
+                racerToDNF = linkedRunning_1.removeFirst();
 
-                this.log.add(racer+" did not finish");
+            } else if (nextFinish_1 == null && nextFinish_2 != null) {
+                //Then remove lastStart_2 as it is the only racer racing.
+                racerToDNF = linkedRunning_2.removeFirst();
 
             } else {
-                //Then there is not a racer to DNF.
-                throw new RaceException("No racer to DNF");
+                //There is a racer in both lanes.
+                //Then we have to determine which racer started LAST and remove that one.
+                if (nextFinish_1.getStartTime().isBefore(nextFinish_2.getStartTime())) {
+                    //Then we should remove lastStart_1 as it before after lastStart_2
+                    racerToDNF = linkedRunning_1.removeFirst();
+                } else {
+                    //Then we should remove lastStart_2 as it before after lastStart_1
+                    racerToDNF = linkedRunning_2.removeFirst();
+                }
             }
+
+            //Add the racer to be the next to start.
+            this.finishedRacers.add(racerToDNF);
+            racerToDNF.didNotFinish();
+
+            this.log.add(racerToDNF + " Did Not Finish");
         }
     }
 
