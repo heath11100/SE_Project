@@ -1,7 +1,6 @@
 package ChronoTimer;
 
 import Exceptions.InvalidTimeException;
-import Exceptions.RaceException;
 
 public class Racer {
 	/**

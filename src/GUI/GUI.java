@@ -168,7 +168,6 @@ public class GUI {
 		printerPower.addActionListener(new Listener(handler,"PRINTER POWER"));
 		panels[2].add(printerPower,c);
 
-		
 		printerText.setEditable(false);
 		printerText.setLineWrap(true);
 		printerText.setWrapStyleWord(true);
