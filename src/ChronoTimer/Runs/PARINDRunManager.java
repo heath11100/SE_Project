@@ -80,7 +80,7 @@ public class PARINDRunManager implements RunManager {
         Card card = new Card();
 
         //Header
-        String headerString = "Next Pair Queued:\n";
+        String headerString = "Next Two Queued Racers:\n";
 
         if (this.queuedRacers.size() > 0) {
             int count = 0;
@@ -104,7 +104,7 @@ public class PARINDRunManager implements RunManager {
 
         //Footer
         //Finish times of the last pair to finish (essentially last two racers).
-        String footerString = "Last Pair to Finish:\n";
+        String footerString = "Last Two Racers to Finish:\n";
 
         if (this.finishedRacers.size() > 0) {
             LinkedList<Racer> linkedFinished = (LinkedList<Racer>) this.finishedRacers;
@@ -317,10 +317,10 @@ public class PARINDRunManager implements RunManager {
                     //Add the racer to the finished queue.
                     this.finishedRacers.add(racer);
 
-                    this.log.add(relativeTime.getTimeStamp() +" "+racer+" finished with time "+racer.getElapsedTime().getTimeStamp() + " in lane " + lane);
+                    this.log.add("Finished " + racer + " " + racer.getElapsedTimeString());
 
                 } catch (InvalidTimeException e) {
-                    //Relative time was invalid (probably before the start time for the racer.
+                    //Relative time was invalid (probably before the start time for the racer).
                 }
 
             } else {

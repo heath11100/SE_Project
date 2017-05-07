@@ -331,7 +331,7 @@ public class PARGRPRunManager implements RunManager {
                         this.finishedRacers.set(laneIndex, racer);
                         this.runningRacers.set(laneIndex, null);
 
-                        this.log.add("Finished " + racer + " at time " + relativeTime.getTimeStamp());
+                        this.log.add("Finished " + racer + " " + racer.getElapsedTimeString());
 
                     } catch (InvalidTimeException e) { /*Do nothing.*/ }
                 }

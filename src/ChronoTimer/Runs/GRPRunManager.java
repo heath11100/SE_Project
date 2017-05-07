@@ -190,7 +190,7 @@ public class GRPRunManager implements RunManager {
 
             this.finishedRacers.add(newRacer);
 
-            this.log.add("Finished " + newRacer);
+            this.log.add("Finished " + newRacer + " " + newRacer.getElapsedTimeString());
 
         } catch (InvalidTimeException e) {
             //INVALID TIME!

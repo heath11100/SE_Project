@@ -309,7 +309,7 @@ public class INDRunManager implements RunManager{
                 //Add the racer to the finished queue.
                 this.finishedRacers.add(racer);
 
-                this.log.add(relativeTime.getTimeStamp() +" "+racer+" finished with time "+racer.getElapsedTime().getTimeStamp());
+                this.log.add("Finished " + racer + " " + racer.getElapsedTimeString());
 
             } catch (InvalidTimeException e) {
                 //Relative time was invalid (probably before the start time for the racer.
