@@ -163,6 +163,8 @@ public class Handler {
 			if(hour != 0) displayArea.append("" + hour + ": ");
 			if(min != 0) displayArea.append("" + min + ": ");
 			displayArea.append(curNum);
+			if(!printerPower)
+				printArea.setText("");
 			
 			return true;
 		} catch (InvalidTimeException e) 
@@ -197,8 +199,7 @@ public class Handler {
 	}
 
 	private void swap() {
-		// TODO Auto-generated method stub
-		//ayy dunno what to do here?
+		
 	}
 
 	/**

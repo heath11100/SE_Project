@@ -7,13 +7,17 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.Set;
+
 import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
 import junit.framework.TestCase;
+
 import com.google.gson.Gson;
 
 public class ChronoTrigger 
@@ -30,7 +34,7 @@ public class ChronoTrigger
 	private String eventType;
 	private int[] lanes = new int[8];
 	private boolean power;
-	private String[] temps = new String[20];
+	private Map<Integer, String> temps = new HashMap<>();
 	/**
 	 * Default Constructor
 	 * 
@@ -59,12 +63,13 @@ public class ChronoTrigger
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		int i = 0;
 		while(inFile.hasNext())
 		{
-			tk1 =  inFile.next();
-			temps[i] = (tk1);
-			i++;
+			tk1 =  inFile.nextLine();
+			String[] tk2 = tk1.split("\\t| ");
+			if(tk2.length == 3)
+				tk2[1] = tk2[1] + " " + tk2[2];
+			temps.put(Integer.parseInt(tk2[0]), tk2[1]);
 		}
 		inFile.close();
 	}
@@ -102,9 +107,11 @@ public class ChronoTrigger
 		int i = 0;
 		while(inFile.hasNext())
 		{
-			tk1 =  inFile.next();
-			temps[i] = (tk1);
-			i++;
+			tk1 =  inFile.nextLine();
+			String[] tk2 = tk1.split("\\t| ");
+			if(tk2.length == 3)
+				tk2[1] = tk2[1] + " " + tk2[2];
+			temps.put(Integer.parseInt(tk2[0]), tk2[1]);
 		}
 		inFile.close();
 	}
@@ -256,14 +263,14 @@ public class ChronoTrigger
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		int i = 0;
 		while(inFile.hasNext())
 		{
-			tk1 =  inFile.next();
-			temps[i] = (tk1);
-			i++;
+			tk1 =  inFile.nextLine();
+			String[] tk2 = tk1.split("\\t| ");
+			if(tk2.length == 3)
+				tk2[1] = tk2[1] + " " + tk2[2];
+			temps.put(Integer.parseInt(tk2[0]), tk2[1]);
 		}
-		inFile.close();
 	}
 	/**
 	 * turn power off
@@ -723,8 +730,12 @@ public class ChronoTrigger
 				{
 					String fname, lname;
 					try{
-					fname = temps[k];
-					lname = temps[k+1];
+					String[] name = temps.get(r.getNumber()).split(" ");
+					fname = name[0];
+					if(name.length >= 2)
+						lname = name[1];
+					else
+						lname = "";
 					}
 					catch(NullPointerException e)
 					{
