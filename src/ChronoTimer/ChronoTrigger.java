@@ -410,45 +410,64 @@ public class ChronoTrigger
 			}
 			
 			//if valid channel..
-			if(c>=0 && c< 9){
-				//if trigger is successful and there's a current race
-				if (channels[c].trigger() && !runs.isEmpty()){
-					if(c == 1)
-					{
-						try {
-							runs.get(curRun).startNextRacer(officialTime, lanes[0]);
+			try
+			{
+				if(c>=0 && c< 9){
+					//if trigger is successful and there's a current race
+					if (channels[c].trigger() && !runs.isEmpty()){
+							switch(runs.get(curRun).getEventType())
+							{
+								case IND:
+								case GRP:
+									if(c == 1)
+									{
+											runs.get(curRun).startNextRacer(officialTime, 1);
+										
+									}
+									if(c == 2)
+									{
+										runs.get(curRun).finishNextRacer(officialTime, 1);
+									}
+								break;
+								case PARIND:
+									if(c == 1)
+									{
+										runs.get(curRun).startNextRacer(officialTime,1);
+										
+									}
+									if(c == 2)
+									{
+										runs.get(curRun).finishNextRacer(officialTime,1);
+									}
+									if(c == 3)
+									{
+										runs.get(curRun).startNextRacer(officialTime, 2);
+										
+									}
+									if(c == 4)
+									{
+										runs.get(curRun).finishNextRacer(officialTime, 2);
+									}
+								break;
+								case PARGRP:
+									if(runs.get(curRun).hasStarted())
+									{
+										runs.get(curRun).finishNextRacer(officialTime, c);
+									}
+									else
+										runs.get(curRun).startNextRacer(officialTime, 1);
+									
 							}
-						catch(RaceException e) {history.add(e.getMessage());}
-						catch(InvalidTimeException e){history.add(e.getMessage());}
-						catch(NoSuchElementException e){history.add(e.getMessage());}
-						catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
-					}
-					if(c == 2)
-					{
-						try {runs.get(curRun).finishNextRacer(officialTime, lanes[0]);}
-						catch(RaceException e) {history.add(e.getMessage());}
-						catch(InvalidTimeException e){history.add(e.getMessage());}
-						catch(NoSuchElementException e){history.add(e.getMessage());}
-						catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
-					}
-					if(c == 3)
-					{
-						try {runs.get(curRun).startNextRacer(officialTime, lanes[1]);}
-						catch(RaceException e) {history.add(e.getMessage());}
-						catch(InvalidTimeException e){history.add(e.getMessage());}
-						catch(NoSuchElementException e){history.add(e.getMessage());}
-						catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
-					}
-					if(c == 4)
-					{
-						try {runs.get(curRun).finishNextRacer(officialTime, lanes[1]);}
-						catch(RaceException e) {history.add(e.getMessage());}
-						catch(InvalidTimeException e){history.add(e.getMessage());}
-						catch(NoSuchElementException e){history.add(e.getMessage());}
-						catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+							
+						
 					}
 				}
 			}
+			catch(RaceException e) {history.add(e.getMessage());}
+			catch(InvalidTimeException e){history.add(e.getMessage());}
+			catch(NoSuchElementException e){history.add(e.getMessage());}
+			catch (Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+			
 		}
 		else
 			history.add("Cannot trigger: Channel "+c+" doesn't exist.");
