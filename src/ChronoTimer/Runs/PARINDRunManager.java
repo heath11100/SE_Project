@@ -319,11 +319,11 @@ public class PARINDRunManager implements RunManager {
     }
 
     /**
-     * Cancels the next racer to finish, in the corresponding lane, and places that racer back in the queue of racers yet to start.
+     * Cancels the last racer to start, so the racer with the smalled elapsed time.
      *
-     * @param lane corresponding to the lane to cancel the racer from. Note: lane may not be used by all event types.
-     * @return true if a racer is successfully placed into the queue, false otherwise.
-     * @throws RaceException when eventType is GRP
+     * @param lane corresponding to the lane to cancel the racer from. Note: lane is ignored for PARIND.
+     *             PARIND finds the racer with the smallest elapsed time among all of the lanes.
+     * @throws RaceException when lane is not 1 or 2 OR when there is not a racer to cancel.
      * @precondition race has started but not yet ended
      */
     @Override
@@ -375,11 +375,11 @@ public class PARINDRunManager implements RunManager {
     }
 
     /**
-     * Marks the next racer to finish, in the corresponding lane, as a did not finish.
+     * Marks the racer with the largest elapsed time as a Did Not Finish.
      *
-     * @param lane corresponding to the lane to cancel the racer from. Note: lane may not be used by all event types.
-     * @return true if a racer is successfully marked as a DNF, false otherwise.
-     * @throws RaceException when eventType is GRP
+     * @param lane corresponding to the lane to cancel the racer from. Note: lane is ignored for PARIND.
+     *             PARIND finds the racer with the largest elapsed time among all of the lanes.
+     * @throws RaceException when lane is not 1 or 2 OR when there is not a racer to cancel.
      * @precondition race has started but not yet ended
      */
     @Override
