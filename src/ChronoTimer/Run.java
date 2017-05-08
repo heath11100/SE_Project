@@ -401,10 +401,30 @@ public class Run {
 	}
 
 	/**
-	 * Swaps the next two racers to finish.
+	 * Attempts to swap the next two racers to finish for IND race type.
+	 * @throws RaceException in the following conditions:
+	 * - Run has not started
+	 * - Run has already ended
+	 * - Event type is not IND
+	 * - There is not two racers to swap
 	 */
 	public void swap() throws RaceException {
-		//TODO:
+		if (!this.hasStarted()) {
+			throw new RaceException("Run has not yet started");
+
+		} else if (this.hasEnded()) {
+			throw new RaceException("Run has already ended");
+		}
+
+		//Race has started but has not ended.
+		switch (this.eventType) {
+			case IND:
+				((INDRunManager)this.runManager).swap();
+				break;
+
+			default:
+				throw new RaceException("Cannot swap in " + this.eventType.toString() + " event");
+		}
 	}
 	
 	public enum EventType {

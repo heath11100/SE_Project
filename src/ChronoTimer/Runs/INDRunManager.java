@@ -384,6 +384,26 @@ public class INDRunManager implements RunManager{
         }
     }
 
+    /**
+     * Swaps the next two racers to finish.
+     * @throws RaceException if there are not two racers to swap.
+     * @precondition run has started but has not ended.
+     */
+    public void swap() throws RaceException {
+        if (this.runningRacers.size() < 2) {
+            //Then there are not two racers to swap, throw an exception
+            throw new RaceException("There are not two racers to swap");
+        } else {
+            //There are at least two racers.
+            LinkedList<Racer> linkedRunning = (LinkedList<Racer>)this.runningRacers;
+            Racer nextRacer = linkedRunning.get(0);
+            Racer secondNextRacer = linkedRunning.get(1);
+
+            linkedRunning.set(0, secondNextRacer);
+            linkedRunning.set(1, nextRacer);
+        }
+    }
+
     @Override
     public String toString() {
         String outputString = "IND RUN OUTPUT\nQueued:\n";
