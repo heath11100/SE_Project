@@ -675,10 +675,10 @@ public class ChronoTrigger
 				e.printStackTrace();
 			}
 			
-			if (!runs.isEmpty())
-				curPrint.print(runs.get(runNum).getLog());
-			else if (curPrint == null)
+			if (curPrint == null)
 				history.add("illegal printer passed to export");
+			else if (!runs.isEmpty())
+				curPrint.print(runs.get(runNum).getLog());
 			else
 				history.add("runNum " + runNum+ " was invalid");
 		}
