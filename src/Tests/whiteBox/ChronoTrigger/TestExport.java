@@ -1,10 +1,20 @@
 package Tests.whiteBox.ChronoTrigger;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+
 import ChronoTimer.ChronoTime;
 import ChronoTimer.ChronoTrigger;
+import ChronoTimer.Run;
 import Exceptions.InvalidTimeException;
 import junit.framework.TestCase;
 
@@ -39,23 +49,42 @@ public class TestExport extends TestCase{
 	}
 
 	public void testNoRuns(){
-		
+		ct.exportRun(t2);
+		assertFalse(Files.exists(FileSystems.getDefault().getPath("run0.txt")));
 	}
 	
 	public void testNoCurrentRun(){
-		
+		ct.newRun(t3);
+		ct.addRacer(t3, 4);
+		ct.toggle(t3, 1);ct.toggle(t3, 2);
+		ct.triggerSensor(t3, 1);ct.triggerSensor(t4, 2);
+		ct.finRun(t5);
+		ct.exportRun(t6);
+		assertTrue(Files.exists(FileSystems.getDefault().getPath("run0.txt")));
 	}
 	
 	public void testUnfinishedRun(){
-		
+		ct.newRun(t3);
+		ct.addRacer(t3, 4);
+		ct.toggle(t3, 1);ct.toggle(t3, 2);
+		ct.triggerSensor(t3, 1);
+		ct.exportRun(t6);
+		assertTrue(Files.exists(FileSystems.getDefault().getPath("run0.txt")));
 	}
 	
 	public void testInvalidRunNumber(){
-		
+		ct.exportRun(t6,5);
+		assertFalse(Files.exists(FileSystems.getDefault().getPath("run0.txt")));
+		assertFalse(Files.exists(FileSystems.getDefault().getPath("run5.txt")));
 	}
 	
 	public void testInvalidPrinter(){
-		// A Run is instantiated, 3 Racers are queued
+		ct.newRun(t3);
+		ct.addRacer(t3, 4);
+		ct.toggle(t3, 1);ct.toggle(t3, 2);
+		ct.triggerSensor(t3, 1);ct.triggerSensor(t4, 2);
+		ct.finRun(t5);
+		ct.exportRun(t6, 0, null);
 	}
 	
 	public void testExportIND(){

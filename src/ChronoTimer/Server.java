@@ -135,14 +135,14 @@ public class Server {
     		s = s.substring(4);
     		NamedRacer r = new Gson().fromJson(s, NamedRacer.class);
     		racers.add(r);
-    		System.out.println("Successfully added employee.");
+    		System.out.println("Successfully added racer.");
     	}
     	else if (s.startsWith("CLEAR")){
     		racers.clear();
-    		System.out.println("Successfully cleared all employees.");
+    		System.out.println("Successfully cleared all racers.");
     	}
     	else if (s.startsWith("PRINT")){
-    		System.out.println("Employees:"+((racers.isEmpty())?"NONE":""));
+    		System.out.println("Racers:"+((racers.isEmpty())?"NONE":""));
     		System.out.flush();
     		for (int i=0;i<racers.size();i++)
     			System.out.println(racers.get(i).toString());

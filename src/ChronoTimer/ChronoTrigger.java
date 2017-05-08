@@ -677,6 +677,8 @@ public class ChronoTrigger
 			
 			if (!runs.isEmpty())
 				curPrint.print(runs.get(runNum).getLog());
+			else if (curPrint == null)
+				history.add("illegal printer passed to export");
 			else
 				history.add("runNum " + runNum+ " was invalid");
 		}

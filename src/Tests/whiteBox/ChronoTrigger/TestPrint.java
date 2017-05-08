@@ -18,13 +18,6 @@ public class TestPrint extends TestCase{
 	
 	@Override
 	public void setUp() throws InvalidTimeException{
-        try {
-                assert 1/0 == 42 : "OK";
-                System.err.println("Assertions must be enabled to use this test suite.");
-                System.err.println("In Eclipse: add -ea in the VM Arguments box under Run>Run Configurations>Arguments");
-                assertFalse("Assertions must be -ea enabled in the Run Configuration>Arguments>VM Arguments",true);
-        } catch (ArithmeticException ex) {}
-        
         // We will route all irrelevant output to a print dump.
         dump = new Printer(new PrintStream(new ByteArrayOutputStream()));
         
@@ -72,8 +65,8 @@ public class TestPrint extends TestCase{
 		ct.triggerSensor(t3, 1);ct.triggerSensor(t4, 2);
 		ct.finRun(t5);
 		doPrint("\nTry printing with invalid run number (1):",45);
-		doPrint("\nTry printing with invalid run number (2):",-1);
-		doPrint("\nTry printing with invalid run number (3):",0);
+		doPrint("Try printing with invalid run number (2):",-1);
+		doPrint("Try printing with invalid run number (3):",1);
 	}
 	
 	public void testInvalidPrinter(){
