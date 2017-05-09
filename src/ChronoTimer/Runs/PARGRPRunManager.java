@@ -417,23 +417,22 @@ public class PARGRPRunManager implements RunManager {
      */
     @Override
     public void didNotFinishNextRacer(int lane) throws RaceException {
-        throw new RaceException("Cannot DNF for PARGRP");
-//        if (!this.isValidLane(lane)) {
-//            throw new RaceException("Lane " + lane + " is invalid");
-//
-//        } else {
-//            final int laneIndex = lane-1;
-//
-//            Racer racer = this.runningRacers.get(laneIndex);
-//
-//            if (racer != null) {
-//                racer.didNotFinish();
-//                this.finishedRacers.add(racer);
-//                this.runningRacers.set(laneIndex, null);
-//
-//                this.log.add(racer.toString() + " did not finish");
-//            }
-//        }
+        if (!this.isValidLane(lane)) {
+            throw new RaceException("Lane " + lane + " is invalid");
+
+        } else {
+
+            for (int i = 0; i < NUM_OF_LANES; i++) {
+                Racer racer = this.runningRacers.get(i);
+
+                if (racer != null) {
+                    racer.didNotFinish();
+                    this.finishedRacers.set(i, racer);
+                    this.runningRacers.set(i, null);
+                    this.log.add(racer.toString() + " did not finish");
+                }
+            }
+        }
     }
 
 
