@@ -1,18 +1,9 @@
-
-
-
-
-
-
-
-
-
 All combinations of the following:
 
 	Initial state: CT is off
 
 	Turn CT on	
-	Create new PARGRP race/Create new race and set type to PARGRP	
+	Create new PARGRP race	
 	Queue 0-9 racers	
 	Trigger 1/Trigger 2-8		//should do nothing
 	Toggle all	
