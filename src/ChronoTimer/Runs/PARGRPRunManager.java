@@ -68,6 +68,30 @@ public class PARGRPRunManager implements RunManager {
     }
 
     /**
+     * Determines whether or not all racers are finished.
+     * @return true if all racers are finished, false otherwise (or if there are no racers have finished).
+     * @precondition the race has started but has not ended.
+     */
+    private boolean didAllFinish() {
+        int count = 0;
+
+        for (int i = 0; i < NUM_OF_LANES; i++) {
+            Racer racer = this.runningRacers.get(i);
+
+            if (racer != null) {
+                //Then there is a racer that has not finished.
+                return false;
+            } else {
+                racer = this.finishedRacers.get(i);
+                if (racer != null) {
+                    count++;
+                }
+            }
+        }
+
+        return count != 0;
+    }
+    /**
      * Returns a card that will be displayed by the system.
      *
      * @param elapsedTime is the current elapsed time of the run.
@@ -80,6 +104,9 @@ public class PARGRPRunManager implements RunManager {
         String headerString;
         if (this.hasRunEnded) {
             headerString = "Run Finished at " + elapsedTime.toString();
+
+        } else if (this.didAllFinish()) {
+            headerString = "Last Racer Finished \n";
 
         } else if (elapsedTime == null) {
             //Run has not ended, but has not started either.
@@ -354,19 +381,28 @@ public class PARGRPRunManager implements RunManager {
      */
     @Override
     public void cancelNextRacer(int lane) throws RaceException {
-        for (int i = 0; i < this.runningRacers.size(); i++) {
+        for (int i = 0; i < NUM_OF_LANES; i++) {
             Racer racer = this.runningRacers.get(i);
-            if (racer != null) {
-            	racer.cancel();
+
+            if (racer == null) {
+                //Then racer is not running, they might be finished.
+                racer = this.finishedRacers.get(i);
+
+                if (racer != null) {
+                    //Then the racer is already finished.
+                    Racer newRacer = new Racer(racer.getNumber());
+                    //We need to create a new racer because we cannot cancel a finished racer.
+                    this.queuedRacers.add(newRacer);
+                    this.finishedRacers.set(i, null);
+                }
+
+            } else {
+                //Then the racer in this lane is running.
+                racer.cancel();
                 this.queuedRacers.add(racer);
                 this.runningRacers.set(i, null);
             }
         }
-
-        for (Racer racer : this.finishedRacers) {
-            this.queuedRacers.add(racer);
-        }
-        this.finishedRacers.clear();
 
         this.log.add("Cancelled all racers");
     }

@@ -332,14 +332,14 @@ public class INDRunManager implements RunManager{
     public void cancelNextRacer(int lane) throws RaceException {
         LinkedList<Racer> linkedRunning = (LinkedList<Racer>)this.runningRacers;
         //Peek last will get
-        Racer racer = linkedRunning.peekLast();
+        Racer racer = linkedRunning.peekFirst();
 
         if (racer != null) {
             racer.cancel();
 
             //*Could* throw NoSuchElementException, although it should never throw this.
             //Since racer != null, there is at least one element in the running queue.
-            linkedRunning.removeLast();
+            linkedRunning.removeFirst();
 
             LinkedList<Racer> linkedQueued = (LinkedList<Racer>)this.queuedRacers;
             if (!linkedQueued.offerFirst(racer)) {
