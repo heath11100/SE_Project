@@ -14,7 +14,7 @@ import Exceptions.RaceException;
  */
 public class TestCancel {
 	private Run run;
-	private ChronoTime t1,t2,t3,t4,t5,t6;
+	private ChronoTime t1,t2,t3,t4,t5;
 	
 	@Before
 	public void setUp() throws InvalidTimeException{
@@ -29,7 +29,6 @@ public class TestCancel {
         t3 = new ChronoTime("0:3:0.0");
         t4 = new ChronoTime("0:4:0.0");
         t5 = new ChronoTime("0:5:0.0");
-        t6 = new ChronoTime("0:6:0.0");
         run = new Run();
 	}
 	
