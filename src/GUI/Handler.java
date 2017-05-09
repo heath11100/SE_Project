@@ -30,9 +30,9 @@ public class Handler {
 	int hour = 0, min = 0;
 	boolean extraInput = false;
 	
-	final int TIMERDELAY = 100;
+	final int TIMERDELAY = 29;
 	protected int STARTDELAY = 1000;
-	final int SERVERDELAY = 10000;
+	final int SERVERDELAY = 5372;
 	
 	boolean SERVERENABLED;
 

@@ -9,7 +9,10 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+
 import Exceptions.InvalidTimeException;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
@@ -44,7 +47,7 @@ public class Server {
     }
 
     static class DisplayHandler implements HttpHandler {
-        public void handle(HttpExchange t) throws IOException {
+        public void handle(HttpExchange t) throws IOException{
 
             String response = "<!DOCTYPE html><html><head><title>Race Results</title><link rel=\"stylesheet\" href=\"/css/style.css\"></head>";
 			// set up the header
@@ -52,7 +55,24 @@ public class Server {
             
 			try {
 				if (!sharedResponse.isEmpty()) {
-					Collections.sort(racers);
+					Collections.sort(racers,new Comparator<NamedRacer>(){
+						@Override
+						public int compare(NamedRacer r1, NamedRacer r2) {
+							if (r1.getMyRacer().getStatus() == Racer.Status.DNF){
+								if (r2.getMyRacer().getStatus() == Racer.Status.DNF)
+									return 0;
+								else
+									return 1;
+							}
+							else if (r2.getMyRacer().getStatus() == Racer.Status.DNF)
+								return -1;
+							try {
+								return r1.getMyRacer().getElapsedTime().isBefore(r2.getMyRacer().getElapsedTime()) ? -1: 1;
+							} catch (InvalidTimeException e) {
+								return 0;
+							}
+						}
+					});
 					response += generateTable(); 
 		}
 			} catch (JsonSyntaxException | InvalidTimeException e) {
@@ -156,7 +176,7 @@ public class Server {
     	for (int i=0;i<racers.size();i++){
     		NamedRacer cur = racers.get(i);
     		result +="<tr><td>"+cur.getMyRacer().getNumber()+"</td><td>"+cur.getLastName()+", "+cur.getFirstInitial()+"</td><td>"+
-    				((cur.getMyRacer().getStatus() == Racer.Status.DNF)? "DNF" : cur.getMyRacer().getElapsedTime())
+    				((cur.getMyRacer().getStatus() == Racer.Status.DNF)? "DNF" : cur.getMyRacer().getElapsedTime().getTimeStamp())
     		+"</td></tr>";}
     	return result+"</table>";
     }
