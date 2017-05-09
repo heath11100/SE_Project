@@ -525,6 +525,25 @@ public class ChronoTrigger
 		flush();
 	}
 	
+	public void swap(ChronoTime commandTime)
+	{
+		if(power)
+		{
+			try {
+				officialTime = commandTime.withOffset(offset);
+			} catch (InvalidTimeException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			if (!runs.isEmpty()){
+				try {runs.get(curRun).swap();}
+				catch(RaceException e) {history.add(e.getMessage());}
+				catch(NoSuchElementException e){history.add(e.getMessage());}
+				catch(Exception e){System.out.println("Unexpected exception...");e.printStackTrace();}
+			}
+		}
+	}
+	
 	/**
 	 * Ends Race. Currently need a method for this in Run
 	 * @param commandTime

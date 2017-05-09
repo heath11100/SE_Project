@@ -197,9 +197,17 @@ public class Handler {
 			curNum = "";
 
 	}
-
+	
+	
+	/**
+	 * since CT handles this state, and it is merely one button push, there is no need for interface between them like usual
+	 */
 	private void swap() {
-		
+		try {
+			main.swap(ChronoTime.now());
+		} catch (InvalidTimeException e) {
+			System.out.println("time exception");
+		}
 	}
 
 	/**

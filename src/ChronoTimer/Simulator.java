@@ -278,7 +278,8 @@ public class Simulator {
 						case "CLR":
 							//no action yet provided
 							break;
-						case "SWAP": //not used in sprint 2
+						case "SWAP":
+							sim.swap(ChronoTime.now());
 							break;
 						case "CANCEL":
 							sim.cancel(cTime);
