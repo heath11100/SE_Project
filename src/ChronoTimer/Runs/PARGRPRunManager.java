@@ -89,8 +89,9 @@ public class PARGRPRunManager implements RunManager {
             int count = 1;
             String queuedString = "\nQueued Racers:\n";
 
-            if (this.queuedRacers.size() > 0) {
+            if (this.queuedRacers != null && this.queuedRacers.size() > 0) {
                 for (Racer racer : this.queuedRacers) {
+                	if (racer == null) continue;
                     queuedString += "Lane " + (count) + ": " + racer.toString() + "\n";
                     count++;
                 }
