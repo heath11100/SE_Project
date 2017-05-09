@@ -356,8 +356,8 @@ public class PARGRPRunManager implements RunManager {
         for (int i = 0; i < this.runningRacers.size(); i++) {
             Racer racer = this.runningRacers.get(i);
             if (racer != null) {
+            	racer.cancel();
                 this.queuedRacers.add(racer);
-
                 this.runningRacers.set(i, null);
             }
         }
