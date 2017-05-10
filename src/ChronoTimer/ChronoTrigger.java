@@ -874,6 +874,21 @@ public class ChronoTrigger
 			ct = new ChronoTrigger();
 			ct.powerOn(t1);
 		}
+		public void testONOFF()
+		{
+			ct = new ChronoTrigger();
+			ct.powerOn(t1);
+			assertTrue(ct.power == true);
+			ct.powerOff(t1);
+			assertTrue(ct.power == false);
+			ct.powerOn(t1);
+			ct.newRun(t1);
+			assertTrue(ct.runs.get(0) != null);
+			ct.finRun(t1);
+			ct.newRun(t1);
+			ct.setType(t1, "IND");
+			assertTrue(ct.runs.get(1).getEventType() == ChronoTimer.Run.EventType.IND );
+		}
 		
 		public void testConstructors(){
 			//constructor 1
