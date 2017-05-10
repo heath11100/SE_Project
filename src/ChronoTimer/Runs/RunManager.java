@@ -10,11 +10,9 @@ import java.util.ArrayList;
 
 /**
  * Created by austinheath on 4/30/17.
- *
- * Questions:
- * 1) If I get a call for StartNextRacer, should I throw an error or just handle it myself?
  */
 public interface RunManager {
+    //Is final because its in an interface.
     int MAX_RACERS = 9_999;
 
     /**
@@ -112,13 +110,20 @@ public interface RunManager {
 
 
     /**
-     * Cancels the next racer to finish, in the corresponding lane, and places that racer back in the queue of racers yet to start.
-     * @precondition race has started but not yet ended
-     * @param lane corresponding to the lane to cancel the racer from. Note: lane may not be used by all event types.
-     * @return true if a racer is successfully placed into the queue, false otherwise.
-     * @throws RaceException when eventType is GRP
+     * This method is called when the run should cancel the last racer to start running.
+     * Implementation specifics are dependent on each event type.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> the run has started</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
+     *
+     * @param lane corresponds to the lane to cancel the racer from
+     * @throws RaceException specifics are dependent on each event type
      */
     void cancelNextRacer(int lane) throws RaceException;
+
 
     /**
      * Marks the next racer to finish, in the corresponding lane, as a did not finish.

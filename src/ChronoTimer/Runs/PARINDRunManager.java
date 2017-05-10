@@ -342,13 +342,19 @@ public class PARINDRunManager implements RunManager {
         }
     }
 
+
     /**
-     * Cancels the last racer to start, so the racer with the smalled elapsed time.
+     * Cancels the last racer to start and puts them at the head of the queue to start next.
+     * Note: this will check both lane 1 and lane 2 and find the racer that started last and remove them from that lane.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> the run has started</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
      *
-     * @param lane corresponding to the lane to cancel the racer from. Note: lane is ignored for PARIND.
-     *             PARIND finds the racer with the smallest elapsed time among all of the lanes.
-     * @throws RaceException when lane is not 1 or 2 OR when there is not a racer to cancel.
-     * @precondition race has started but not yet ended
+     * @param lane is ignored for PARIND type
+     * @throws RaceException when there is not a racer to cancel
      */
     @Override
     public void cancelNextRacer(int lane) throws RaceException {

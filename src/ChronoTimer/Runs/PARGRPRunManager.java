@@ -453,6 +453,20 @@ public class PARGRPRunManager implements RunManager {
      * @throws RaceException when eventType is GRP
      * @precondition race has started but not yet ended
      */
+
+    /**
+     * Cancels all of the currently running racers and resets any racer that has finished into the queue to start.
+     * The order of each racer is preserved.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> the run has started</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
+     *
+     * @param lane is ignored for PARGRP type
+     * @throws RaceException is not thrown for PARGRP.
+     */
     @Override
     public void cancelNextRacer(int lane) throws RaceException {
         for (int i = 0; i < NUM_OF_LANES; i++) {
@@ -468,6 +482,9 @@ public class PARGRPRunManager implements RunManager {
                     //We need to create a new racer because we cannot cancel a finished racer.
                     this.queuedRacers.add(newRacer);
                     this.finishedRacers.set(i, null);
+
+                } else {
+                    //There is not a racer in this lane.
                 }
 
             } else {

@@ -343,13 +343,18 @@ public class INDRunManager implements RunManager{
         }
     }
 
+
     /**
-     * Cancels the next racer to finish, in the corresponding lane, and places that racer back in the queue of racers yet to start.
+     * Cancels the last racer to start and puts them at the head of the queue to start next.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> the run has started</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
      *
-     * @param lane corresponding to the lane to cancel the racer from. Note: lane may not be used by all event types.
-     * @return true if a racer is successfully placed into the queue, false otherwise.
-     * @throws RaceException when eventType is GRP OR there is no racer to cancel.
-     * @precondition race has started but not yet ended
+     * @param lane is ignored for IND type
+     * @throws RaceException when there is not a racer to cancel
      */
     @Override
     public void cancelNextRacer(int lane) throws RaceException {
@@ -378,6 +383,7 @@ public class INDRunManager implements RunManager{
             throw new RaceException("No racer to cancel");
         }
     }
+
 
     /**
      * Marks the next racer to finish, in the corresponding lane, as a did not finish.

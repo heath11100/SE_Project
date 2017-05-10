@@ -237,6 +237,12 @@ public class GRPRunManager implements RunManager {
      * @throws RaceException when eventType is GRP
      * @precondition race has started but not yet ended
      */
+
+    /**
+     * Does nothing in particular. Cancel is not supported for GRP.
+     * @param lane is ignored for GRP type
+     * @throws RaceException on every call, GRP does not support cancel.
+     */
     @Override
     public void cancelNextRacer(int lane) throws RaceException {
         //Does nothing as there is not a queue and no list of running racers.
