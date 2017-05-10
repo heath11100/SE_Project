@@ -119,7 +119,7 @@ public class TestChronoTime extends TestCase{
 			Duration offset6 = Duration.ofHours(-10);//	   -10 hour
 			
 			//accurate to within 10 hundredths of a second (to allow calculation time)
-			int delta = 10;
+			int delta = 30;
 			
 			ChronoTime t0 = ChronoTime.now();
 			t1 = ChronoTime.now(offset1);
