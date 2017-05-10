@@ -124,7 +124,7 @@ public class Racer {
 	
 	/**
 	 * Sets the Racer's status to RACING and sets the Racer's startTime to startTime
-	 * @param startTime the time corresponding to when the Racer started a Race
+	 * @param startTime the time corresponding to when the Racer started a Race, relative to the start of the race.
 	 * @precondition The Racer has status QUEUED
 	 * @postcondition The Racer has status RACING
 	 * @throws IllegalStateException when the status is not QUEUED. This can occur if you attempt to start a racer that already began. 
@@ -140,7 +140,7 @@ public class Racer {
 	
 	/**
 	 * Sets the Racer's status to FINISHED and sets the Racer's endTime to endTime.
-	 * @param endTime the time corresponding to when the Racer finished a Race
+	 * @param endTime the time corresponding to when the Racer finished a Race, relative to the start of the race.
 	 * @precondition The Racer has status RACING
 	 * @postcondition The Racer has status FINISHED
 	 * @throws InvalidTimeException when endTime is before startTime

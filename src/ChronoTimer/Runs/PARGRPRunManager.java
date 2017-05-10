@@ -96,10 +96,24 @@ public class PARGRPRunManager implements RunManager {
 
         return count != 0;
     }
+
     /**
-     * Returns a card that will be displayed by the system.
-     *
-     * @param elapsedTime is the current elapsed time of the run.
+     * Returns a card that displays information relevant to the race. The card contains three sections:
+     *  <br> Header: Displays information relative to the following conditions:
+     *  <ul>
+     *      <li> If the run has ended, through manual end, the run finish time is displayed
+     *      <li> If the run has not ended, but all racers have ended, header says the last racer has finished</li>
+     *      <li> If the run has not yet started, it will display all of the queued racers</li>
+     *      <li> If the run has started, it simply lists the race time</li>
+     *  </ul>
+     *  <br> Body: displays information relative to the following conditions:
+     *  <ul>
+     *      <li> If a racer has not finished, it displays the lane number and racer number</li>
+     *      <li> If a racer has finished, it displays the lane number and racer number and their elapsed time</li>
+     *  </ul>
+     *  <br> Footer: does not display any information.
+     * @param elapsedTime is the current elapsed time of the run. If elapsedTime is null, it is assumed the run has not yet started.
+     *                    This is used to compute a current elapsed time for each running racer.
      * @return a valid card.
      */
     @Override
@@ -166,7 +180,8 @@ public class PARGRPRunManager implements RunManager {
     }
 
     /**
-     * This will move DNF any currently running racers.
+     * This is called when the run has ended to inform the RunManager that the run is officially over.
+     * This will move DNF any currently running racers and ignore any racers within the queue waiting to start.
      */
     @Override
     public void endRun() {
@@ -181,8 +196,7 @@ public class PARGRPRunManager implements RunManager {
 
     /**
      * Returns a list of all racers within a run.
-     * - This does NOT return the racers in any particular order.
-     *
+     * <i>This does NOT return the racers in any particular order.
      * @return a aggregated list of all racers.
      */
     @Override
@@ -210,8 +224,7 @@ public class PARGRPRunManager implements RunManager {
 
     /**
      * Determines whether the racer exists with the given racerNumber.
-     * This will check all racers within the run (queued, running, or finished).
-     *
+     * This will check all racers within the run manager (queued, running, or finished).
      * @param racerNumber corresponding to a racer's bib number
      * @return true if a racer exists with the given racerNumber, false otherwise.
      */
@@ -250,15 +263,44 @@ public class PARGRPRunManager implements RunManager {
     }
 
     /**
-     * Queues a racer with a given racerNumber.
-     *
-     * @param racerNumber corresponding to a racer's bib number, number must be in bounds [1,9999]
-     * @return if the racer was queued successfully, false otherwise.
-     * @throws RaceException with any of the following conditions:
-     *                       1) Racer already exists with racerNumber
-     *                       2) 8 Racers are already queued
-     * @precondition the run has not already started,
-     * racerNumber is valid (in bounds [1,9999])
+     * Determine whether or not a racer has started running or has finished running.
+     * @return true if a racer is running or finished, false otherwise.
+     */
+    private boolean hasStarted() {
+        boolean started = false;
+
+        for (int i = 0; i < this.NUM_OF_LANES; i++) {
+            Racer racer = this.runningRacers.get(i);
+            if (racer != null) {
+                started = true;
+                break;
+            }
+        }
+
+        if (!started) {
+            for (int i = 0; i < this.NUM_OF_LANES; i++) {
+                Racer racer = this.finishedRacers.get(i);
+                if (racer != null) {
+                    started = true;
+                    break;
+                }
+            }
+        }
+
+        return started;
+    }
+
+    /**
+     * Queues a racer to start with the given racerNumber. <i>Note: you can only queue 8 racers for PARGRP</i>
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> racerNumber is within bounds [1,9999]</li>
+     *     <li> the run has not yet started</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
+     * @param  racerNumber corresponding to the racer's bib number
+     * @throws RaceException when a racer already exists with racerNumber or when 8 racers are already queued
      */
     @Override
     public void queueRacer(int racerNumber) throws RaceException {
@@ -269,6 +311,8 @@ public class PARGRPRunManager implements RunManager {
         } else if (this.queuedRacers.size() >= NUM_OF_LANES) {
             throw new RaceException("Maximum racers already queued.");
 
+        } else if (this.hasStarted()) {
+            throw new RaceException("Cannot queue racer once run has started");
         } else {
             Racer newRacer = new Racer(racerNumber);
             this.queuedRacers.add(newRacer);
@@ -303,43 +347,43 @@ public class PARGRPRunManager implements RunManager {
     }
 
     /**
-     * This method is called when the run should start the next racer, or next batch of racers, dependent on the eventType.
+     * This starts all of the queued racers and places them into the lanes corresponding to their position within the queue.
+     * For example, the racer at the head of the queue will go into lane 1, next in lane 2, etc.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> relativeTime is valid (not null, and set relative to the start of the run)</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
      *
      * @param relativeTime corresponds to the start time, relative to the start of the run.
-     * @param lane         corresponds to the lane to start the next racer from. Note: this may be ignored for some eventTypes.
-     * @return true if the next racer, or batch of racers, were started successfully, false otherwise.
-     * @throws RaceException see specific eventType implementations for conditions where this exception is thrown.
-     * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
+     * @param lane is ignored for PARGRP.
+     * @throws RaceException when there is not a lane for a racer to be added to.
      */
     @Override
     public void startNext(ChronoTime relativeTime, int lane) throws RaceException {
         //START ALL RACERS.
-        if (!this.isValidLane(lane)) {
-            throw new RaceException("Lane " + lane + " is invalid");
+        int runIndex = 0;
 
-        } else {
-            int runIndex = 0;
+        //start all racers
+        for (Racer racer : this.queuedRacers) {
+            //Ensure that we are not getting a running lane that does not exist.
+            if (runIndex < this.runningRacers.size()) {
+                this.runningRacers.add(runIndex, racer);
 
-            //start all racers
-            for (Racer racer : this.queuedRacers) {
-                //Ensure that we are not getting a running lane that does not exist.
-                if (runIndex < this.runningRacers.size()) {
-                    this.runningRacers.add(runIndex, racer);
+                racer.start(relativeTime);
+                runIndex++;
 
-                    racer.start(relativeTime);
-                    runIndex++;
+                this.log.add("Started " + racer + " at time " + relativeTime.getTimeStamp());
 
-                    this.log.add("Started " + racer + " at time " + relativeTime.getTimeStamp());
-
-                } else {
-                    throw new RaceException("INTERNAL INCONSISTENCY: Not enough run lanes.");
-                }
+            } else {
+                throw new RaceException("INTERNAL INCONSISTENCY: Not enough run lanes.");
             }
-
-            //At this point: all runners have been added to the running queue.
-            //Remove all racers from the queue.
-            this.queuedRacers.clear();
         }
+
+        //At this point: all runners have been added to the running queue.
+        //Remove all racers from the queue.
+        this.queuedRacers.clear();
     }
 
     /**

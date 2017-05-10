@@ -24,64 +24,74 @@ public interface RunManager {
     Log getLog();
 
     /**
-     * Returns a card that will be displayed by the system.
-     * @param  elapsedTime is the current elapsed time of the run.
+     * Returns a card that displays information relevant to the race.
+     * The card contains three sections:
+     * <br> Header
+     * <br> Body
+     * <br> Footer
+     * @param elapsedTime is the current elapsed time of the run. This is used to compute a current elapsed time for each running racer.
      * @return a valid card.
      */
     Card getCard(ChronoTime elapsedTime);
 
     /**
-     * This will move DNF any currently running racers.
+     * This is called when the run has ended to inform the RunManager that the run is officially over.
+     * Implementation specifics are dependent on each event type.
      */
     void endRun();
 
     /**
      * Returns a list of all racers within a run.
-     * - This does NOT return the racers in any particular order.
+     * <i>This does NOT return the racers in any particular order.
      * @return a aggregated list of all racers.
      */
     ArrayList<Racer> getAllRacers();
 
     /**
      * Determines whether the racer exists with the given racerNumber.
-     * This will check all racers within the run (queued, running, or finished).
+     * This will check all racers within the run manager (queued, running, or finished).
      * @param racerNumber corresponding to a racer's bib number
      * @return true if a racer exists with the given racerNumber, false otherwise.
      */
     boolean doesRacerExist(int racerNumber);
 
     /**
-     * Queues a racer with a given racerNumber.
-     * @precondition the run has not already started,
-     * racerNumber is valid (in bounds [1,9999])
-     *
-     * @param racerNumber corresponding to a racer's bib number, number must be in bounds [1,9999]
-     * @return if the racer was queued successfully, false otherwise.
-     * @throws RaceException with any of the following conditions:
-     * 1) Racer already exists with racerNumber
+     * Queues a racer to start with the given racerNumber.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> racerNumber is within bounds [1,9999]</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
+     * @param  racerNumber corresponding to the racer's bib number
+     * @throws RaceException when a racer already exists with racerNumber
      */
     void queueRacer(int racerNumber) throws RaceException;
-
 
     /**
      * Removed a racer from the the queue.
      * Note: this will not remove a racer if they are running or have finished.
      * @param racerNumber corresponding to a racer's bib number, number must be in bounds [1,9999]
-     * @return true if the racer was de-queued successfully, false otherwise.
      * @throws RaceException when racer with racerNumber does not exist in the queue.
      */
     void deQueueRacer(int racerNumber) throws RaceException;
 
     /**
-     * This method is called when the run should start the next racer, or next batch of racers, dependent on the eventType.
-     * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
+     * This method is called when the run should start the next racer(s) (dependent on the event type).
+     * Implementation specifics are dependent on each event type.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> relativeTime is valid (not null, and set relative to the start of the run)</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
      *
      * @param relativeTime corresponds to the start time, relative to the start of the run.
-     * @param lane corresponds to the lane to start the next racer from. Note: this may be ignored for some eventTypes.
-     * @return true if the next racer, or batch of racers, were started successfully, false otherwise.
-     * @throws RaceException see specific eventType implementations for conditions where this exception is thrown.
+     * @param lane corresponds to the lane to start the next racer(s) from
+     * @throws RaceException specifics are dependent on each event type
      */
     void startNext(ChronoTime relativeTime, int lane) throws RaceException;
+
 
     /**
      * This method is called when the run should finish the next racer, or next batch of racers, dependent ofn the eventType.

@@ -1,6 +1,7 @@
 package Tests.whiteBox;
 
 import ChronoTimer.ChronoTrigger;
+import Tests.whiteBox.Run.Managers.TestAllManagers;
 import org.junit.runners.Suite;
 
 import Tests.whiteBox.ChronoTime.TestChronoTime;
@@ -22,6 +23,9 @@ import org.junit.runner.RunWith;
 
         //Test Racer
         TestRacer.class,
+
+        //Test Run Managers
+        TestAllManagers.class
 })
 
 /**

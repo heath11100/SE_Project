@@ -30,8 +30,6 @@ public class Run {
 	private final int MIN_BIB_NUMBER = 1;
 	private final int MAX_BIB_NUMBER = 9999;
 
-	private Timer timer;
-
 	public Run(EventType eventType) {
 		this.startTime = null;
 		this.endTime = null;
@@ -40,9 +38,6 @@ public class Run {
 
 		//We must set the runManager so when we set the event type we can access a valid log.
 		this.runManager = new INDRunManager(new Log());
-
-		this.timer = new Timer();
-		this.timer.schedule(new WriteState(this.runManager), 0, 500);
 
 		//This will ensure that runManager correctly corresponds to the event type and not arbitrarily set.
 		try {
@@ -190,7 +185,7 @@ public class Run {
 			this.startTime = atTime;
 			this.endTime = atTime;
 
-			this.getLog().add("Started run at " + atTime);
+			this.runManager.endRun();
 
 		} else if (!this.startTime.isBefore(atTime)) {
 			throw new InvalidTimeException("Run has not started.");
@@ -245,18 +240,10 @@ public class Run {
 			throw new RaceException("Invalid event type: " + newEventType);
 		}
 
-		this.timer.cancel();
-		this.timer.purge();
-
-		this.timer = new Timer();
-
-		// And From your main() method or any other method
-		this.timer.schedule(new WriteState(this.runManager), 0, 500);
-
 		//Add to the log.
 		log.add("Event type is " + newEventType);
 	}
-	
+
 	/**
 	 * Queues a racer, identified with racerNumber, to the queue of racers yet to begin the run.
 	 * @param racerNumber is used to identify the racer, no other racer may have this number, 
@@ -289,6 +276,7 @@ public class Run {
 	 * or when the racerNumber is not within bounds [1,9999]
 	 * OR when the lane is invalid
 	 * OR when eventType is GRP
+	 * //TODO:
 	 */
 	public void removeRacer(int racerNumber) throws RaceException {
 		if (racerNumber < MIN_BIB_NUMBER || racerNumber > MAX_BIB_NUMBER) {

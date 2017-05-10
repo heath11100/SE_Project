@@ -45,8 +45,11 @@ public class GRPRunManager implements RunManager {
 
 
     /**
-     * Returns a card that will be displayed by the system.
-     *
+     * Returns a card that displays information relevant to the race. The card contains three sections:
+     *  <br> Header: displays the current race time
+     *  <br> Body: no information is displayed within the body
+     *  <br> Footer: displays the last racer to finish
+     * @param elapsedTime is the current elapsed time of the run. This is used to compute a current elapsed time for each running racer.
      * @return a valid card.
      */
     @Override
@@ -82,7 +85,8 @@ public class GRPRunManager implements RunManager {
     }
 
     /**
-     * This will move DNF any currently running racers.
+     * This is called when the run is ended to inform the RunManager that the run is officially over.
+     * Since GRP does not contain any queued racers or store any running racers, this call does not do anything in particular.
      */
     @Override
     public void endRun() {
@@ -93,7 +97,7 @@ public class GRPRunManager implements RunManager {
 
     /**
      * Returns a list of all racers within a run.
-     * - This does NOT return the racers in any particular order.
+     * <i>This does NOT return the racers in any particular order.
      * @return a aggregated list of all racers.
      */
     @Override
@@ -104,8 +108,7 @@ public class GRPRunManager implements RunManager {
 
     /**
      * Determines whether the racer exists with the given racerNumber.
-     * This will check all racers within the run (queued, running, or finished).
-     *
+     * This will check all racers within the run manager (queued, running, or finished).
      * @param racerNumber corresponding to a racer's bib number
      * @return true if a racer exists with the given racerNumber, false otherwise.
      */
@@ -121,12 +124,9 @@ public class GRPRunManager implements RunManager {
     }
 
     /**
-     * Queues a racer with a given racerNumber.
-     * @param racerNumber corresponding to a racer's bib number, number must be in bounds [1,9999]
-     * @return if the racer was queued successfully, false otherwise.
-     * @throws RaceException everytime because queueRacer is not supported for GRP.
-     * @precondition the run has not already started,
-     * racerNumber is valid (in bounds [1,9999])
+     * GRP does not support queueing racers.
+     * @param  racerNumber corresponding to the racer's bib number
+     * @throws RaceException on any call, GRP does not support queueing racers.
      */
     @Override
     public void queueRacer(int racerNumber) throws RaceException {
@@ -154,9 +154,23 @@ public class GRPRunManager implements RunManager {
      * @return true if the next racer, or batch of racers, were started successfully, false otherwise.
      * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
      */
+
+    /**
+     * This method does not do anything in particular, as racers are not logged until they finish.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> relativeTime is valid (not null, and set relative to the start of the run)</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
+     *
+     * @param relativeTime is ignored for GRP event type.
+     * @param lane is ignored for GRP event type.
+     * @throws RaceException is not thrown for GRP event type.
+     */
     @Override
     public void startNext(ChronoTime relativeTime, int lane) throws RaceException {
-        //Does nothing, all racers are started,
+        //Does nothing, all racers are "started",
         // but there is no need to add racers as they are dummy racers anyways.
     }
 
@@ -232,6 +246,7 @@ public class GRPRunManager implements RunManager {
      * @param racerNumber the bib number that will be set.
      * @throws RaceException when there is not a racer to be marked.
      */
+    //TODO: Check to ensure we are not marking two racers with the same numbe!
     public void markNextRacer(int racerNumber) throws RaceException {
         LinkedList<Racer> linkedList = (LinkedList<Racer>)this.finishedRacers;
         if (this.nextRacerToMarkIndex < this.finishedRacers.size()) {

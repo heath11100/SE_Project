@@ -43,9 +43,11 @@ public class INDRunManager implements RunManager{
     }
 
     /**
-     * Returns a card that will be displayed by the system.
-     *
-     * @param elapsedTime is the current elapsed time of the run.
+     * Returns a card that displays information relevant to the race. The card contains three sections:
+     *  <br> Header: displays the next three queued racers
+     *  <br> Body: displays as many currently running racers as possible.
+     *  <br> Footer: displays the last racer that finished.
+     * @param elapsedTime is the current elapsed time of the run. This is used to compute a current elapsed time for each running racer.
      * @return a valid card.
      */
     @Override
@@ -136,7 +138,8 @@ public class INDRunManager implements RunManager{
     }
 
     /**
-     * This will move DNF any currently running racers.
+     * This is called when the run has ended to inform the RunManager that the run is officially over.
+     * This will move DNF any currently running racers and ignore any racers within the queue waiting to start.
      */
     @Override
     public void endRun() {
@@ -152,8 +155,7 @@ public class INDRunManager implements RunManager{
 
     /**
      * Returns a list of all racers within a run.
-     * - This does NOT return the racers in any particular order.
-     *
+     * <i>This does NOT return the racers in any particular order.
      * @return a aggregated list of all racers.
      */
     @Override
@@ -169,8 +171,7 @@ public class INDRunManager implements RunManager{
 
     /**
      * Determines whether the racer exists with the given racerNumber.
-     * This will check all racers within the run (queued, running, or finished).
-     *
+     * This will check all racers within the run manager (queued, running, or finished).
      * @param racerNumber corresponding to a racer's bib number
      * @return true if a racer exists with the given racerNumber, false otherwise.
      */
@@ -207,14 +208,16 @@ public class INDRunManager implements RunManager{
     }
 
     /**
-     * Queues a racer with a given racerNumber.
-     *
-     * @param racerNumber corresponding to a racer's bib number, number must be in bounds [1,9999]
-     * @return if the racer was queued successfully, false otherwise.
-     * @throws RaceException with any of the following conditions:
-     *                       1) Racer already exists with racerNumber
-     *
-     * @precondition the run has not already started, racerNumber is valid (in bounds [1,9999])
+     * Queues a racer to start with the given racerNumber.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> racerNumber is within bounds [1,9999]</li>
+     *     <li> the run has not already started</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
+     * @param  racerNumber corresponding to the racer's bib number
+     * @throws RaceException when a racer already exists with racerNumber
      */
     @Override
     public void queueRacer(int racerNumber) throws RaceException {
@@ -263,6 +266,20 @@ public class INDRunManager implements RunManager{
      * @return true if the next racer, or batch of racers, were started successfully, false otherwise.
      * @throws RaceException if there is not a racer to start.
      * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
+     */
+
+    /**
+     * This method is called when the run should start the next racer.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> relativeTime is valid (not null, and set relative to the start of the run)</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
+     *
+     * @param relativeTime corresponds to the start time, relative to the start of the run.
+     * @param lane is ignored for IND event type.
+     * @throws RaceException when there is not a racer to start.
      */
     @Override
     public void startNext(ChronoTime relativeTime, int lane) throws RaceException {
