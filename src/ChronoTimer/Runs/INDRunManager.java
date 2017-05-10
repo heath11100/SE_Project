@@ -213,7 +213,6 @@ public class INDRunManager implements RunManager{
      * Preconditions:
      * <ul>
      *     <li> racerNumber is within bounds [1,9999]</li>
-     *     <li> the run has not already started</li>
      *     <li> the run has not yet ended</li>
      * </ul>
      * @param  racerNumber corresponding to the racer's bib number
@@ -257,16 +256,6 @@ public class INDRunManager implements RunManager{
 
         throw new RaceException("Racer with number: " + racerNumber + " is not queued");
     }
-
-    /**
-     * This method is called when the run should start the next racer, or next batch of racers, dependent on the eventType.
-     *
-     * @param relativeTime corresponds to the start time, relative to the start of the run.
-     * @param lane         lane is ignored for IND race type.
-     * @return true if the next racer, or batch of racers, were started successfully, false otherwise.
-     * @throws RaceException if there is not a racer to start.
-     * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
-     */
 
     /**
      * This method is called when the run should start the next racer.

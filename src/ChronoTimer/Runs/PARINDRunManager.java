@@ -8,6 +8,7 @@ import Exceptions.InvalidTimeException;
 import Exceptions.RaceException;
 import org.junit.Test;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Queue;
 import java.util.LinkedList;
@@ -72,7 +73,7 @@ public class PARINDRunManager implements RunManager {
     /**
      * Returns a card that displays information relevant to the race. The card contains three sections:
      *  <br> Header: displays the two queued racers
-     *  <br> Body: no information is displayed within the body
+     *  <br> Body: a list of each racer running, not in any particular order.
      *  <br> Footer: displays the last two racers to finish
      * @param elapsedTime is the current elapsed time of the run. This is used to compute a current elapsed time for each running racer.
      * @return a valid card.
@@ -102,7 +103,66 @@ public class PARINDRunManager implements RunManager {
         card.setHeader(headerString);
 
         //Body
-        //Nothing
+        String bodyString = "Running Racers:";
+
+        ArrayList<Racer> runningRacers = new ArrayList<>();
+        LinkedList<Racer> runningLane1 = (LinkedList<Racer>)this.runningLanes.get(0);
+        LinkedList<Racer> runningLane2 = (LinkedList<Racer>)this.runningLanes.get(1);
+
+        for (int i = 0; i < Math.max(runningLane1.size(), runningLane2.size()); i++) {
+            if (i < runningLane1.size()) {
+                runningRacers.add(runningLane1.get(i));
+            }
+
+            if (i < runningLane2.size()) {
+                runningRacers.add(runningLane2.get(i));
+            }
+        }
+
+        //Iterate through running racers backwards.
+        if (runningRacers.size() > 0) {
+            int lineCount = 0;
+            //Body
+            //Set body as the list of running racers.
+            //From the max number of rows allowed, subtract the amount for the header (queueSize)
+            //Note: I subtract 3 to account for the "Next 3 Queued Racers:" line, which is not counted in queueSize
+            //  while also accounting for the "Last Racer to finish" and "None" in the footer.
+            //Subtracting 4 to account for the double line spaces we have.
+            final int maxBodyLine = Card.MAX_ROWS - 2 - 4 - 4;
+            final int runningQueueSize = runningRacers.size();
+
+            bodyString += " (showing " + Math.min(maxBodyLine, runningQueueSize) + " of " + runningQueueSize + ")\n";
+
+            final int sizeOffset = 1 + runningQueueSize - Math.min(maxBodyLine, runningQueueSize);
+            for (int i = runningQueueSize-sizeOffset; i >= 0; i--) {
+                Racer racer = runningRacers.get(i);
+
+                String elapsedTimeString;
+                try {
+                    //Calculate the current elapsed time
+                    //This puts the current time (that is passed in) relative to the run start time.
+                    ChronoTime racerElapsed = elapsedTime.elapsedSince(racer.getStartTime());
+                    elapsedTimeString = racerElapsed.toString();
+
+                } catch (Exception e) {
+                    //Most likely invalid time exception
+                    //Could be a NulLPointerException because elapsed time *could* be a null pointer
+                    //Although, it should not if there is a runner racing.
+                    elapsedTimeString = "<INVALID TIME>";
+                }
+
+                bodyString += racer.toString() + " " + elapsedTimeString + "\n";
+                lineCount++;
+
+                if (lineCount >= maxBodyLine) {
+                    //Then we have reached the cap on racers to add, break from adding racers.
+                    break;
+                }
+            }
+        } else {
+            bodyString += "\nNone";
+        }
+        card.setBody(bodyString);
 
         //Footer
         //Finish times of the last pair to finish (essentially last two racers).
@@ -208,7 +268,6 @@ public class PARINDRunManager implements RunManager {
      * Preconditions:
      * <ul>
      *     <li> racerNumber is within bounds [1,9999]</li>
-     *     <li> the run has not yet started</li>
      *     <li> the run has not yet ended</li>
      * </ul>
      * @param  racerNumber corresponding to the racer's bib number

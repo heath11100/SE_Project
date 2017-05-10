@@ -146,14 +146,6 @@ public class GRPRunManager implements RunManager {
         throw new RaceException("Cannot de-queue a racer for GRP event");
     }
 
-    /**
-     * This method is called when the run should start the next racer, or next batch of racers, dependent on the eventType.
-     *
-     * @param relativeTime corresponds to the start time, relative to the start of the run.
-     * @param lane         corresponds to the lane to start the next racer from. Note: this may be ignored for some eventTypes.
-     * @return true if the next racer, or batch of racers, were started successfully, false otherwise.
-     * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
-     */
 
     /**
      * This method does not do anything in particular, as racers are not logged until they finish.
@@ -174,15 +166,6 @@ public class GRPRunManager implements RunManager {
         // but there is no need to add racers as they are dummy racers anyways.
     }
 
-    /**
-     * This method is called when the run should finish the next racer, or next batch of racers, dependent ofn the eventType.
-     *
-     * @param relativeTime corresponds to the end time, relative to the start of the run.
-     * @param lane         corresponds to the lane to start the next racer from. GRP only supports lane 1.
-     * @return true if the next racer, or batch of racers, were finished successfully, false otherwise.
-     * @throws RaceException see specific eventType implementations for conditions where this exception is thrown.
-     * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
-     */
 
     /**
      * Adds another racer to the finished list.
@@ -229,14 +212,6 @@ public class GRPRunManager implements RunManager {
         }
     }
 
-    /**
-     * Cancels the next racer to finish, in the corresponding lane, and places that racer back in the queue of racers yet to start.
-     *
-     * @param lane corresponding to the lane to cancel the racer from. Note: lane may not be used by all event types.
-     * @return true if a racer is successfully placed into the queue, false otherwise.
-     * @throws RaceException when eventType is GRP
-     * @precondition race has started but not yet ended
-     */
 
     /**
      * Does nothing in particular. Cancel is not supported for GRP.

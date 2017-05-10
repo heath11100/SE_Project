@@ -30,6 +30,7 @@ public class Run {
 	private final int MIN_BIB_NUMBER = 1;
 	private final int MAX_BIB_NUMBER = 9999;
 
+
 	public Run(EventType eventType) {
 		this.startTime = null;
 		this.endTime = null;
@@ -45,37 +46,12 @@ public class Run {
 		} catch (RaceException e) { /* should never reach this, eventType.toString() will be recognized */ }
 	}
 
-	public class WriteState extends TimerTask {
-		private RunManager runManager;
-
-		public WriteState(RunManager runManager) {
-			super();
-			this.runManager = runManager;
-		}
-
-		@Override
-		public void run() {
-			final String filePath = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + "runState.txt";
-
-			try {
-				FileWriter fileWriter = new FileWriter(filePath, false);
-
-				BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
-				bufferedWriter.write(this.runManager.toString());
-
-				bufferedWriter.close();
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 	
 	public Run() {
 		this(EventType.IND);
 	}
-	
+
+
 	/**
 	 * Get the log the run maintains to keep track of all changes to the run.
 	 * @return the log
@@ -83,6 +59,7 @@ public class Run {
 	public Log getLog() {
 		return this.runManager.getLog();
 	}
+
 
 	/**
 	 * Get the card of the run which displays information relative to the event type.
@@ -101,7 +78,7 @@ public class Run {
 	 * 	Header:
 	 * 	- Next pair to run
 	 * 	Body:
-	 * 	- NOTHING
+	 * 	- A list of all running racers.
 	 * 	Footer:
 	 * 	- Finish times of the last pair to finish
 	 *
@@ -133,6 +110,7 @@ public class Run {
 		}
 	}
 
+
 	/**
 	 * Determines whether or not the run has started.
 	 * @return true if the run has started, false otherwise.
@@ -140,7 +118,8 @@ public class Run {
 	public boolean hasStarted() {
 		return this.startTime != null;
 	}
-	
+
+
 	/**
 	 * Determines whether or not the run has ended.
 	 * @return true if the run has ended, false otherwise.
@@ -157,26 +136,26 @@ public class Run {
 	public EventType getEventType() {
 		return this.eventType;
 	}
-	
+
+
 	/**
-	 * Returns an ArrayList of all racers.
-	 * @return the number of the removed lane.
-	 * @throws RaceException when there is not a lane to remove
-	 * @throws IllegalStateException when the lists are not the same size (this would be an internal error)
+	 * Returns ana aggregated list of racers within the run. This includes queued racers, running racers, and finished racers.
+	 * Racers are not sorted in any particular order.
+	 * @return all of the racers within the run.
 	 */
 	public ArrayList<Racer> getAllRacers(){
 		return  this.runManager.getAllRacers();
 	}
-	
+
+
 	/**
-	 * Ends the current run. This cannot be undone. Any racers that are currently running will be set to DNF. 
-	 * Queued racers are not affected.
-	 * @param atTime is the time the run ended.
-	 * @throws RaceException when attempting to end a run after a run has already been ended OR
-	 * if the run has not started
-	 * @throws InvalidTimeException when atTime is before the run start time
+	 * Ends the run, this action cannot be undone. This will prevent any further manipulation of racers.
+	 * Any currently running racers will be set to DNF.
+	 * <i>Note: if the run has not started this will set the start time to be equal to atTime and then end the run.</i>
+	 * @param  atTime is the time the run ended
+	 * @thows RaceException when the run has already ended or if atTime is before the run start time.
 	 */
-	public void endRun(ChronoTime atTime) throws RaceException, InvalidTimeException {		
+	public void endRun(ChronoTime atTime) throws RaceException {
 		if (this.hasEnded()) {
 			throw new RaceException("Run already ended.");
 
@@ -188,7 +167,7 @@ public class Run {
 			this.runManager.endRun();
 
 		} else if (!this.startTime.isBefore(atTime)) {
-			throw new InvalidTimeException("Run has not started.");
+			throw new RaceException("End time cannot be before start time");
 
 		} else {
 			this.runManager.endRun();
@@ -197,16 +176,16 @@ public class Run {
 
 		this.getLog().add("Ended run at " + atTime);
 	}
-	
+
+
 	/**
-	 * Sets the event type to a new event type. The event type can be changed until a racer has been added to the run (queued).
-	 * Note: When switching from PARIND to IND all lanes, except the first, are removed.
-	 * @param newEventType is a string representation of the eventType
-	 * @throws RaceException when attempting to change the event type after a racer is queued, running, or finished,
-	 * OR
-	 * if newEventType does not correspond to a valid event type
+	 * Sets the event type to the new event type associated with newTypeString.
+	 * <i>Note: newTypeString is tested case-sensitive</i>
+	 * @param newTypeString is a string representation of the event type.
+	 * @throws RaceException if the run has already started or if the run has already ended
+	 * or if newTypeString is not a valid event type string
 	 */
-	public void setEventType(String newEventType) throws RaceException {
+	public void setEventType(String newTypeString) throws RaceException {
 		if (this.hasStarted()) {
 			throw new RaceException("Cannot change event type once run started");
 
@@ -215,7 +194,7 @@ public class Run {
 		}
 
 		Log log = this.runManager.getLog();
-		switch (newEventType) {
+		switch (newTypeString) {
 			case "IND":
 				this.eventType = EventType.IND;
 				this.runManager = new INDRunManager(log);
@@ -237,21 +216,25 @@ public class Run {
 				break;
 			
 		default:
-			throw new RaceException("Invalid event type: " + newEventType);
+			throw new RaceException("Invalid event type: " + newTypeString);
 		}
 
 		//Add to the log.
-		log.add("Event type is " + newEventType);
+		log.add("Event type is " + newTypeString);
 	}
 
+
 	/**
-	 * Queues a racer, identified with racerNumber, to the queue of racers yet to begin the run.
-	 * @param racerNumber is used to identify the racer, no other racer may have this number, 
-	 * number must be 1 to 4 digits [1,9999]
-	 * @throws RaceException when a racer exists with racerNumber
-	 * OR when the racerNumber does not fit within the bounds [1,9999]
-	 * OR when the run was ended
-	 * OR when the event type is GRP
+	 * Attempts to queue a racer to start with racerNumber as the bib number.
+	 * @param racerNumber associated with the racer's bib number
+	 * @throws RaceException if racerNumber is not within bounds [1,9999] or if the run has already ended
+	 * or under the following conditions:
+	 * <ul>
+	 *     <li>IND: if a racer already has racerNumber within the run</li>
+	 *     <li>PARIND: if a racer already has racerNumber within the run</li>
+	 *	   <li>GRP: always </li>
+	 *     <li>PARGRP: if a racer already has racerNumber within the run or if there are already 8 racers</li>
+	 * </ul>
 	 */
 	public void queueRacer(int racerNumber) throws RaceException {
 		if (racerNumber < MIN_BIB_NUMBER || racerNumber > MAX_BIB_NUMBER) {
@@ -298,6 +281,26 @@ public class Run {
 	 * @throws RaceException when run has already ended
 	 * OR run type is IND or PARIND and there is not another racer to start
 	 * OR run type is GRP and the run has already started
+	 */
+
+	/**
+	 * Starts the next racer(s) as described for each event type:
+	 * <ul>
+	 *     <li>IND: starts the next racer in the queue</li>
+	 *     <li>PARIND: starts the next racer in the given lane</li>
+	 *     <li>GRP: starts the run</li>
+	 *     <li>PARGRP: starts the run provided lane is 1</li>
+	 * </ul>
+	 * @param atTime corresponds to the start time
+	 * @param lane corresponds to the lane to start the next racer(s) from
+	 * @throws RaceException when atTime is null or is before the run start time (where applicable)
+	 * or if the run has already ended or where conditions apply for each event type:
+	 * <ul>
+	 *     <li>IND: there is not a racer to start</li>
+	 *     <li>PARIND: there is not a racer to start or lane is not 1 or 2</li>
+	 *     <li>GRP: does not throw an error</li>
+	 *     <li>PARGRP: if lane is not in bounds [1,8]</li>
+	 * </ul>
 	 */
 	public void startNextRacer(ChronoTime atTime, int lane) throws InvalidTimeException, RaceException {
 		ChronoTime tempStartTime;
@@ -376,8 +379,8 @@ public class Run {
 			this.runManager.cancelNextRacer(lane);
 		}
 	}
-	
-	/** 
+
+	/**
 	 * Sets the next racer, to finish, as a Did Not Finish (DNF) finish type.
 	 * @param lane is the lane the next racer to DNF is in
 	 * @throws RaceException when there is not a racer to set DNF for

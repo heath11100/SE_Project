@@ -354,6 +354,7 @@ public class PARGRPRunManager implements RunManager {
      * <ul>
      *     <li> relativeTime is valid (not null, and set relative to the start of the run)</li>
      *     <li> the run has not yet ended</li>
+     *     <li> lane is 1</li>
      * </ul>
      *
      * @param relativeTime corresponds to the start time, relative to the start of the run.
@@ -385,16 +386,6 @@ public class PARGRPRunManager implements RunManager {
         //Remove all racers from the queue.
         this.queuedRacers.clear();
     }
-
-    /**
-     * This method is called when the run should finish the next racer, or next batch of racers, dependent ofn the eventType.
-     *
-     * @param relativeTime corresponds to the end time, relative to the start of the run.
-     * @param lane         corresponds to the lane to start the next racer from. Note: this may be ignored for some eventTypes.
-     * @return true if the next racer, or batch of racers, were finished successfully, false otherwise.
-     * @throws RaceException see specific eventType implementations for conditions where this exception is thrown.
-     * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
-     */
 
     /**
      * Finishes the racer in the given lane.
