@@ -264,8 +264,6 @@ public class TestRun extends TestCase {
 			run.endRun(time1);
 			
 			fail("Should not pass when time is before the start time");
-		} catch (InvalidTimeException e) {
-			assertTrue("Time should fail because it is before the start time.",true);
 		} catch (RaceException e) {
 			fail("RaceException should not be thrown.");
 		}
@@ -291,8 +289,6 @@ public class TestRun extends TestCase {
 			assertTrue(run.hasStarted());
 			assertTrue(run.hasEnded());
 
-		} catch (InvalidTimeException e) {
-			fail("InvalidTimeException should not be thrown.");
 		} catch (RaceException e) {
 			fail("Should not throw error because endTime and startTime are now the same.");
 		}
@@ -322,8 +318,6 @@ public class TestRun extends TestCase {
 			run.endRun(time3);
 			
 			fail("Should not pass when time is before the start time");
-		} catch (InvalidTimeException e) {
-			fail("InvalidTimeException should not be thrown.");
 		} catch (RaceException e) {
 			assertTrue("Should fail because run has already ended.",true);
 		}
