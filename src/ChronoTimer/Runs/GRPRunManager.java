@@ -266,14 +266,14 @@ public class GRPRunManager implements RunManager {
     }
 
 
-    public static class TestGRPRunManager {
+    public static class TestRunManager {
         private GRPRunManager runManager;
 
         private int racerNumber;
 
         private ChronoTime time1, time2, time3;
 
-        public TestGRPRunManager() throws InvalidTimeException {
+        public TestRunManager() throws InvalidTimeException {
             this.runManager = new GRPRunManager(new Log());
 
             racerNumber = 1234;

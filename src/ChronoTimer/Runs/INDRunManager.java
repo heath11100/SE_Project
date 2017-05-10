@@ -331,15 +331,16 @@ public class INDRunManager implements RunManager{
     @Override
     public void cancelNextRacer(int lane) throws RaceException {
         LinkedList<Racer> linkedRunning = (LinkedList<Racer>)this.runningRacers;
-        //Peek last will get
-        Racer racer = linkedRunning.peekFirst();
+
+        //Peek last will get the last racer to start.
+        Racer racer = linkedRunning.peekLast();
 
         if (racer != null) {
             racer.cancel();
 
             //*Could* throw NoSuchElementException, although it should never throw this.
             //Since racer != null, there is at least one element in the running queue.
-            linkedRunning.removeFirst();
+            linkedRunning.removeLast();
 
             LinkedList<Racer> linkedQueued = (LinkedList<Racer>)this.queuedRacers;
             if (!linkedQueued.offerFirst(racer)) {
@@ -428,14 +429,14 @@ public class INDRunManager implements RunManager{
         return outputString;
     }
 
-    public static class TestINDRunManager {
+    public static class TestRunManager {
         private INDRunManager runManager;
 
         private int racerNumber;
 
         private ChronoTime time1, time2, time3;
 
-        public TestINDRunManager() throws InvalidTimeException {
+        public TestRunManager() throws InvalidTimeException {
             this.runManager = new INDRunManager(new Log());
 
             racerNumber = 1234;
@@ -739,8 +740,10 @@ public class INDRunManager implements RunManager{
             assertEquals(2, this.runManager.runningRacers.size());
 
             LinkedList<Racer> runningLinked = (LinkedList<Racer>)this.runManager.runningRacers;
+
             //The last racer to start.
             Racer racerToCancel = runningLinked.getLast();
+
             //Last racer to start should be racerNumber2[4321]
             assertEquals(4321, racerToCancel.getNumber());
 
@@ -749,15 +752,15 @@ public class INDRunManager implements RunManager{
             //Queue should be: 1) racerNumber2[4321], 2) racerNumber3[8080]
             //Running should be 1) racerNumber[1234]
 
-            //Running Racer should have 0 racer, Queued racers should have 1.
-            assertEquals(1, this.runManager.runningRacers.size());
+            //Running Racer should have 1 racer, Queued racers should have 2.
             assertEquals(2, this.runManager.queuedRacers.size());
+            assertEquals(1, this.runManager.runningRacers.size());
 
             //Peek is the head of the queue, or the next racer to start.
-            Racer cancelledRacer = this.runManager.queuedRacers.peek();
+            Racer nextToStart = this.runManager.queuedRacers.peek();
 
             //Head of the queue should be racerNumber2[4321]
-            assertEquals(4321, cancelledRacer.getNumber());
+            assertEquals(racerToCancel.getNumber(), nextToStart.getNumber());
             //The last racer to start (racerToCancel) should be equal the the nextRacer to start at this point (cancelledRacer)
         }
 

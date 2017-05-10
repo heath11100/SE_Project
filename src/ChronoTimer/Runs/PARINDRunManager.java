@@ -473,14 +473,14 @@ public class PARINDRunManager implements RunManager {
 
 
 
-    public static class TestINDRunManager {
+    public static class TestRunManager {
         private PARINDRunManager runManager;
 
         private int racerNumber;
 
         private ChronoTime time1, time2, time3;
 
-        public TestINDRunManager() throws InvalidTimeException {
+        public TestRunManager() throws InvalidTimeException {
             this.runManager = new PARINDRunManager(new Log());
 
             racerNumber = 1234;

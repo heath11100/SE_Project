@@ -6,7 +6,6 @@ import org.junit.runners.Suite;
 import Tests.whiteBox.ChronoTime.TestChronoTime;
 import Tests.whiteBox.ChronoTrigger.TestChronoTrigger;
 import Tests.whiteBox.Racer.TestRacer;
-import Tests.whiteBox.Run.TestAllRun;
 
 import org.junit.runner.RunWith;
 
@@ -23,9 +22,6 @@ import org.junit.runner.RunWith;
 
         //Test Racer
         TestRacer.class,
-
-        //Test All Runs
-        TestAllRun.class
 })
 
 /**

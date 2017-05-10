@@ -11,7 +11,7 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        GRPRunManager.TestGRPRunManager.class
+        GRPRunManager.TestRunManager.class
 })
 
 public class TestGRPRunManager { }

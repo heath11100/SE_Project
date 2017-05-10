@@ -10,7 +10,7 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        INDRunManager.TestINDRunManager.class
+        INDRunManager.TestRunManager.class
 })
 
 public class TestINDRunManager {
