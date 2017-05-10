@@ -463,14 +463,6 @@ public class PARINDRunManager implements RunManager {
         }
     }
 
-    /**
-     * Marks the racer with the largest elapsed time as a Did Not Finish.
-     *
-     * @param lane corresponding to the lane to cancel the racer from. Note: lane is ignored for PARIND.
-     *             PARIND finds the racer with the largest elapsed time among all of the lanes.
-     * @throws RaceException when lane is not 1 or 2 OR when there is not a racer to cancel.
-     * @precondition race has started but not yet ended
-     */
 
     /**
      * Sets the next racer to finish as a Did Not Finish.

@@ -1,17 +1,9 @@
 package ChronoTimer;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import ChronoTimer.Runs.*;
 import Exceptions.*;
-
-import javax.swing.filechooser.FileSystemView;
 
 /**
  * PARGRP:
@@ -331,18 +323,26 @@ public class Run {
 			this.startTime = tempStartTime;
 		}
 	}
-	
+
+
 	/**
-	 * For IND and PARIND this finishes the next racer that is currently racing in the given lane.
-	 * For GRP this marks the finish of another racer.
-	 * @param atTime this is the absolute time the racer finished.
-	 * @param lane for IND and PARIND this is the lane the racer belongs to. This is ignored for GRP.
-	 * @throws InvalidTimeException when atTime is null
-	 * OR when atTime is before the run's start time
-	 * @throws RaceException when the run has not started
-	 * OR when the run has already ended
-	 * OR there is not another racer to finish for IND and PARIND event types
-	 * OR the maximum number of runners have finished (9999) for GRP event type.
+	 * Finishes the next racer(s) as described for each event type:
+	 * <ul>
+	 *     <li>IND: finishes the next racer in the queue</li>
+	 *     <li>PARIND: finishes the next racer in the given lane</li>
+	 *     <li>GRP: adds a racer to the finished queue as a placeholder</li>
+	 *     <li>PARGRP: finishes the racer in the given lane</li>
+	 * </ul>
+	 * @param atTime corresponds to the finish time
+	 * @param lane corresponds to the lane to finish the next racer(s) from
+	 * @throws RaceException if the run has not started or atTime is null or the run has ended or
+	 * where conditions apply for each event type:
+	 * <ul>
+	 *     <li>IND: there is not a racer to start</li>
+	 *     <li>PARIND: there is not a racer to start or lane is not 1 or 2</li>
+	 *     <li>GRP: does not throw an error</li>
+	 *     <li>PARGRP: if lane is not in bounds [1,8]</li>
+	 * </ul>
 	 */
 	public void finishNextRacer(ChronoTime atTime, int lane) throws InvalidTimeException, RaceException {
 		if (!this.hasStarted()) {
@@ -360,11 +360,24 @@ public class Run {
 		}
 	}
 
+
 	/**
-	 * Cancels the next racer to finish putting that racer at the end of the queued racers.
-	 * @throws RaceException when there is not a racer to cancel
-	 * OR when the race has already ended
-	 * OR when eventType is GRP
+	 * Cancels racer(s) as described for each event type:
+	 * <ul>
+	 *     <li>IND: cancels last racer to start</li>
+	 *     <li>PARIND: cancels the last racer to start - independent of the lane</li>
+	 *     <li>GRP: cancel is not supported for GRP</li>
+	 *     <li>PARGRP: cancels all running racers and restarts any finished racers</li>
+	 * </ul>
+	 * @param lane corresponds to the lane to cancel the racer from
+	 * @throws RaceException if the run has ended or
+	 * where conditions apply for each event type:
+	 * <ul>
+	 *     <li>IND: if there is not a racer to cancel</li>
+	 *     <li>PARIND: if there is not a racer to cancel</li>
+	 *     <li>GRP: exception is not thrown</li>
+	 *     <li>PARGRP: exception is not thrown</li>
+	 * </ul>
 	 */
 	public void cancelNextRacer(int lane) throws RaceException {
 		if (this.hasEnded()) {
@@ -380,13 +393,24 @@ public class Run {
 		}
 	}
 
+
 	/**
-	 * Sets the next racer, to finish, as a Did Not Finish (DNF) finish type.
-	 * @param lane is the lane the next racer to DNF is in
-	 * @throws RaceException when there is not a racer to set DNF for
-	 * OR when the race has already ended
-	 * OR when the lane is not a valid lane.
-	 * OR when eventType is GRP
+	 * Sets the next racer to finish as a Did Not Finish as described for each event type:
+	 * <ul>
+	 *     <li>IND: DNFs next racer to finish</li>
+	 *     <li>PARIND: DNFs the presumed next racer to finish</li>
+	 *     <li>GRP: cancel is not supported for GRP</li>
+	 *     <li>PARGRP: sets all racers currently running as DNF</li>
+	 * </ul>
+	 * @param lane corresponds to the lane to DNF the racer from
+	 * @throws RaceException if the run has ended or
+	 * where conditions apply for each event type:
+	 * <ul>
+	 *     <li>IND: if there is not a racer to DNF</li>
+	 *     <li>PARIND: if there is not a racer to DNF</li>
+	 *     <li>GRP: exception is always thrown - not supported for GRP</li>
+	 *     <li>PARGRP: exception is not thrown</li>
+	 * </ul>
 	 */
 	public void didNotFinishNextRacer(int lane) throws RaceException {
 		 if (this.hasEnded()) {
@@ -396,13 +420,11 @@ public class Run {
 		}
 	}
 
+
 	/**
-	 * Attempts to swap the next two racers to finish for IND race type.
-	 * @throws RaceException in the following conditions:
-	 * - Run has not started
-	 * - Run has already ended
-	 * - Event type is not IND
-	 * - There is not two racers to swap
+	 * Swaps the next two racers to start for IND event type only.
+	 * @throws RaceException if the run has not started or if run has ended
+	 * or if there are not two racers to swap
 	 */
 	public void swap() throws RaceException {
 		if (!this.hasStarted()) {

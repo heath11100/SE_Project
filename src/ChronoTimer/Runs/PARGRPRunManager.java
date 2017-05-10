@@ -436,14 +436,6 @@ public class PARGRPRunManager implements RunManager {
         }
     }
 
-    /**
-     * Cancels the next racer to finish, in the corresponding lane, and places that racer back in the queue of racers yet to start.
-     *
-     * @param lane corresponding to the lane to cancel the racer from. Note: lane may not be used by all event types.
-     * @return true if a racer is successfully placed into the queue, false otherwise.
-     * @throws RaceException when eventType is GRP
-     * @precondition race has started but not yet ended
-     */
 
     /**
      * Cancels all of the currently running racers and resets any racer that has finished into the queue to start.
