@@ -293,14 +293,20 @@ public class PARINDRunManager implements RunManager {
         }
     }
 
+
     /**
-     * This method is called when the run should finish the next racer, or next batch of racers, dependent ofn the eventType.
+     * Finishes the next racer in the given lane.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> relativeTime is valid (not null, and set relative to the start of the run)</li>
+     *     <li> the run has started</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
      *
-     * @param relativeTime corresponds to the end time, relative to the start of the run.
-     * @param lane         corresponds to the lane to start the next racer from. Note: this may be ignored for some eventTypes.
-     * @return true if the next racer, or batch of racers, were finished successfully, false otherwise.
-     * @throws RaceException see specific eventType implementations for conditions where this exception is thrown.
-     * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
+     * @param relativeTime corresponds to the finish time, relative to the start of the run.
+     * @param lane corresponds to the lane to finish the next racer from
+     * @throws RaceException when the lane is invalid (not 1 or 2) or there is not a racer to finish.
      */
     @Override
     public void finishNext(ChronoTime relativeTime, int lane) throws RaceException {

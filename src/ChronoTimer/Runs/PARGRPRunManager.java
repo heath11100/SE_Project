@@ -395,6 +395,21 @@ public class PARGRPRunManager implements RunManager {
      * @throws RaceException see specific eventType implementations for conditions where this exception is thrown.
      * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
      */
+
+    /**
+     * Finishes the racer in the given lane.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> relativeTime is valid (not null, and set relative to the start of the run)</li>
+     *     <li> the run has started</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
+     *
+     * @param relativeTime corresponds to the finish time, relative to the start of the run.
+     * @param lane corresponds to the lane to finish the next racer from
+     * @throws RaceException when lane is invalid (not in bounds [1,8]) or there is not a racer to finish in the given lane
+     */
     @Override
     public void finishNext(ChronoTime relativeTime, int lane) throws RaceException {
         //Test if lane is valid [1,8]

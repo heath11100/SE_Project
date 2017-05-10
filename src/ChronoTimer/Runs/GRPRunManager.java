@@ -183,9 +183,26 @@ public class GRPRunManager implements RunManager {
      * @throws RaceException see specific eventType implementations for conditions where this exception is thrown.
      * @precondition atTime is valid (not null, and relative to the start of the run), the run has NOT already ended
      */
+
+    /**
+     * Adds another racer to the finished list.
+     * Racers are added with a "dummy" number, which is distinct from any number that can be entered by a user.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> relativeTime is valid (not null, and set relative to the start of the run)</li>
+     *     <li> the run has started</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
+     *
+     * @param relativeTime corresponds to the finish time, relative to the start of the run.
+     * @param lane corresponds to the lane to finish the next racer from
+     * @throws RaceException when the maximum number of racers to finish have already finished or if lane is not 1.
+     */
     @Override
     public void finishNext(ChronoTime relativeTime, int lane) throws RaceException {
         if (this.finishedRacers.size() == MAX_RACERS) {
+            //Note: we check for equality because adding another racer would put us OVER the max.
             throw new RaceException("Maximum number of racers have already finished.");
 
         } else if (lane != 1) {
