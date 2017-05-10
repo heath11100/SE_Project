@@ -1,7 +1,13 @@
 package Tests.whiteBox;
 
 import ChronoTimer.ChronoTrigger;
+import Tests.whiteBox.ChronoTrigger.TestExport;
+import Tests.whiteBox.ChronoTrigger.TestPrint;
 import Tests.whiteBox.Run.Managers.TestAllManagers;
+import Tests.whiteBox.Run.TestCancel;
+import Tests.whiteBox.Run.TestDNF;
+import Tests.whiteBox.Run.TestRun;
+import Tests.whiteBox.Run.TestSwap;
 import org.junit.runners.Suite;
 
 import Tests.whiteBox.ChronoTime.TestChronoTime;
@@ -25,7 +31,20 @@ import org.junit.runner.RunWith;
         TestRacer.class,
 
         //Test Run Managers
-        TestAllManagers.class
+        TestAllManagers.class,
+
+        //Test Run
+        TestRun.class,
+
+        TestCancel.class,
+
+        TestDNF.class,
+
+        TestSwap.class,
+
+        TestExport.class,
+
+        TestPrint.class
 })
 
 /**
