@@ -412,50 +412,59 @@ public class PARINDRunManager implements RunManager {
      * @throws RaceException when lane is not 1 or 2 OR when there is not a racer to cancel.
      * @precondition race has started but not yet ended
      */
+
+    /**
+     * Sets the next racer to finish as a Did Not Finish.
+     * This assumes that the racer with the largest elapsed time is the next to finish.
+     * This will check both lane 1 and lane 2 to see which racer has the largest elapsed time.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> the run has started</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
+     *
+     * @param lane lane is ignored for PARIND.
+     * @throws RaceException when there is not a racer to DNF.
+     */
     @Override
     public void didNotFinishNextRacer(int lane) throws RaceException {
-        if (!this.isValidLane(lane)) {
-            //Not valid lane
-            throw new RaceException("Invalid lane: " + lane);
+        LinkedList<Racer> linkedRunning_1 = (LinkedList<Racer>)this.runningLanes.get(0);
+        LinkedList<Racer> linkedRunning_2 = (LinkedList<Racer>)this.runningLanes.get(1);
+
+        Racer nextFinish_1 = linkedRunning_1.peekFirst(); //Returns a racer if there is one, otherwise doesn't throw error.
+        Racer nextFinish_2 = linkedRunning_2.peekFirst(); //Returns a racer if there is one, otherwise doesn't throw error.
+
+        Racer racerToDNF;
+        if (nextFinish_1 == null && nextFinish_2 == null) {
+            //Throw error because there is not a racer running.
+            throw new RaceException("No racer to DNF");
+
+        } else if (nextFinish_1 != null && nextFinish_2 == null) {
+            //Then remove lastStart_1 as it is the only racer racing.
+            racerToDNF = linkedRunning_1.removeFirst();
+
+        } else if (nextFinish_1 == null && nextFinish_2 != null) {
+            //Then remove lastStart_2 as it is the only racer racing.
+            racerToDNF = linkedRunning_2.removeFirst();
 
         } else {
-            LinkedList<Racer> linkedRunning_1 = (LinkedList<Racer>)this.runningLanes.get(0);
-            LinkedList<Racer> linkedRunning_2 = (LinkedList<Racer>)this.runningLanes.get(1);
-
-            Racer nextFinish_1 = linkedRunning_1.peekFirst(); //Returns a racer if there is one, otherwise doesn't throw error.
-            Racer nextFinish_2 = linkedRunning_2.peekFirst(); //Returns a racer if there is one, otherwise doesn't throw error.
-
-            Racer racerToDNF;
-            if (nextFinish_1 == null && nextFinish_2 == null) {
-                //Throw error because there is not a racer running.
-                throw new RaceException("No racer to DNF");
-
-            } else if (nextFinish_1 != null && nextFinish_2 == null) {
-                //Then remove lastStart_1 as it is the only racer racing.
+            //There is a racer in both lanes.
+            //Then we have to determine which racer started LAST and remove that one.
+            if (nextFinish_1.getStartTime().isBefore(nextFinish_2.getStartTime())) {
+                //Then we should remove lastStart_1 as it before after lastStart_2
                 racerToDNF = linkedRunning_1.removeFirst();
-
-            } else if (nextFinish_1 == null && nextFinish_2 != null) {
-                //Then remove lastStart_2 as it is the only racer racing.
-                racerToDNF = linkedRunning_2.removeFirst();
-
             } else {
-                //There is a racer in both lanes.
-                //Then we have to determine which racer started LAST and remove that one.
-                if (nextFinish_1.getStartTime().isBefore(nextFinish_2.getStartTime())) {
-                    //Then we should remove lastStart_1 as it before after lastStart_2
-                    racerToDNF = linkedRunning_1.removeFirst();
-                } else {
-                    //Then we should remove lastStart_2 as it before after lastStart_1
-                    racerToDNF = linkedRunning_2.removeFirst();
-                }
+                //Then we should remove lastStart_2 as it before after lastStart_1
+                racerToDNF = linkedRunning_2.removeFirst();
             }
-
-            //Add the racer to be the next to start.
-            this.finishedRacers.add(racerToDNF);
-            racerToDNF.didNotFinish();
-
-            this.log.add(racerToDNF + " Did Not Finish");
         }
+
+        //Add the racer to be the next to start.
+        this.finishedRacers.add(racerToDNF);
+        racerToDNF.didNotFinish();
+
+        this.log.add(racerToDNF + " Did Not Finish");
     }
 
     @Override

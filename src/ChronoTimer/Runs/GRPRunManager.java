@@ -249,13 +249,11 @@ public class GRPRunManager implements RunManager {
         throw new RaceException("Cannot Cancel for GRP event");
     }
 
+
     /**
-     * Marks the next racer to finish, in the corresponding lane, as a did not finish.
-     *
-     * @param lane corresponding to the lane to cancel the racer from. Note: lane may not be used by all event types.
-     * @return true if a racer is successfully marked as a DNF, false otherwise.
-     * @throws RaceException when eventType is GRP
-     * @precondition race has started but not yet ended
+     * Does nothing in particular. DNF is not supported for GRP.
+     * @param lane is ignored for GRP type
+     * @throws RaceException on every call, GRP does not support DNF.
      */
     @Override
     public void didNotFinishNextRacer(int lane) throws RaceException {

@@ -126,12 +126,17 @@ public interface RunManager {
 
 
     /**
-     * Marks the next racer to finish, in the corresponding lane, as a did not finish.
-     * @precondition race has started but not yet ended
+     * This method is called when the run should set the next racer to start as Did Not Finish.
+     * Implementation specifics are dependent on each event type.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> the run has started</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
      *
-     * @param lane corresponding to the lane to cancel the racer from. Note: lane may not be used by all event types.
-     * @return true if a racer is successfully marked as a DNF, false otherwise.
-     * @throws RaceException when eventType is GRP
+     * @param lane corresponds to the lane to DNF the racer from
+     * @throws RaceException specifics are dependent on each event type
      */
     void didNotFinishNextRacer(int lane) throws RaceException;
 }

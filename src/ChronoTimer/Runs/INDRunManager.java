@@ -384,14 +384,17 @@ public class INDRunManager implements RunManager{
         }
     }
 
-
     /**
-     * Marks the next racer to finish, in the corresponding lane, as a did not finish.
+     * Sets the next racer to finish as a Did Not Finish.
+     * <br>
+     * Preconditions:
+     * <ul>
+     *     <li> the run has started</li>
+     *     <li> the run has not yet ended</li>
+     * </ul>
      *
-     * @param lane corresponding to the lane to cancel the racer from. Note: lane may not be used by all event types.
-     * @return true if a racer is successfully marked as a DNF, false otherwise.
-     * @throws RaceException when eventType is GRP
-     * @precondition race has started but not yet ended
+     * @param lane is ignored for IND event type.
+     * @throws RaceException when there is not a racer to DNF
      */
     @Override
     public void didNotFinishNextRacer(int lane) throws RaceException{
