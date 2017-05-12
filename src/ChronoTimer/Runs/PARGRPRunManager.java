@@ -409,30 +409,23 @@ public class PARGRPRunManager implements RunManager {
 
         } else {
             final int laneIndex = lane-1;
+            //Lane is valid - indexed [0, number of running racers]
 
-            if (laneIndex >= 0 || laneIndex < this.runningRacers.size()) {
-                //Lane is valid - indexed [0, number of running racers]
+            Racer racer = this.runningRacers.get(laneIndex);
 
-                Racer racer = this.runningRacers.get(laneIndex);
+            if (racer != null) {
+                try {
+                    racer.finish(relativeTime);
 
-                if (racer != null) {
-                    try {
-                        racer.finish(relativeTime);
+                    this.finishedRacers.set(laneIndex, racer);
+                    this.runningRacers.set(laneIndex, null);
 
-                        this.finishedRacers.set(laneIndex, racer);
-                        this.runningRacers.set(laneIndex, null);
+                    this.log.add("Finished " + racer + " " + racer.getElapsedTimeString());
 
-                        this.log.add("Finished " + racer + " " + racer.getElapsedTimeString());
-
-                    } catch (InvalidTimeException e) { /*Do nothing.*/ }
-                } else {
-                    throw new RaceException("No racer in lane " + lane + " to finish");
-                }
-
+                } catch (InvalidTimeException e) { /*Do nothing.*/ }
             } else {
-                throw new RaceException("Lane " + lane +" is invalid");
+                throw new RaceException("No racer in lane " + lane + " to finish");
             }
-
         }
     }
 

@@ -279,6 +279,9 @@ public class PARINDRunManager implements RunManager {
             //Racer already exists, throw an exception.
             throw new RaceException("Racer already exists with number: " + racerNumber);
 
+        } else if (this.queuedRacers.size() == MAX_RACERS) {
+            throw new RaceException("Maximum racers already queued");
+
         } else {
             Racer newRacer = new Racer(racerNumber);
             this.queuedRacers.add(newRacer);
