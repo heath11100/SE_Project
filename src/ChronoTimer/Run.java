@@ -304,7 +304,6 @@ public class Run {
 		} else {
 			tempStartTime = this.startTime;
 		}
-
 		if (atTime == null) {
 			throw new InvalidTimeException("Invalid time to start: NULL");
 
@@ -317,7 +316,6 @@ public class Run {
 		} else {
 
 			ChronoTime elapsedTime = atTime.elapsedSince(tempStartTime);
-
 			this.runManager.startNext(elapsedTime, lane);
 
 			this.startTime = tempStartTime;
@@ -419,6 +417,10 @@ public class Run {
 		 	this.runManager.didNotFinishNextRacer(lane);
 		}
 	}
+	
+	
+	public ChronoTime getStartTime()
+	{return startTime;}
 
 
 	/**

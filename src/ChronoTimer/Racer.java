@@ -91,7 +91,7 @@ public class Racer {
 			return new ChronoTime(0,0,0,0);
 
 		} else if (this.endTime == null) {
-			return ChronoTime.now().elapsedSince(this.startTime);
+			return (startTime);//ChronoTime.now().elapsedSince(this.startTime);
 
 		} else {
 			return this.endTime.elapsedSince(this.startTime);

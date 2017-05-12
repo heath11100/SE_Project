@@ -52,29 +52,24 @@ public class Server {
             String response = "<!DOCTYPE html><html><head><title>Race Results</title><link rel=\"stylesheet\" href=\"/css/style.css\"></head>";
 			// set up the header
             System.out.println(response);
-            
 			try {
 				if (!sharedResponse.isEmpty()) {
 					Collections.sort(racers,new Comparator<NamedRacer>(){
 						@Override
 						public int compare(NamedRacer r1, NamedRacer r2) {
-							if (r1.getMyRacer().getStatus() == Racer.Status.DNF){
-								if (r2.getMyRacer().getStatus() == Racer.Status.DNF)
+							if (r1.isDNF()){
+								if (r2.isDNF())
 									return 0;
 								else
 									return 1;
 							}
-							else if (r2.getMyRacer().getStatus() == Racer.Status.DNF)
+							else if (r2.isDNF())
 								return -1;
-							try {
-								return r1.getMyRacer().getElapsedTime().isBefore(r2.getMyRacer().getElapsedTime()) ? -1: 1;
-							} catch (InvalidTimeException e) {
-								return 0;
-							}
+							return r1.getElapsedTime().isBefore(r2.getElapsedTime()) ? -1: 1;
 						}
 					});
 					response += generateTable(); 
-		}
+				}
 			} catch (JsonSyntaxException | InvalidTimeException e) {
 				e.printStackTrace();
 			}
@@ -175,8 +170,8 @@ public class Server {
     	String result = "<table><tr><th>Bib</th><th>Last Name, First Initial</th><th>Time</th></tr>";
     	for (int i=0;i<racers.size();i++){
     		NamedRacer cur = racers.get(i);
-    		result +="<tr><td>"+cur.getMyRacer().getNumber()+"</td><td>"+cur.getLastName()+", "+cur.getFirstInitial()+"</td><td>"+
-    				((cur.getMyRacer().getStatus() == Racer.Status.DNF)? "DNF" : cur.getMyRacer().getElapsedTime().getTimeStamp())
+    		result +="<tr><td>"+cur.getNumber()+"</td><td>"+cur.getLastName()+", "+cur.getFirstInitial()+"</td><td>"+
+    				((cur.isDNF())? "DNF" : cur.getElapsedTime().getTimeStamp())
     		+"</td></tr>";}
     	return result+"</table>";
     }
